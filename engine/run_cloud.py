@@ -119,6 +119,10 @@ def main():
                 print("== done (no change) ==")
                 return
 
+    # after the checklist, so an answer sees today's list rather than yesterday's
+    if mode in ("full", "interactive"):
+        step("answer questions", check_inbox.questions)
+
     step("state", state_mod.main)
     step("build app", pwa.main)
 

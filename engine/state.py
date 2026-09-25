@@ -26,11 +26,13 @@ from datetime import date, timedelta
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
+import ask as askmod  # noqa: E402
 import chem       # noqa: E402
 import checklist  # noqa: E402
 import poolcfg    # noqa: E402
 import season     # noqa: E402
 import store      # noqa: E402
+import trends as trendmod  # noqa: E402
 
 DISCLAIMER = ("Every dose here is an estimate from your pool's volume and one measurement. "
               "Add, circulate, retest -- never dose twice against the same reading. "
@@ -126,6 +128,15 @@ def trends(readings, days=90, today=None):
             "n_readings": len(pts)}
 
 
+def _safe(fn, default):
+    """Analysis and Q&A are extras. Neither is worth taking the app down for."""
+    try:
+        return fn()
+    except Exception as e:
+        print("  ! %s" % e)
+        return default
+
+
 def basis(cl):
     """The few facts the checklist wording is only valid for."""
     return cl.get("basis") or {}
@@ -182,6 +193,9 @@ def build(today=None, with_checklist=True):
         "opening": store.opening_state(),
         # what last autumn knows that this spring needs
         "opening_brief": season.opening_brief(today),
+        # what the water is DOING, and whether any stabiliser is worth buying
+        "analysis": _safe(lambda: trendmod.analyze(today), {}),
+        "qa": askmod.qa_log(12),
         "season": season.status(today),
         "closing_steps": season.closing_state()["steps"],
         "action_kinds": store.ACTION_KINDS,

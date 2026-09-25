@@ -3,7 +3,8 @@
     "store": "data/store",
     "inbox": "inbox",
     "out": "out",
-    "app": "app"
+    "app": "app",
+    "ask": "ask"
   },
   "pool": {
     "gallons": 18000,

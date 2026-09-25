@@ -43,6 +43,9 @@ pool-pilot/                 PUBLIC — Pages serves this whole repo
     poolcfg.py              loads config.json; renders safety_rules into every prompt
     chem.py                 pure dose arithmetic — the only place a number is produced
     store.py                append-only JSONL: readings, actions, opening progress
+    trends.py               drift rates, acid demand, and whether a stabiliser is worth it
+    ask.py                  answers a question from this pool's data
+    ask_prompt.md
     ondilo.py               pulls readings straight off the ICO over Ondilo's API
     vision.py               `claude -p --allowedTools Read` on a screenshot -> strict JSON
     vision_prompt.md
@@ -58,6 +61,7 @@ pool-pilot/                 PUBLIC — Pages serves this whole repo
   data/store/*.jsonl        the data — read by the phone over plain HTTPS, no token
   data/images/              archived screenshots, next to the readings they produced
   inbox/                    what the phone drops; archived after ingest
+  ask/                      questions waiting for an answer
   app/                      the built app
   scripts/commit_push.sh    race-safe commit + push
   .github/workflows/        daily.yml, interactive.yml
@@ -141,6 +145,71 @@ alkalinity, free chlorine or borates — those stay strip tests you type in, and
 switched on the "New reading" card says so.
 
 Rate limit is 30 requests/hour per user; a poll makes three, every three hours.
+
+## Is anything worth buying?
+
+`engine/trends.py` fits a least-squares line through each measurement and measures how much acid
+has *actually* gone in, then turns that into a verdict on the **stabilisers** — the chemicals you
+buy once to stop fighting the same fight every week.
+
+Two rules it is built around:
+
+- **It is allowed to say no.** A recommender that only ever says "buy more chemicals" is an
+  advert. If pH is holding steady and the acid is barely moving, borates are 43 lb of boric acid
+  to solve a problem you don't have, and it says so.
+- **It never extrapolates from nothing.** Four readings over twelve days is the floor for an
+  opinion. Under that it returns "not enough yet" with the counts, rather than a confident slope
+  through noise. Every verdict carries how many readings it rests on.
+
+The borate case is argued from *measured acid demand*, not from a guess:
+
+> **Borates — worth it** (high confidence)
+> pH is climbing +0.08 a week and you have put in about 118 fl oz of acid a month across 4
+> occasions. Borates at 50 ppm are a second buffer where carbonate alkalinity is weakest, and
+> people typically see acid demand fall by something like a third to a half — call it 47 fl oz a
+> month back. That is the case for the 42.9 lb build: it is a one-off that stops a recurring
+> chore.
+
+versus the same engine on a stable pool:
+
+> **Borates — not yet** (medium confidence)
+> pH is steady (+0.00 a week) and you have only used about 8 fl oz of acid a month. Borates would
+> work, but they are 42.9 lb of boric acid to solve a problem you do not currently have.
+
+It also reads salt's slope as a *dilution gauge* — salt doesn't evaporate or burn off, so a
+steady fall is a direct measure of how much fresh water is going in, and it's diluting CYA and
+borates at the same rate.
+
+Because the case rests on logged acid, tapping **I did this** matters more than it looks.
+
+```bash
+py engine/trends.py
+py engine/trends.py --verbose    # with the underlying series
+```
+
+## Asking it things
+
+An **Ask** tab. The question goes to `ask/<timestamp>.txt`, the interactive workflow answers it
+with the whole state bundle — panel, checklist, drift rates, recent actions, the per-volume
+reference card — and the answer comes back in about a minute.
+
+`engine/ask_prompt.md` carries one rule that matters more than the rest: **the answer may quote a
+dose the engine already computed, and may never compute one.** Everything else routes pounds and
+fluid ounces through `chem.py`, where they are capped and paired with a retest. An assistant
+doing mental arithmetic in a sentence would be a way around all of that, and the least visible
+one. Asked directly to size a dose for a reading that doesn't exist, it answers:
+
+> Your pool isn't at 8.4. The ICO read 7.97 today. For that reading your checklist has 27 fl oz
+> of muriatic acid, which it expects to bring pH down to about 7.75. I won't work out a figure
+> for 8.4. If a reading ever shows it, the checklist will calculate the dose.
+
+A question whose answer never came back is **not** archived — it stays in `ask/` and is retried
+next run. A missing answer is a delay; a wrong one about acid is not.
+
+```bash
+py engine/ask.py "why is my ORP low when chlorine looks fine?"
+py engine/ask.py --last 5
+```
 
 ## Opening and closing
 

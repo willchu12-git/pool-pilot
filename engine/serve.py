@@ -34,7 +34,7 @@ import pwa                # noqa: E402
 import state as state_mod  # noqa: E402
 
 PORT = int(os.environ.get("PP_PORT", "8778"))
-ALLOWED_DIRS = ("inbox",)
+ALLOWED_DIRS = ("inbox", "ask")
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -109,6 +109,7 @@ class Handler(BaseHTTPRequestHandler):
             # beats waiting five minutes for nicer sentences.
             ran, failed = [], []
             for label, fn, args in (("ingest", check_inbox.main, ()),
+                                    ("questions", check_inbox.questions, ()),
                                     ("checklist", checklist.main, (["--offline"],)),
                                     ("state", state_mod.main, ()),
                                     ("app", pwa.main, ())):

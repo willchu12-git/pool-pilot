@@ -9,6 +9,7 @@ on:
   push:
     paths:
       - "inbox/**"
+      - "ask/**"
   workflow_dispatch:
 
 permissions:

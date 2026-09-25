@@ -744,6 +744,140 @@
     "updated_at": null
   },
   "opening_brief": null,
+  "analysis": {
+    "today": "2026-09-24",
+    "window_days": 90,
+    "drift": {
+      "ph": {
+        "key": "ph",
+        "n": 1,
+        "span_days": 0,
+        "first": [
+          "2026-09-25",
+          7.97
+        ],
+        "last": [
+          "2026-09-25",
+          7.97
+        ],
+        "enough": false,
+        "per_week": null,
+        "per_month": null,
+        "r2": null,
+        "note": "Only 1 reading(s) over 0 day(s) -- not enough to call a trend yet."
+      },
+      "orp_mv": {
+        "key": "orp_mv",
+        "n": 1,
+        "span_days": 0,
+        "first": [
+          "2026-09-25",
+          403.0
+        ],
+        "last": [
+          "2026-09-25",
+          403.0
+        ],
+        "enough": false,
+        "per_week": null,
+        "per_month": null,
+        "r2": null,
+        "note": "Only 1 reading(s) over 0 day(s) -- not enough to call a trend yet."
+      },
+      "salt_ppm": {
+        "key": "salt_ppm",
+        "n": 1,
+        "span_days": 0,
+        "first": [
+          "2026-09-25",
+          2593.0
+        ],
+        "last": [
+          "2026-09-25",
+          2593.0
+        ],
+        "enough": false,
+        "per_week": null,
+        "per_month": null,
+        "r2": null,
+        "note": "Only 1 reading(s) over 0 day(s) -- not enough to call a trend yet."
+      },
+      "cya_ppm": {
+        "key": "cya_ppm",
+        "n": 0,
+        "span_days": 0,
+        "first": null,
+        "last": null,
+        "enough": false,
+        "per_week": null,
+        "per_month": null,
+        "r2": null,
+        "note": "Only 0 reading(s) over 0 day(s) -- not enough to call a trend yet."
+      },
+      "ta_ppm": {
+        "key": "ta_ppm",
+        "n": 0,
+        "span_days": 0,
+        "first": null,
+        "last": null,
+        "enough": false,
+        "per_week": null,
+        "per_month": null,
+        "r2": null,
+        "note": "Only 0 reading(s) over 0 day(s) -- not enough to call a trend yet."
+      },
+      "water_temp_f": {
+        "key": "water_temp_f",
+        "n": 0,
+        "span_days": 0,
+        "first": null,
+        "last": null,
+        "enough": false,
+        "per_week": null,
+        "per_month": null,
+        "r2": null,
+        "note": "Only 0 reading(s) over 0 day(s) -- not enough to call a trend yet."
+      }
+    },
+    "acid_demand": {
+      "days": 30,
+      "occasions": 0,
+      "floz": 0.0,
+      "floz_per_month": 0.0,
+      "per_month_occasions": 0.0,
+      "logged_amounts": 0
+    },
+    "recommendations": [
+      {
+        "key": "borates",
+        "title": "Borates",
+        "verdict": "unknown",
+        "because": "Not enough history yet. Only 1 reading(s) over 0 day(s) -- not enough to call a trend yet. Log your acid doses and give it a month of readings, and this can be answered from your own pool rather than from generalities.",
+        "confidence": "none",
+        "dose": {
+          "lb": 42.9,
+          "batches": 4
+        }
+      },
+      {
+        "key": "cya",
+        "title": "Stabiliser (CYA)",
+        "verdict": "unknown",
+        "because": "CYA has not been measured. The ICO does not read it, so it needs a strip test -- and on a saltwater pool it is the number that decides whether the cell can keep up at all.",
+        "confidence": "none"
+      },
+      {
+        "key": "ta",
+        "title": "Total alkalinity",
+        "verdict": "unknown",
+        "because": "TA has not been measured. It is what acid demand actually scales with, so without it every acid dose is computed against an assumed buffer.",
+        "confidence": "none"
+      }
+    ],
+    "readings_used": 1,
+    "headline": "Nothing needs buying."
+  },
+  "qa": [],
   "season": {
     "state": "open",
     "closed": false,

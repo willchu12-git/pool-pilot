@@ -29,6 +29,7 @@ from datetime import datetime
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
+import ask as askmod  # noqa: E402
 import poolcfg  # noqa: E402
 import season   # noqa: E402
 import store    # noqa: E402
@@ -116,6 +117,37 @@ def json_drops():
             n += 1
         _move(fp, arch, fn)
     print("json: %d record(s)" % n)
+    return n
+
+
+def questions(st=None):
+    """ask/*.txt -> answered, appended to qa.jsonl.
+
+    A question whose answer never came back is NOT archived -- it stays in ask/
+    so the next run tries again. Losing the question would be worse than the
+    delay, and there is no useful fallback answer to invent.
+    """
+    base = poolcfg.path_of("ask")
+    arch = _archive_dir(base)
+    files = sorted(f for f in os.listdir(base)
+                   if f.lower().endswith(".txt") and os.path.isfile(os.path.join(base, f)))
+    n = 0
+    for fn in files:
+        fp = os.path.join(base, fn)
+        q = open(fp, encoding="utf-8-sig").read().strip()
+        if not q:
+            _move(fp, arch, fn)
+            continue
+        print("  ? %s" % q[:80])
+        a = askmod.answer(q, st)
+        if not a:
+            print("  ! no answer -- leaving it in ask/ to retry next run")
+            continue
+        askmod.record(q, a)
+        print("  = %s" % a[:100].replace("\n", " "))
+        _move(fp, arch, fn)
+        n += 1
+    print("questions: %d answered" % n)
     return n
 
 

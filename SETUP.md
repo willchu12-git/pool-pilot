@@ -249,6 +249,25 @@ not. Tap **Save & sync**.
   Use a test strip and type the number into **New reading → Type a reading in by hand**.
 - Anything else you do to the pool goes in **Log something else**.
 
+## Asking it things
+
+The **Ask** tab. Type a question, tap Ask, and the answer comes back in about a minute. It knows
+your readings, your drift rates and everything you've logged, so "why is my ORP low?" gets an
+answer about *your* pool. General questions ("how does a salt cell actually work?") just get
+answered.
+
+It will quote a dose your checklist has already worked out. It won't invent one — if you ask for
+a number it doesn't have a reading for, it'll tell you to take the reading.
+
+## Worth buying?
+
+Bottom of the **History** tab. After a few weeks of readings it works out whether borates or
+stabiliser are actually worth it *for your pool* — from how fast your pH climbs and how much acid
+you've actually poured. It's quite happy to tell you not to bother.
+
+This is the one place where tapping **I did this** on acid doses really pays off: that log is
+what the whole borate case is built on.
+
 ## Closing up for the winter
 
 Go to the **Season** tab and work down *Closing up*. Any order. It's five short things and

@@ -280,6 +280,39 @@ input[type=file]{padding:9px;font-size:13px}
   margin-left:6px}
 .cstep .saved{font-size:12.5px;color:var(--green);margin-top:6px;line-height:1.45}
 .gatebox{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+/* stabiliser recommendations */
+.rec{border-left:3px solid var(--line);padding:12px 0 12px 13px;border-bottom:1px solid var(--line)}
+.rec:last-child{border-bottom:none;padding-bottom:0}
+.rec.yes{border-left-color:var(--amber)}
+.rec.watch{border-left-color:var(--blue)}
+.rec.no,.rec.notyet{border-left-color:var(--green)}
+.rec.unknown{border-left-color:var(--line)}
+.rec .rh{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.rec .rt{font-size:15.5px;font-weight:600}
+.rec .rb{font-size:14px;line-height:1.55;color:#d7e3ea;margin-top:7px}
+.rec .rd{font-size:13px;color:var(--aqua-soft);margin-top:7px;font-weight:600}
+.rec .rc{font-size:11px;color:var(--faint);margin-top:6px;letter-spacing:.3px}
+.drifts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.drift{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:9px 11px}
+.drift .dk{font-size:10.5px;letter-spacing:.9px;text-transform:uppercase;color:var(--faint)}
+.drift .dv{font-size:17px;font-weight:650;margin-top:3px}
+.drift .dv.up{color:var(--amber)} .drift .dv.down{color:var(--blue)}
+.drift .dn{font-size:11px;color:var(--faint);margin-top:2px}
+.drift.thin .dv{font-size:13px;color:var(--faint);font-weight:400;padding-top:3px}
+
+/* ask */
+.qa{border-left:2px solid var(--line);padding-left:12px;margin-bottom:15px}
+.qa .q{font-weight:600;font-size:14.5px;line-height:1.4}
+.qa .a{color:#ded7e6;font-size:14.5px;margin-top:7px;white-space:pre-wrap;line-height:1.55}
+.qa .when{font-size:11px;color:var(--faint);margin-top:6px}
+.qa.pending{border-left-color:var(--aqua)}
+.qa .a.thinking{color:var(--dim);display:flex;align-items:center;gap:7px}
+.dots{display:inline-flex;gap:3px}
+.dots span{width:5px;height:5px;border-radius:50%;background:var(--aqua-soft);
+  animation:pulse 1.1s ease-in-out infinite}
+.dots span:nth-child(2){animation-delay:.15s}
+.dots span:nth-child(3){animation-delay:.3s}
+@keyframes pulse{0%,60%,100%{opacity:.25}30%{opacity:1}}
 .note{font-size:12px;color:var(--faint);margin-top:10px;line-height:1.5}
 .rules{margin:0;padding-left:18px;font-size:13px;color:var(--dim);line-height:1.6}
 .rules li{margin:6px 0}
@@ -400,10 +433,33 @@ nav button.on{color:var(--aqua-soft)}
     <div id="chart"></div>
     <div class="chartnote" id="chartnote"></div>
   </div>
+  <div class="card" id="recCard">
+    <h2>Worth buying?</h2>
+    <div class="sub">The stabilisers — the things you buy once to stop fighting the same fight
+      every week. Judged from your own drift rates and how much acid has actually gone in.</div>
+    <div class="drifts" id="drifts"></div>
+    <div style="margin-top:16px" id="recs"></div>
+    <div class="note" id="recNote"></div>
+  </div>
+
   <div class="card">
     <h2>Everything that's happened</h2>
     <div class="tl" id="timeline"></div>
   </div>
+</section>
+
+<!-- --------------------------------------------------------------- ASK -->
+<section id="tab-ask" class="hide">
+  <div class="card">
+    <h2>Ask about the pool</h2>
+    <div class="sub">Answered from your actual readings, your drift rates and what you've
+      logged — or just answered, if it's a general question.</div>
+    <textarea id="q_text" placeholder="why is ORP low when chlorine looks fine?"></textarea>
+    <button class="btn" id="q_send">Ask</button>
+    <div class="note">It goes to the cloud and comes back in about a minute. It will quote a
+      dose the checklist has already worked out, and won't invent one.</div>
+  </div>
+  <div id="qalist"></div>
 </section>
 
 <!-- ------------------------------------------------------------ SEASON -->
@@ -491,6 +547,7 @@ nav button.on{color:var(--aqua-soft)}
 <nav>
   <button data-tab="today" class="on"><span class="ic">&#128167;</span>Today</button>
   <button data-tab="hist"><span class="ic">&#128200;</span>History</button>
+  <button data-tab="ask"><span class="ic">&#128172;</span>Ask</button>
   <button data-tab="season"><span class="ic">&#127774;</span>Season</button>
   <button data-tab="set"><span class="ic">&#9881;</span>Settings</button>
 </nav>
@@ -845,7 +902,8 @@ function render(){
     renderHero(); renderPanel(); renderChips(); renderItems(); renderConfirm();
     renderActionChips(); renderManual(); renderSafety();
   }
-  renderChart(); renderTimeline(); renderOpening(); renderSettings();
+  renderChart(); renderTimeline(); renderRecs(); renderAsk();
+  renderOpening(); renderSettings();
   $("foot").textContent = (STATE.disclaimer || "") + " Built " + BUILT + ".";
 }
 
@@ -1218,6 +1276,106 @@ function renderTimeline(){
   }).join("");
 }
 
+/* ----------------------------------------------- stabiliser recommendations */
+const VERDICT = {
+  "yes":     {label:"worth it",   cls:"yes"},
+  "watch":   {label:"watch",      cls:"watch"},
+  "not yet": {label:"not yet",    cls:"notyet"},
+  "no":      {label:"no",         cls:"no"},
+  "unknown": {label:"no data",    cls:"unknown"}
+};
+const DRIFT_SHOW = [
+  {key:"ph", label:"pH", dp:2}, {key:"salt_ppm", label:"Salt", dp:0},
+  {key:"cya_ppm", label:"CYA", dp:0}, {key:"orp_mv", label:"ORP", dp:0}
+];
+
+function renderRecs(){
+  const a = STATE.analysis || {};
+  const recs = a.recommendations || [];
+  const has = recs.length > 0;
+  $("recCard").classList.toggle("hide", !has || closedNow());
+  if(!has) return;
+
+  $("drifts").innerHTML = DRIFT_SHOW.map(function(d){
+    const t = (a.drift || {})[d.key] || {};
+    if(!t.enough){
+      return '<div class="drift thin"><div class="dk">' + esc(d.label) + '</div>' +
+             '<div class="dv">not enough<br>history yet</div></div>';
+    }
+    const pw = t.per_week;
+    const dir = pw > 0 ? "up" : (pw < 0 ? "down" : "");
+    const v = (pw > 0 ? "+" : "") + pw.toFixed(d.dp);
+    return '<div class="drift"><div class="dk">' + esc(d.label) + '</div>' +
+           '<div class="dv ' + dir + '">' + esc(v) + '</div>' +
+           '<div class="dn">per week \u00b7 ' + t.n + ' readings</div></div>';
+  }).join("");
+
+  $("recs").innerHTML = recs.map(function(r){
+    const v = VERDICT[r.verdict] || VERDICT.unknown;
+    let h = '<div class="rec ' + v.cls + '"><div class="rh"><div class="rt">' +
+            esc(r.title) + '</div><span class="chip ' +
+            (v.cls === "yes" ? "warn" : (v.cls === "no" || v.cls === "notyet" ? "ok" : "")) +
+            '">' + esc(v.label) + '</span></div>';
+    h += '<div class="rb">' + esc(r.because) + '</div>';
+    /* only show what it would cost when the answer is actually "do it" -- a
+       weight printed under "no data" reads as a recommendation, which is the
+       opposite of what that verdict means */
+    if(r.dose && r.dose.lb && (r.verdict === "yes" || r.verdict === "watch"))
+      h += '<div class="rd">' + r.dose.lb + ' lb' +
+        (r.dose.batches ? ', about ' + r.dose.batches + ' bucket batches' : '') + '</div>';
+    h += '<div class="rc">confidence: ' + esc(r.confidence) + '</div>';
+    return h + '</div>';
+  }).join("");
+
+  const ac = a.acid_demand || {};
+  $("recNote").textContent = ac.occasions
+    ? "Acid logged in the last " + ac.days + " days: " + ac.floz + " fl oz across " +
+      ac.occasions + " occasion(s). That number is what the borate case rests on, so tapping " +
+      "\u201cI did this\u201d on acid matters more than it looks."
+    : "No acid logged in the last " + (ac.days || 30) + " days. Tap \u201cI did this\u201d on " +
+      "acid doses and this gets a real answer instead of a general one.";
+}
+
+/* ------------------------------------------------------------------- ask */
+function pendingQ(){ return ls.get("pp_pendingq", null); }
+
+function renderAsk(){
+  const qa = (STATE.qa || []).slice().reverse();
+  const p = pendingQ();
+  /* the cloud has answered it if a matching question came back */
+  if(p && qa.some(function(r){ return r.question === p.question; })){
+    ls.set("pp_pendingq", null);
+  }
+  const pend = pendingQ();
+  let h = "";
+  if(pend){
+    h += '<div class="card"><div class="qa pending"><div class="q">' + esc(pend.question) +
+         '</div><div class="a thinking">thinking<span class="dots"><span></span><span></span>' +
+         '<span></span></span></div><div class="when">asked ' + esc(pend.at) +
+         ' \u00b7 answers land in about a minute</div></div></div>';
+  }
+  if(qa.length){
+    h += '<div class="card"><h2>Earlier</h2>' + qa.map(function(r){
+      return '<div class="qa"><div class="q">' + esc(r.question) + '</div>' +
+             '<div class="a">' + esc(r.answer) + '</div>' +
+             '<div class="when">' + esc(fmtDay(r.answered_at)) + '</div></div>';
+    }).join("") + '</div>';
+  }
+  $("qalist").innerHTML = h;
+}
+
+async function askQuestion(){
+  const q = $("q_text").value.trim();
+  if(!q){ toast("Type a question first"); return; }
+  ls.set("pp_pendingq", {question:q, at:new Date().toLocaleTimeString(undefined,
+    {hour:"numeric", minute:"2-digit"})});
+  $("q_text").value = "";
+  renderAsk();
+  /* a question is a .txt in ask/, not json -- same shape CycleSync uses */
+  await send("ask/" + nowStamp() + ".txt", b64text(q), "chore: question from phone",
+             "Asked \u2014 answer in about a minute");
+}
+
 /* -------------------------------------------------------------- season */
 function closedNow(){ return !!(STATE && STATE.season && STATE.season.closed); }
 
@@ -1587,7 +1745,7 @@ async function forceRebuild(){
 
 /* ----------------------------------------------------------------- tabs */
 function showTab(name){
-  ["today","hist","season","set"].forEach(function(t){
+  ["today","hist","ask","season","set"].forEach(function(t){
     $("tab-" + t).classList.toggle("hide", t !== name);
   });
   Array.prototype.forEach.call(document.querySelectorAll("nav button"), function(b){
@@ -1633,6 +1791,7 @@ $("shot_send").addEventListener("click", sendShot);
 armTwoTap("s_close1", "s_close2", doClose);
 armTwoTap("s_open1", "s_open2", doOpen);
 $("goSeason").addEventListener("click", function(){ showTab("season"); });
+$("q_send").addEventListener("click", askQuestion);
 $("hrefresh").addEventListener("click", function(){ load(); toast("Refreshing…", 1200); });
 
 load();

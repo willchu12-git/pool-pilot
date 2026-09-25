@@ -211,6 +211,30 @@ py engine/ask.py "why is my ORP low when chlorine looks fine?"
 py engine/ask.py --last 5
 ```
 
+## Fixing what you logged
+
+Tapping **I did this** logs the moment you tapped — not the checklist's date. Tap it tomorrow and
+it records tomorrow.
+
+For everything else, tap any action in the History timeline to change what it was, the amount,
+the unit, the date, or the note — or delete it. Readings aren't editable there; those are
+corrected through the confirm card.
+
+Nothing is ever overwritten. An edit appends a correction and a delete appends a tombstone, so
+the original line stays in `actions.jsonl` and a mis-tap is recoverable with a text editor:
+
+```bash
+py engine/store.py edit <id> --amount 45 --at 2026-09-26
+py engine/store.py delete <id>
+py engine/store.py undelete <id>
+```
+
+One wrinkle worth knowing about: `_collapse` deliberately never lets a null overwrite a real
+value, which is what makes partial corrections safe — but it also means a field can't be emptied
+again. An edit that removes an amount therefore lists it in `cleared`, and `cleared` is one of
+the few fields allowed to be written empty, so putting a value back works. Without that, clearing
+a field once would make it permanently un-settable.
+
 ## Opening and closing
 
 The pool is either **open** or **closed**, and closed means genuinely dormant: no checklist, no

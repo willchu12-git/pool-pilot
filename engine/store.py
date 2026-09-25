@@ -153,11 +153,19 @@ def append_jsonl(name, rec):
     return rec
 
 
-def _collapse(rows, key, order):
+def _collapse(rows, key, order, always=()):
     """Later records patch earlier ones with the same key; null/'' never overwrites.
 
-    Booleans are the exception -- `false` is a real answer ("no, I have NOT
-    confirmed this reading"), so it has to be able to overwrite a previous true.
+    Two exceptions, both because "empty" is sometimes a real answer rather than
+    an absent one:
+
+      * Booleans. `false` means "no, I have NOT confirmed this reading", so it
+        has to be able to overwrite a previous true.
+      * Fields named in `always`. The `cleared` list is the case that forced
+        this: it records which fields an edit emptied, and an edit that puts a
+        value BACK has to be able to write an empty list. Without that, clearing
+        a field once made it permanently un-settable -- the stale clear would
+        silently undo every later edit.
     """
     merged = {}
     for r in rows:
@@ -166,7 +174,7 @@ def _collapse(rows, key, order):
             continue
         cur = merged.setdefault(k, {})
         for f, v in r.items():
-            if v not in (None, "", []) or isinstance(v, bool):
+            if v not in (None, "", []) or isinstance(v, bool) or f in always:
                 cur[f] = v
             cur.setdefault(f, v)
     return sorted(merged.values(), key=lambda r: (r.get(order) or "", r.get(key) or ""))
@@ -259,9 +267,29 @@ def confirm_reading(rid, **fixes):
 
 # --------------------------------------------------------------------- actions
 
-def actions():
-    """Everything I've done to the pool, oldest first."""
-    return _collapse(read_jsonl(ACTIONS), "id", "at")
+def _apply_clears(rows):
+    """Put back the Nones that _collapse refuses to write.
+
+    _collapse deliberately never lets a null overwrite a real value -- that is
+    what makes a partial correction safe. But it also means a field can never be
+    emptied again, so an edit that removes an amount lists it in `cleared` and
+    the reader applies that here.
+    """
+    for r in rows:
+        for f in (r.get("cleared") or []):
+            r[f] = None
+    return rows
+
+
+def actions(include_deleted=False):
+    """Everything I've done to the pool, oldest first.
+
+    A deleted action is a tombstone, not an erasure: the original record and the
+    delete are both still on disk. Append-only means a mis-tap is recoverable
+    with a text editor, which is worth more than a tidy file.
+    """
+    rows = _apply_clears(_collapse(read_jsonl(ACTIONS), "id", "at", always=("cleared",)))
+    return rows if include_deleted else [a for a in rows if not a.get("deleted")]
 
 
 def add_action(action, amount=None, unit="", at=None, note="", aid=None):
@@ -278,6 +306,79 @@ def add_action(action, amount=None, unit="", at=None, note="", aid=None):
            "amount": amt, "unit": (unit or "").strip(),
            "note": (note or "").strip(), "logged_at": _now()}
     return append_jsonl(ACTIONS, rec)
+
+
+EDITABLE = ("amount", "unit", "note", "at", "action")
+
+
+def edit_action(aid, **fields):
+    """Correct one action. Appends rather than rewrites.
+
+    Changing `at` also moves `date`, because those two disagreeing is how an
+    action ends up sorted into one day and counted against another.
+    """
+    aid = (aid or "").strip()
+    if not aid:
+        raise ValueError("which action?")
+    cur = next((a for a in actions(True) if a.get("id") == aid), None)
+    if not cur:
+        raise ValueError("no action with id %r" % aid)
+    if cur.get("deleted"):
+        raise ValueError("that action was deleted -- undelete it before editing")
+
+    rec = {"id": aid, "logged_at": _now(), "edited": True}
+    cleared = []
+    for f in EDITABLE:
+        if f not in fields:
+            continue
+        v = fields[f]
+        if f == "at":
+            stamp = _stamp(v)
+            rec["at"], rec["date"] = stamp, stamp[:10]
+            continue
+        if f == "amount":
+            if v in (None, "", "null"):
+                cleared.append("amount")
+                continue
+            try:
+                rec["amount"] = float(v)
+            except (TypeError, ValueError):
+                raise ValueError("%r is not a number" % v)
+            continue
+        if f == "action":
+            key = str(v).strip().lower().replace(" ", "_")
+            rec["action"] = key
+            rec["label"] = ACTION_LABELS.get(key, str(v).strip())
+            continue
+        if v in (None, ""):
+            cleared.append(f)
+        else:
+            rec[f] = str(v).strip()
+    # `cleared` is sticky through _collapse, so it has to be rewritten in full
+    # each time rather than appended to -- otherwise emptying a field once would
+    # make it permanently un-settable, and the next edit that put a value back
+    # would be silently undone by the old clear.
+    still = [f for f in (cur.get("cleared") or []) if f not in rec and f not in cleared]
+    rec["cleared"] = sorted(set(cleared) | set(still))
+    if len(rec) <= 4 and not cleared and rec["cleared"] == sorted(cur.get("cleared") or []):
+        return cur                      # nothing actually changed
+    append_jsonl(ACTIONS, rec)
+    return next(a for a in actions(True) if a.get("id") == aid)
+
+
+def delete_action(aid):
+    """Tombstone one action. Recoverable -- nothing is removed from the file."""
+    aid = (aid or "").strip()
+    cur = next((a for a in actions(True) if a.get("id") == aid), None)
+    if not cur:
+        raise ValueError("no action with id %r" % aid)
+    append_jsonl(ACTIONS, {"id": aid, "deleted": True, "logged_at": _now()})
+    return cur
+
+
+def undelete_action(aid):
+    append_jsonl(ACTIONS, {"id": (aid or "").strip(), "deleted": False, "logged_at": _now()})
+    return next((a for a in actions(True) if a.get("id") == aid), None)
 
 
 def last_action(key, rows=None):
@@ -424,6 +525,16 @@ def ingest(rec):
                               rec.get("on") or rec.get("date"), rec.get("note", ""))
         return "opening", {"date": rec.get("on") or rec.get("date", "")}
 
+    if kind in ("action_edit", "edit_action"):
+        return "action-edit", edit_action(
+            rec.get("id") or "", **{f: rec[f] for f in EDITABLE if f in rec})
+
+    if kind in ("action_delete", "delete_action"):
+        return "action-delete", delete_action(rec.get("id") or "")
+
+    if kind in ("action_undelete", "undelete_action"):
+        return "action-undelete", undelete_action(rec.get("id") or "")
+
     if kind == "season":
         import season                       # local: season imports store
         return season.ingest(rec)
@@ -449,6 +560,8 @@ def _usage():
     print('  py engine/store.py reading --ph 8.1 --orp 564 --salt 2791 --temp 78')
     print('  py engine/store.py did added_salt --amount 40 --unit lb')
     print('  py engine/store.py did backwashed_filter')
+    print('  py engine/store.py edit <id> --amount 45 --at 2026-09-26')
+    print('  py engine/store.py delete <id>')
     print('  py engine/store.py opening physical_prep --on today')
     print('  py engine/store.py opening salt_addition --undo')
     print('  py engine/store.py show')
@@ -473,6 +586,19 @@ def main(argv):
     elif cmd in ("did", "action"):
         r = add_action(positional[0] if positional else "other", opt("--amount"),
                        opt("--unit", ""), opt("--at"), opt("--note", ""))
+    elif cmd == "edit":
+        kw = {}
+        for f in EDITABLE:
+            v = opt("--" + f)
+            if v is not None:
+                kw[f] = v
+        if "--clear-amount" in rest:
+            kw["amount"] = None
+        r = edit_action(positional[0] if positional else "", **kw)
+    elif cmd == "delete":
+        r = delete_action(positional[0] if positional else "")
+    elif cmd == "undelete":
+        r = undelete_action(positional[0] if positional else "")
     elif cmd == "opening":
         sid = positional[0] if positional else ""
         r = undo_opening_step(sid) if "--undo" in rest else \

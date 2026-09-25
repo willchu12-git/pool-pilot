@@ -249,6 +249,15 @@ not. Tap **Save & sync**.
   Use a test strip and type the number into **New reading → Type a reading in by hand**.
 - Anything else you do to the pool goes in **Log something else**.
 
+## Got the day or the amount wrong?
+
+Tapping **I did this** records the moment you tap it. If the app says add salt today and you
+actually do it tomorrow, tap it tomorrow and it logs tomorrow.
+
+To fix anything else, go to the **History** tab and tap the entry. You can change what it was,
+the amount, the date, or delete it. Nothing is really destroyed — a deleted entry is still in the
+file underneath, so a mis-tap is recoverable.
+
 ## Asking it things
 
 The **Ask** tab. Type a question, tap Ask, and the answer comes back in about a minute. It knows

@@ -147,6 +147,16 @@ input[type=file]{padding:9px;font-size:13px}
 .vpill.low,.vpill.high{color:var(--amber);border-color:#5c4a2c}
 .tlrow .nt{font-size:12.5px;color:var(--faint);margin-top:5px;font-style:italic}
 .tlrow.unconfirmed .what{color:var(--amber)}
+.tlrow.editable{cursor:pointer}
+.tlrow.editable .what:after{content:"\270E";color:var(--faint);font-size:12px;margin-left:7px}
+.tlrow.open{background:#18222b;border-radius:12px;margin:0 -8px;padding:11px 8px}
+.tledit{grid-column:1 / -1;margin-top:10px;padding-top:11px;border-top:1px solid var(--line)}
+.tledit .row3{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tledit label{margin-top:8px}
+.tlbtns{display:flex;gap:8px;margin-top:12px}
+.tlbtns .btn{margin-top:0;flex:1}
+.btn.danger{background:transparent;border:1px solid #6e3436;color:var(--red)}
+.btn.danger.armed{background:var(--red);border-color:var(--red);color:#1a1016}
 
 /* ---- opening wizard ---- */
 .step{display:grid;grid-template-columns:34px 1fr;gap:12px;padding:14px 0;
@@ -356,6 +366,7 @@ nav button.on{color:var(--aqua-soft)}
 
   <div class="card">
     <h2>Everything that's happened</h2>
+    <div class="sub">Tap anything you did to fix the amount or the date, or to delete it.</div>
     <div class="tl" id="timeline"></div>
   </div>
 </section>
@@ -468,7 +479,7 @@ nav button.on{color:var(--aqua-soft)}
 const EMBED = null;
 const DEFAULT_REPO = "willchu12-git/pool-pilot";
 const DATA_URL = "../data/store/state.json";      /* same-origin state.json, when the repo is public */
-const BUILT = "2026-09-24 23:03";
+const BUILT = "2026-09-24 23:13";
 const CHEM = {"ppm_per_lb_per_10k": 12.0, "fc_ppm_per_gal_per_10k": 10.6, "acid_floz_per_ta_per_ph_per_10k": 0.86, "default_ta": 80, "lb_per_gal_water": 8.345};                /* kept in step with engine/chem.py at build time */
 const LOCAL_API = "http://127.0.0.1:8778";
 
@@ -1183,9 +1194,118 @@ function renderTimeline(){
              (r.amount ? " — " + r.amount + " " + esc(r.unit || "") : "") + '</div>';
     }
     if(r.note) body += '<div class="nt">' + esc(r.note) + '</div>';
+    const editable = r.type === "action";
+    const open = editable && editingId === r.id;
     return '<div class="tlrow' + (r.type === "reading" && !r.confirmed ? " unconfirmed" : "") +
-           '"><div class="when">' + esc(fmtDay(r.date)) + '</div><div>' + body + '</div></div>';
+           (editable ? " editable" : "") + (open ? " open" : "") + '"' +
+           (editable ? ' data-edit="' + esc(r.id) + '"' : '') +
+           '><div class="when">' + esc(fmtDay(r.date)) + '</div><div>' + body + '</div>' +
+           (open ? editForm(r) : "") + '</div>';
   }).join("");
+
+  Array.prototype.forEach.call(document.querySelectorAll("[data-edit]"), function(el){
+    el.addEventListener("click", function(e){
+      if(e.target.closest(".tledit")) return;      /* taps inside the form aren't toggles */
+      editingId = (editingId === el.dataset.edit) ? null : el.dataset.edit;
+      renderTimeline();
+    });
+  });
+  wireEditForm();
+}
+
+/* Which action row is expanded. One at a time -- a page of open forms on a phone
+   is a page you scroll through looking for the one you opened. */
+let editingId = null;
+
+function editForm(r){
+  const kinds = (STATE.action_kinds || []);
+  return '<div class="tledit">' +
+    '<label for="ed_what">What</label><select id="ed_what">' +
+    kinds.map(function(k){
+      return '<option value="' + esc(k.key) + '"' +
+             (k.key === r.action ? " selected" : "") + '>' + esc(k.label) + '</option>';
+    }).join("") + '</select>' +
+    '<div class="row3">' +
+      '<div><label for="ed_amount">Amount</label>' +
+      '<input type="number" inputmode="decimal" step="any" id="ed_amount" value="' +
+      (r.amount === null || r.amount === undefined ? "" : r.amount) +
+      '" placeholder="none"></div>' +
+      '<div><label for="ed_unit">Unit</label>' +
+      '<input type="text" id="ed_unit" value="' + esc(r.unit || "") + '"></div>' +
+    '</div>' +
+    '<label for="ed_date">Date</label>' +
+    '<input type="date" id="ed_date" value="' + esc(String(r.date || "").slice(0, 10)) + '">' +
+    '<label for="ed_note">Note</label>' +
+    '<input type="text" id="ed_note" value="' + esc(r.note || "") + '" placeholder="optional">' +
+    '<div class="tlbtns">' +
+      '<button class="btn sm" data-esave="' + esc(r.id) + '">Save</button>' +
+      '<button class="btn ghost sm" data-ecancel="1">Cancel</button>' +
+    '</div>' +
+    '<button class="btn danger sm" data-edel="' + esc(r.id) + '">Delete this entry</button>' +
+    '</div>';
+}
+
+function wireEditForm(){
+  const save = document.querySelector("[data-esave]");
+  if(save) save.addEventListener("click", function(){ saveEdit(save.dataset.esave); });
+  const cancel = document.querySelector("[data-ecancel]");
+  if(cancel) cancel.addEventListener("click", function(){ editingId = null; renderTimeline(); });
+  const del = document.querySelector("[data-edel]");
+  if(del) del.addEventListener("click", function(){
+    /* two taps: the only destructive control in the app */
+    if(!del.classList.contains("armed")){
+      del.classList.add("armed");
+      del.textContent = "Tap again to delete";
+      setTimeout(function(){
+        if(!del.isConnected) return;
+        del.classList.remove("armed"); del.textContent = "Delete this entry";
+      }, 4000);
+      return;
+    }
+    deleteAction(del.dataset.edel);
+  });
+}
+
+/* apply an edit locally so the row moves on this tap rather than next sync */
+function patchLocalAction(id, patch){
+  const apply = function(a){ return a.id === id ? Object.assign({}, a, patch) : a; };
+  if(STATE.raw && STATE.raw.actions) STATE.raw.actions = STATE.raw.actions.map(apply);
+  STATE.timeline = (STATE.timeline || []).map(function(row){
+    return (row.type === "action" && row.id === id) ? Object.assign({}, row, patch) : row;
+  });
+  const p = pending();
+  p.actions = (p.actions || []).map(apply);
+  ls.set("pp_pending", p);
+}
+
+async function saveEdit(id){
+  const amt = $("ed_amount").value.trim();
+  const d = $("ed_date").value || today();
+  const what = $("ed_what").value;
+  const label = (STATE.action_kinds.filter(function(k){ return k.key === what; })[0] || {}).label;
+  const patch = {action: what, label: label || what,
+                 amount: amt === "" ? null : Number(amt),
+                 unit: $("ed_unit").value.trim(), note: $("ed_note").value.trim(),
+                 date: d, at: d + "T12:00:00"};
+  patchLocalAction(id, patch);
+  editingId = null;
+  render();
+  await sendJson("action_edit", {kind:"action_edit", id:id, action:what,
+                                 amount:patch.amount, unit:patch.unit,
+                                 note:patch.note, at:patch.at}, "Updated");
+}
+
+async function deleteAction(id){
+  STATE.timeline = (STATE.timeline || []).filter(function(row){
+    return !(row.type === "action" && row.id === id); });
+  if(STATE.raw && STATE.raw.actions)
+    STATE.raw.actions = STATE.raw.actions.filter(function(a){ return a.id !== id; });
+  const p = pending();
+  p.actions = (p.actions || []).filter(function(a){ return a.id !== id; });
+  ls.set("pp_pending", p);
+  editingId = null;
+  render();
+  await sendJson("action_delete", {kind:"action_delete", id:id}, "Deleted");
 }
 
 /* ----------------------------------------------- stabiliser recommendations */

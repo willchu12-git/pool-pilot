@@ -21,13 +21,20 @@
   },
   "targets": {
     "orp_mv": [600, null],
-    "ph": [7.8, 8.1],
+    "ph": [7.6, 7.8],
     "salt_ppm": [2800, 3200],
     "cya_ppm": [30, 50],
     "borates_ppm": 50,
-    "ta_ppm": [60, 100],
+    "ta_ppm": [60, 80],
     "water_temp_f": [null, null],
-    "notes": "[low, high]; null on either side means 'no ceiling/floor, don't nag about it'. borates_ppm is a single target, not a band."
+    "notes": "[low, high]; null on either side means 'no ceiling/floor, don't nag about it'. borates_ppm is a single target, not a band.",
+    "why_these": {
+      "ph": "7.6-7.8 rather than 7.8-8.1. The ICO reads ORP, and ORP tracks the ACTIVE fraction of your chlorine, which collapses as pH rises: roughly 40% of free chlorine is active HOCl at 7.7, but only ~22% at 8.0. Holding a 600 mV floor at pH 8.0+ means running the cell hard to make up for chemistry, not for demand. 7.6-7.8 is also high enough that the cell's own upward pH drift doesn't need acid every week -- targeting 7.4 on a saltwater pool is a treadmill.",
+      "ta_ppm": "60-80 rather than 60-100. Carbonate out-gassing is what drives the pH climb on a saltwater pool, and lower TA means a slower climb and less acid over a season. The usual reason to hold TA high is protecting plaster from etching -- a vinyl liner has no such floor, so there is nothing to buy with the extra 20 ppm.",
+      "cya_ppm": "Left at 30-50 on purpose, even though saltwater pools are often run at 70-80. CYA binds chlorine, and an ORP probe only sees what is unbound -- high CYA would push ORP down and make the 600 mV floor unreachable no matter what the cell does. 30-50 is the band that keeps ORP-based control honest.",
+      "salt_ppm": "2800-3200 centers on 3000, which is in-spec for essentially every Jandy cell. Check your cell's manual: if it asks for 3000-3500, move this band up to match it -- a cell run under its own band makes less chlorine and wears out faster.",
+      "borates_ppm": "50 ppm is what makes the pH band above hold. Borates are a second buffer working where carbonate alkalinity is weakest, and they are most of the reason pH stops climbing every week."
+    }
   },
   "cadence_days": {
     "reading": 7,

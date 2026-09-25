@@ -694,9 +694,18 @@ function render(){
   $("today").textContent = new Date().toLocaleDateString(undefined,
     {weekday:"long", month:"long", day:"numeric"});
   if(!STATE){
+    /* first run on a fresh phone: nothing has synced yet, so say so everywhere
+       rather than leaving labelled cards sitting empty and looking broken. */
     $("headline").textContent = "Not connected yet.";
     $("summary").textContent = "Add your private repo and a GitHub token in Settings, and this " +
       "fills in from the cloud.";
+    $("s_pool").textContent = "Syncs from your private repo once you're connected.";
+    $("s_ref").textContent = "These are worked out from your pool's volume, which arrives with " +
+      "the first sync.";
+    $("s_built").textContent = "App built " + BUILT + ". Nothing synced yet.";
+    const q0 = ls.get("pp_queue", []);
+    $("s_queue").textContent = q0.length
+      ? (q0.length + " item(s) waiting to sync.") : "Nothing waiting to sync.";
     return;
   }
   LIVE = recompute();

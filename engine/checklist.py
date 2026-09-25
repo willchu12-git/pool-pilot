@@ -159,6 +159,13 @@ def _ph_items(r, gallons, chems):
             "TA wasn't measured, so this dose assumes a mid-band buffer -- treat it as a "
             "starting point and retest." if d["ta_assumed"] else
             "Computed against the measured TA of %g." % d["ta_used"]))
+        if d["capped"]:
+            lands = chem.ph_after_acid(ph, d["floz"], gallons, r.get("ta_ppm"),
+                                       chems["acid"].get("strength_pct", 31.45))
+            because += (" This is a partial dose on purpose -- it should land near pH %s, not "
+                        "all the way to target. Past about half a pH unit you're pouring "
+                        "against water you can't see any more, so the rest goes in tomorrow "
+                        "after a retest." % lands)
         return [_item("ph_down", "Bring pH down", "dose", P_TODAY, because,
                       dose=dose, measured=_fmt("ph", ph), target=_band_text("ph"))]
     if lo is not None and ph < lo:
@@ -198,6 +205,40 @@ def _shock_items(r, gallons, chems):
                   % (_fmt("fc_ppm", fc), FC_FLOOR_PPM),
                   dose=dose, measured=_fmt("fc_ppm", fc),
                   target="at least %g ppm" % FC_FLOOR_PPM)]
+
+
+def _ta_items(r, items_so_far):
+    """Total alkalinity. There is no such thing as an 'add this to lower TA' dose.
+
+    TA only comes down by acid plus aeration: acid drops pH and TA together, then
+    aerating drives pH back up while leaving TA where it fell. So when acid is
+    already on today's list this is just a note that it is doing double duty, and
+    when it isn't, this is a project to plan rather than a chore to tick off.
+    """
+    ta = r.get("ta_ppm")
+    if ta is None:
+        return []
+    lo, hi = poolcfg.band("ta_ppm")
+    if hi is not None and ta > hi:
+        acid_today = any(i["key"] == "ph_down" and i["dose"] for i in items_so_far)
+        because = ("TA is %s, over the %s band, and high TA is what makes pH climb every week "
+                   "on a saltwater pool." % (_fmt("ta_ppm", ta), _band_text("ta_ppm")))
+        because += (" The acid already on today's list pulls TA down with the pH, so this needs "
+                    "no separate dose -- just keep an eye on it as the pH corrections land."
+                    if acid_today else
+                    " Bringing it down is acid plus aeration, not an additive: acid to drive pH "
+                    "to about 7.2, then run the waterfall to aerate pH back up while TA stays "
+                    "down. Worth planning for a weekend, not doing on a Tuesday.")
+        return [_item("ta_high", "Total alkalinity is running high", "watch", P_WATCH, because,
+                      measured=_fmt("ta_ppm", ta), target=_band_text("ta_ppm"))]
+    if lo is not None and ta < lo:
+        return [_item("ta_low", "Total alkalinity is low", "watch", P_SOON,
+                      "TA is %s, under the %s band. Low TA means pH swings on very little "
+                      "provocation. Borates buffer some of this, but if it keeps drifting down "
+                      "it wants baking soda -- worth a confirming test first."
+                      % (_fmt("ta_ppm", ta), _band_text("ta_ppm")),
+                      measured=_fmt("ta_ppm", ta), target=_band_text("ta_ppm"))]
+    return []
 
 
 def _salt_items(r, gallons, chems):
@@ -455,6 +496,7 @@ def build(today=None, reading=None):
         items += _salt_items(r, gallons, chems)
         items += _cya_items(r, gallons, chems)
         items += _borate_items(r, gallons, chems)
+        items += _ta_items(r, items)
         items += _orp_items(r, out_of_band, acts, gallons)
 
     items = _apply_supersedes(items, (r or {}).get("at"), acts)

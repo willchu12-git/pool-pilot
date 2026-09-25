@@ -22,8 +22,8 @@
       null
     ],
     "ph": [
-      7.8,
-      8.1
+      7.6,
+      7.8
     ],
     "salt_ppm": [
       2800,
@@ -36,13 +36,20 @@
     "borates_ppm": 50,
     "ta_ppm": [
       60,
-      100
+      80
     ],
     "water_temp_f": [
       null,
       null
     ],
-    "notes": "[low, high]; null on either side means 'no ceiling/floor, don't nag about it'. borates_ppm is a single target, not a band."
+    "notes": "[low, high]; null on either side means 'no ceiling/floor, don't nag about it'. borates_ppm is a single target, not a band.",
+    "why_these": {
+      "ph": "7.6-7.8 rather than 7.8-8.1. The ICO reads ORP, and ORP tracks the ACTIVE fraction of your chlorine, which collapses as pH rises: roughly 40% of free chlorine is active HOCl at 7.7, but only ~22% at 8.0. Holding a 600 mV floor at pH 8.0+ means running the cell hard to make up for chemistry, not for demand. 7.6-7.8 is also high enough that the cell's own upward pH drift doesn't need acid every week -- targeting 7.4 on a saltwater pool is a treadmill.",
+      "ta_ppm": "60-80 rather than 60-100. Carbonate out-gassing is what drives the pH climb on a saltwater pool, and lower TA means a slower climb and less acid over a season. The usual reason to hold TA high is protecting plaster from etching -- a vinyl liner has no such floor, so there is nothing to buy with the extra 20 ppm.",
+      "cya_ppm": "Left at 30-50 on purpose, even though saltwater pools are often run at 70-80. CYA binds chlorine, and an ORP probe only sees what is unbound -- high CYA would push ORP down and make the 600 mV floor unreachable no matter what the cell does. 30-50 is the band that keeps ORP-based control honest.",
+      "salt_ppm": "2800-3200 centers on 3000, which is in-spec for essentially every Jandy cell. Check your cell's manual: if it asks for 3000-3500, move this band up to match it -- a cell run under its own band makes less chlorine and wears out faster.",
+      "borates_ppm": "50 ppm is what makes the pH band above hold. Borates are a second buffer working where carbonate alkalinity is weakest, and they are most of the reason pH stops climbing every week."
+    }
   },
   "cadence_days": {
     "reading": 7,
@@ -84,7 +91,7 @@
   ],
   "checklist": {
     "date": "2026-09-24",
-    "generated_at": "2026-09-24T21:38:17",
+    "generated_at": "2026-09-24T21:44:46",
     "reading": {
       "id": "2026-09-22T09:15:00",
       "at": "2026-09-22T09:15:00",
@@ -93,7 +100,7 @@
       "confirmed": true,
       "image": "",
       "note": "",
-      "logged_at": "2026-09-24T21:38:16",
+      "logged_at": "2026-09-24T21:44:42",
       "ph": 8.3,
       "orp_mv": 558.0,
       "salt_ppm": 2760.0,
@@ -113,10 +120,10 @@
         "unit": "",
         "value": 8.3,
         "display": "8.3",
-        "target": "7.8-8.1",
+        "target": "7.6-7.8",
         "status": "high",
-        "low": 7.8,
-        "high": 8.1
+        "low": 7.6,
+        "high": 7.8
       },
       {
         "key": "orp_mv",
@@ -168,10 +175,10 @@
         "unit": "ppm",
         "value": 95.0,
         "display": "95 ppm",
-        "target": "60-100 ppm",
-        "status": "ok",
+        "target": "60-80 ppm",
+        "status": "high",
         "low": 60,
-        "high": 100
+        "high": 80
       },
       {
         "key": "water_temp_f",
@@ -251,28 +258,28 @@
         "title": "Bring pH down",
         "kind": "dose",
         "priority": 1,
-        "because": "pH is 8.3, above the 7.8-8.1 target. Computed against the measured TA of 95.",
-        "why": "pH is 8.3, above the 7.8-8.1 target. Computed against the measured TA of 95.",
+        "because": "pH is 8.3, above the 7.6-7.8 target. Computed against the measured TA of 95. This is a partial dose on purpose -- it should land near pH 7.92, not all the way to target. Past about half a pH unit you're pouring against water you can't see any more, so the rest goes in tomorrow after a retest.",
+        "why": "pH is 8.3, above the 7.6-7.8 target. Computed against the measured TA of 95. This is a partial dose on purpose -- it should land near pH 7.92, not all the way to target. Past about half a pH unit you're pouring against water you can't see any more, so the rest goes in tomorrow after a retest.",
         "how": "Pump running. Measure the acid into a bucket of pool water first -- acid into water, never water into acid -- then walk it slowly around the deep end, away from the skimmer and the returns. Never down the skimmer. Retest tomorrow.",
         "dose": {
-          "amount": 37,
+          "amount": 56,
           "unit": "fl oz",
           "chemical": "muriatic acid",
-          "label": "37 fl oz (4.6 cups) of muriatic acid",
+          "label": "56 fl oz (6.97 cups) of muriatic acid",
           "detail": {
-            "floz": 37,
-            "want_floz": 36.8,
-            "capped": false,
-            "cups": 4.6,
-            "quarts": 1.15,
+            "floz": 56,
+            "want_floz": 80.9,
+            "capped": true,
+            "cups": 6.97,
+            "quarts": 1.74,
             "ta_used": 95.0,
             "ta_assumed": false,
-            "drops_ph": 0.25,
+            "drops_ph": 0.55,
             "strength_pct": 31.45
           }
         },
         "measured": "8.3",
-        "target": "7.8-8.1",
+        "target": "7.6-7.8",
         "wait_hours": null,
         "after": null,
         "superseded": false,
@@ -345,13 +352,30 @@
         "after": null,
         "superseded": false,
         "order": 7
+      },
+      {
+        "id": "ta_high",
+        "key": "ta_high",
+        "title": "Total alkalinity is running high",
+        "kind": "watch",
+        "priority": 3,
+        "because": "TA is 95 ppm, over the 60-80 ppm band, and high TA is what makes pH climb every week on a saltwater pool. The acid already on today's list pulls TA down with the pH, so this needs no separate dose -- just keep an eye on it as the pH corrections land.",
+        "why": "TA is 95 ppm, over the 60-80 ppm band, and high TA is what makes pH climb every week on a saltwater pool. The acid already on today's list pulls TA down with the pH, so this needs no separate dose -- just keep an eye on it as the pH corrections land.",
+        "how": "",
+        "dose": null,
+        "measured": "95 ppm",
+        "target": "60-80 ppm",
+        "wait_hours": null,
+        "after": null,
+        "superseded": false,
+        "order": 8
       }
     ],
     "counts": {
-      "total": 7,
+      "total": 8,
       "todo": 6,
       "doses": 3,
-      "out_of_band": 4
+      "out_of_band": 5
     },
     "safety_rules": [
       "NEVER pour undiluted acid into the skimmer. Acid down the skimmer runs neat through the pump, heater and salt cell and eats them. Dilute it and pour it slowly around the deep end with the pump running.",
@@ -384,12 +408,13 @@
         "emptied_skimmer",
         "orp_blocked",
         "ph_down",
-        "salt_up"
+        "salt_up",
+        "ta_high"
       ],
       "doses": {
         "salt_up": 36.0,
         "cya_up": 2.5,
-        "ph_down": 37
+        "ph_down": 56
       }
     },
     "headline": "Add salt.",
@@ -403,10 +428,10 @@
       "unit": "",
       "value": 8.3,
       "display": "8.3",
-      "target": "7.8-8.1",
+      "target": "7.6-7.8",
       "status": "high",
-      "low": 7.8,
-      "high": 8.1
+      "low": 7.6,
+      "high": 7.8
     },
     {
       "key": "orp_mv",
@@ -458,10 +483,10 @@
       "unit": "ppm",
       "value": 95.0,
       "display": "95 ppm",
-      "target": "60-100 ppm",
-      "status": "ok",
+      "target": "60-80 ppm",
+      "status": "high",
       "low": 60,
-      "high": 100
+      "high": 80
     },
     {
       "key": "water_temp_f",
@@ -483,7 +508,7 @@
     "confirmed": true,
     "image": "",
     "note": "",
-    "logged_at": "2026-09-24T21:38:16",
+    "logged_at": "2026-09-24T21:44:42",
     "ph": 8.3,
     "orp_mv": 558.0,
     "salt_ppm": 2760.0,
@@ -596,7 +621,7 @@
           "key": "ta_ppm",
           "label": "TA",
           "display": "95 ppm",
-          "status": "ok"
+          "status": "high"
         }
       ],
       "note": "",
@@ -655,7 +680,7 @@
           "key": "ta_ppm",
           "label": "TA",
           "display": "95 ppm",
-          "status": "ok"
+          "status": "high"
         }
       ],
       "note": "",
@@ -725,7 +750,7 @@
           "key": "ta_ppm",
           "label": "TA",
           "display": "86 ppm",
-          "status": "ok"
+          "status": "high"
         }
       ],
       "note": "",
@@ -776,7 +801,7 @@
           "key": "ph",
           "label": "pH",
           "display": "8.1",
-          "status": "ok"
+          "status": "high"
         },
         {
           "key": "orp_mv",
@@ -806,7 +831,7 @@
           "key": "ta_ppm",
           "label": "TA",
           "display": "86 ppm",
-          "status": "ok"
+          "status": "high"
         }
       ],
       "note": "",
@@ -846,7 +871,7 @@
           "key": "ph",
           "label": "pH",
           "display": "8.1",
-          "status": "ok"
+          "status": "high"
         },
         {
           "key": "orp_mv",
@@ -876,7 +901,7 @@
           "key": "ta_ppm",
           "label": "TA",
           "display": "88 ppm",
-          "status": "ok"
+          "status": "high"
         }
       ],
       "note": "",
@@ -938,7 +963,7 @@
           "key": "ph",
           "label": "pH",
           "display": "8",
-          "status": "ok"
+          "status": "high"
         },
         {
           "key": "orp_mv",
@@ -968,7 +993,7 @@
           "key": "ta_ppm",
           "label": "TA",
           "display": "88 ppm",
-          "status": "ok"
+          "status": "high"
         }
       ],
       "note": "",
@@ -1008,7 +1033,7 @@
           "key": "ph",
           "label": "pH",
           "display": "8",
-          "status": "ok"
+          "status": "high"
         },
         {
           "key": "orp_mv",
@@ -1038,7 +1063,7 @@
           "key": "ta_ppm",
           "label": "TA",
           "display": "90 ppm",
-          "status": "ok"
+          "status": "high"
         }
       ],
       "note": "",
@@ -1100,7 +1125,7 @@
           "key": "ph",
           "label": "pH",
           "display": "7.9",
-          "status": "ok"
+          "status": "high"
         },
         {
           "key": "orp_mv",
@@ -1130,7 +1155,7 @@
           "key": "ta_ppm",
           "label": "TA",
           "display": "90 ppm",
-          "status": "ok"
+          "status": "high"
         }
       ],
       "note": "",
@@ -1200,7 +1225,7 @@
           "key": "ta_ppm",
           "label": "TA",
           "display": "92 ppm",
-          "status": "ok"
+          "status": "high"
         }
       ],
       "note": "",
@@ -1216,8 +1241,8 @@
         "key": "ph",
         "label": "pH",
         "unit": "",
-        "low": 7.8,
-        "high": 8.1,
+        "low": 7.6,
+        "high": 7.8,
         "points": [
           {
             "date": "2026-07-30",
@@ -1454,7 +1479,7 @@
         "state": "done",
         "confirmed_date": "2026-07-24",
         "note": "",
-        "done_at": "2026-09-24T21:38:16"
+        "done_at": "2026-09-24T21:44:42"
       },
       {
         "id": "mechanical_start",
@@ -1464,7 +1489,7 @@
         "state": "done",
         "confirmed_date": "2026-07-25",
         "note": "",
-        "done_at": "2026-09-24T21:38:16"
+        "done_at": "2026-09-24T21:44:43"
       },
       {
         "id": "base_sanitization",
@@ -1474,7 +1499,7 @@
         "state": "done",
         "confirmed_date": "2026-07-26",
         "note": "",
-        "done_at": "2026-09-24T21:38:16"
+        "done_at": "2026-09-24T21:44:43"
       },
       {
         "id": "cya_anchor",
@@ -1511,7 +1536,7 @@
     "total": 6,
     "current": "cya_anchor",
     "complete": false,
-    "updated_at": "2026-09-24T21:38:16"
+    "updated_at": "2026-09-24T21:44:43"
   },
   "action_kinds": [
     {
@@ -1605,7 +1630,7 @@
         "confirmed": true,
         "image": "",
         "note": "",
-        "logged_at": "2026-09-24T21:38:16",
+        "logged_at": "2026-09-24T21:44:42",
         "ph": 7.8,
         "orp_mv": 665.0,
         "salt_ppm": 3180.0,
@@ -1624,7 +1649,7 @@
         "confirmed": true,
         "image": "",
         "note": "",
-        "logged_at": "2026-09-24T21:38:16",
+        "logged_at": "2026-09-24T21:44:42",
         "ph": 7.9,
         "orp_mv": 650.0,
         "salt_ppm": 3120.0,
@@ -1643,7 +1668,7 @@
         "confirmed": true,
         "image": "",
         "note": "",
-        "logged_at": "2026-09-24T21:38:16",
+        "logged_at": "2026-09-24T21:44:42",
         "ph": 8.0,
         "orp_mv": 641.0,
         "salt_ppm": 3060.0,
@@ -1662,7 +1687,7 @@
         "confirmed": true,
         "image": "",
         "note": "",
-        "logged_at": "2026-09-24T21:38:16",
+        "logged_at": "2026-09-24T21:44:42",
         "ph": 8.0,
         "orp_mv": 628.0,
         "salt_ppm": 3010.0,
@@ -1681,7 +1706,7 @@
         "confirmed": true,
         "image": "",
         "note": "",
-        "logged_at": "2026-09-24T21:38:16",
+        "logged_at": "2026-09-24T21:44:42",
         "ph": 8.1,
         "orp_mv": 615.0,
         "salt_ppm": 2960.0,
@@ -1700,7 +1725,7 @@
         "confirmed": true,
         "image": "",
         "note": "",
-        "logged_at": "2026-09-24T21:38:16",
+        "logged_at": "2026-09-24T21:44:42",
         "ph": 8.1,
         "orp_mv": 602.0,
         "salt_ppm": 2900.0,
@@ -1719,7 +1744,7 @@
         "confirmed": true,
         "image": "",
         "note": "",
-        "logged_at": "2026-09-24T21:38:16",
+        "logged_at": "2026-09-24T21:44:42",
         "ph": 8.2,
         "orp_mv": 588.0,
         "salt_ppm": 2860.0,
@@ -1738,7 +1763,7 @@
         "confirmed": true,
         "image": "",
         "note": "",
-        "logged_at": "2026-09-24T21:38:16",
+        "logged_at": "2026-09-24T21:44:42",
         "ph": 8.2,
         "orp_mv": 571.0,
         "salt_ppm": 2810.0,
@@ -1757,7 +1782,7 @@
         "confirmed": true,
         "image": "",
         "note": "",
-        "logged_at": "2026-09-24T21:38:16",
+        "logged_at": "2026-09-24T21:44:42",
         "ph": 8.3,
         "orp_mv": 558.0,
         "salt_ppm": 2760.0,
@@ -1779,7 +1804,7 @@
         "amount": null,
         "unit": "",
         "note": "",
-        "logged_at": "2026-09-24T21:38:16"
+        "logged_at": "2026-09-24T21:44:42"
       },
       {
         "id": "2026-08-04T17:00:00",
@@ -1790,7 +1815,7 @@
         "amount": null,
         "unit": "",
         "note": "",
-        "logged_at": "2026-09-24T21:38:16"
+        "logged_at": "2026-09-24T21:44:42"
       },
       {
         "id": "2026-08-07T17:00:00",
@@ -1801,7 +1826,7 @@
         "amount": null,
         "unit": "",
         "note": "",
-        "logged_at": "2026-09-24T21:38:16"
+        "logged_at": "2026-09-24T21:44:42"
       },
       {
         "id": "2026-08-08T17:00:00",
@@ -1812,7 +1837,7 @@
         "amount": null,
         "unit": "",
         "note": "",
-        "logged_at": "2026-09-24T21:38:16"
+        "logged_at": "2026-09-24T21:44:42"
       },
       {
         "id": "2026-08-11T17:00:00",
@@ -1823,7 +1848,7 @@
         "amount": null,
         "unit": "",
         "note": "",
-        "logged_at": "2026-09-24T21:38:16"
+        "logged_at": "2026-09-24T21:44:42"
       },
       {
         "id": "2026-08-12T17:00:00",
@@ -1834,7 +1859,7 @@
         "amount": null,
         "unit": "",
         "note": "",
-        "logged_at": "2026-09-24T21:38:16"
+        "logged_at": "2026-09-24T21:44:42"
       },
       {
         "id": "2026-08-15T17:00:00",
@@ -1845,7 +1870,7 @@
         "amount": 24.0,
         "unit": "fl oz",
         "note": "",
-        "logged_at": "2026-09-24T21:38:16"
+        "logged_at": "2026-09-24T21:44:42"
       },
       {
         "id": "2026-08-16T17:00:00",
@@ -1856,7 +1881,7 @@
         "amount": null,
         "unit": "",
         "note": "",
-        "logged_at": "2026-09-24T21:38:16"
+        "logged_at": "2026-09-24T21:44:42"
       },
       {
         "id": "2026-08-21T17:00:00",
@@ -1867,7 +1892,7 @@
         "amount": null,
         "unit": "",
         "note": "",
-        "logged_at": "2026-09-24T21:38:16"
+        "logged_at": "2026-09-24T21:44:42"
       },
       {
         "id": "2026-08-22T17:00:00",
@@ -1878,7 +1903,7 @@
         "amount": null,
         "unit": "",
         "note": "",
-        "logged_at": "2026-09-24T21:38:16"
+        "logged_at": "2026-09-24T21:44:42"
       },
       {
         "id": "2026-08-25T17:00:00",
@@ -1889,7 +1914,7 @@
         "amount": 40.0,
         "unit": "lb",
         "note": "",
-        "logged_at": "2026-09-24T21:38:16"
+        "logged_at": "2026-09-24T21:44:42"
       },
       {
         "id": "2026-08-26T17:00:00",
@@ -1900,7 +1925,7 @@
         "amount": null,
         "unit": "",
         "note": "",
-        "logged_at": "2026-09-24T21:38:16"
+        "logged_at": "2026-09-24T21:44:42"
       },
       {
         "id": "2026-08-29T17:00:00",
@@ -1911,7 +1936,7 @@
         "amount": null,
         "unit": "",
         "note": "",
-        "logged_at": "2026-09-24T21:38:16"
+        "logged_at": "2026-09-24T21:44:42"
       },
       {
         "id": "2026-09-02T17:00:00",
@@ -1922,7 +1947,7 @@
         "amount": 28.0,
         "unit": "fl oz",
         "note": "",
-        "logged_at": "2026-09-24T21:38:16"
+        "logged_at": "2026-09-24T21:44:42"
       },
       {
         "id": "2026-09-04T17:00:00",
@@ -1933,7 +1958,7 @@
         "amount": null,
         "unit": "",
         "note": "",
-        "logged_at": "2026-09-24T21:38:16"
+        "logged_at": "2026-09-24T21:44:42"
       },
       {
         "id": "2026-09-05T17:00:00",
@@ -1944,7 +1969,7 @@
         "amount": null,
         "unit": "",
         "note": "",
-        "logged_at": "2026-09-24T21:38:16"
+        "logged_at": "2026-09-24T21:44:42"
       },
       {
         "id": "2026-09-09T17:00:00",
@@ -1955,7 +1980,7 @@
         "amount": 60.0,
         "unit": "%",
         "note": "",
-        "logged_at": "2026-09-24T21:38:16"
+        "logged_at": "2026-09-24T21:44:42"
       },
       {
         "id": "2026-09-12T17:00:00",
@@ -1966,7 +1991,7 @@
         "amount": null,
         "unit": "",
         "note": "",
-        "logged_at": "2026-09-24T21:38:16"
+        "logged_at": "2026-09-24T21:44:42"
       },
       {
         "id": "2026-09-15T17:00:00",
@@ -1977,7 +2002,7 @@
         "amount": 2.0,
         "unit": "lb",
         "note": "",
-        "logged_at": "2026-09-24T21:38:16"
+        "logged_at": "2026-09-24T21:44:42"
       },
       {
         "id": "2026-09-19T17:00:00",
@@ -1988,7 +2013,7 @@
         "amount": null,
         "unit": "",
         "note": "",
-        "logged_at": "2026-09-24T21:38:16"
+        "logged_at": "2026-09-24T21:44:42"
       }
     ]
   },
@@ -2003,12 +2028,13 @@
       "emptied_skimmer",
       "orp_blocked",
       "ph_down",
-      "salt_up"
+      "salt_up",
+      "ta_high"
     ],
     "doses": {
       "salt_up": 36.0,
       "cya_up": 2.5,
-      "ph_down": 37
+      "ph_down": 56
     }
   }
 }

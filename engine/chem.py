@@ -35,7 +35,10 @@ DEFAULT_TA = 80                      # when TA is unknown, assume mid-band and s
 # Never suggest more than this in one go, regardless of what the arithmetic says.
 # A big correction is always split across days with a retest in between, because
 # the second half of a large dose is being added to water nobody has measured yet.
-MAX_ACID_FLOZ_PER_10K = 52.0         # ~1.6 quarts / 10k gal
+# ~0.45 of a pH unit at TA 80. Past that you are pouring against water you
+# measured an hour ago and cannot see any more, so a big correction is split
+# across days with a retest in between.
+MAX_ACID_FLOZ_PER_10K = 31.0
 MAX_SALT_LB_PER_10K = 50.0
 MAX_CYA_LB_PER_10K = 2.0             # CYA only comes out by draining -- undershoot
 MAX_CHLORINE_GAL_PER_10K = 2.5

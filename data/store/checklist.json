@@ -1,6 +1,6 @@
 {
   "date": "2026-09-24",
-  "generated_at": "2026-09-24T21:38:17",
+  "generated_at": "2026-09-24T21:44:46",
   "reading": {
     "id": "2026-09-22T09:15:00",
     "at": "2026-09-22T09:15:00",
@@ -9,7 +9,7 @@
     "confirmed": true,
     "image": "",
     "note": "",
-    "logged_at": "2026-09-24T21:38:16",
+    "logged_at": "2026-09-24T21:44:42",
     "ph": 8.3,
     "orp_mv": 558.0,
     "salt_ppm": 2760.0,
@@ -29,10 +29,10 @@
       "unit": "",
       "value": 8.3,
       "display": "8.3",
-      "target": "7.8-8.1",
+      "target": "7.6-7.8",
       "status": "high",
-      "low": 7.8,
-      "high": 8.1
+      "low": 7.6,
+      "high": 7.8
     },
     {
       "key": "orp_mv",
@@ -84,10 +84,10 @@
       "unit": "ppm",
       "value": 95.0,
       "display": "95 ppm",
-      "target": "60-100 ppm",
-      "status": "ok",
+      "target": "60-80 ppm",
+      "status": "high",
       "low": 60,
-      "high": 100
+      "high": 80
     },
     {
       "key": "water_temp_f",
@@ -167,28 +167,28 @@
       "title": "Bring pH down",
       "kind": "dose",
       "priority": 1,
-      "because": "pH is 8.3, above the 7.8-8.1 target. Computed against the measured TA of 95.",
-      "why": "pH is 8.3, above the 7.8-8.1 target. Computed against the measured TA of 95.",
+      "because": "pH is 8.3, above the 7.6-7.8 target. Computed against the measured TA of 95. This is a partial dose on purpose -- it should land near pH 7.92, not all the way to target. Past about half a pH unit you're pouring against water you can't see any more, so the rest goes in tomorrow after a retest.",
+      "why": "pH is 8.3, above the 7.6-7.8 target. Computed against the measured TA of 95. This is a partial dose on purpose -- it should land near pH 7.92, not all the way to target. Past about half a pH unit you're pouring against water you can't see any more, so the rest goes in tomorrow after a retest.",
       "how": "Pump running. Measure the acid into a bucket of pool water first -- acid into water, never water into acid -- then walk it slowly around the deep end, away from the skimmer and the returns. Never down the skimmer. Retest tomorrow.",
       "dose": {
-        "amount": 37,
+        "amount": 56,
         "unit": "fl oz",
         "chemical": "muriatic acid",
-        "label": "37 fl oz (4.6 cups) of muriatic acid",
+        "label": "56 fl oz (6.97 cups) of muriatic acid",
         "detail": {
-          "floz": 37,
-          "want_floz": 36.8,
-          "capped": false,
-          "cups": 4.6,
-          "quarts": 1.15,
+          "floz": 56,
+          "want_floz": 80.9,
+          "capped": true,
+          "cups": 6.97,
+          "quarts": 1.74,
           "ta_used": 95.0,
           "ta_assumed": false,
-          "drops_ph": 0.25,
+          "drops_ph": 0.55,
           "strength_pct": 31.45
         }
       },
       "measured": "8.3",
-      "target": "7.8-8.1",
+      "target": "7.6-7.8",
       "wait_hours": null,
       "after": null,
       "superseded": false,
@@ -261,13 +261,30 @@
       "after": null,
       "superseded": false,
       "order": 7
+    },
+    {
+      "id": "ta_high",
+      "key": "ta_high",
+      "title": "Total alkalinity is running high",
+      "kind": "watch",
+      "priority": 3,
+      "because": "TA is 95 ppm, over the 60-80 ppm band, and high TA is what makes pH climb every week on a saltwater pool. The acid already on today's list pulls TA down with the pH, so this needs no separate dose -- just keep an eye on it as the pH corrections land.",
+      "why": "TA is 95 ppm, over the 60-80 ppm band, and high TA is what makes pH climb every week on a saltwater pool. The acid already on today's list pulls TA down with the pH, so this needs no separate dose -- just keep an eye on it as the pH corrections land.",
+      "how": "",
+      "dose": null,
+      "measured": "95 ppm",
+      "target": "60-80 ppm",
+      "wait_hours": null,
+      "after": null,
+      "superseded": false,
+      "order": 8
     }
   ],
   "counts": {
-    "total": 7,
+    "total": 8,
     "todo": 6,
     "doses": 3,
-    "out_of_band": 4
+    "out_of_band": 5
   },
   "safety_rules": [
     "NEVER pour undiluted acid into the skimmer. Acid down the skimmer runs neat through the pump, heater and salt cell and eats them. Dilute it and pour it slowly around the deep end with the pump running.",
@@ -300,12 +317,13 @@
       "emptied_skimmer",
       "orp_blocked",
       "ph_down",
-      "salt_up"
+      "salt_up",
+      "ta_high"
     ],
     "doses": {
       "salt_up": 36.0,
       "cya_up": 2.5,
-      "ph_down": 37
+      "ph_down": 56
     }
   },
   "headline": "Add salt.",

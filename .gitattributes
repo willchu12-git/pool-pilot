@@ -1,0 +1,10 @@
+# These are authored on Windows and executed on an Ubuntu Actions runner.
+# A stray CRLF in a shell script there fails as `\r: command not found`, which
+# is a confusing way to find out about line endings at 3am.
+*.sh   text eol=lf
+*.yml  text eol=lf
+*.py   text eol=lf
+*.json text eol=lf
+*.md   text eol=lf
+*.png  binary
+*.jpg  binary

@@ -596,6 +596,17 @@
     },
     {
       "type": "action",
+      "at": "2026-09-24T23:08:05",
+      "date": "2026-09-24",
+      "id": "2026-09-24T23:08:05-ebolh",
+      "action": "brushed_pool",
+      "label": "Brushed pool",
+      "amount": null,
+      "unit": "",
+      "note": ""
+    },
+    {
+      "type": "action",
       "at": "2026-09-24T23:04:52",
       "date": "2026-09-24",
       "id": "2026-09-24T23:04:52-ij4el",
@@ -817,7 +828,7 @@
   "counts": {
     "readings": 1,
     "confirmed": 1,
-    "actions": 1,
+    "actions": 2,
     "pending": 0
   },
   "raw": {
@@ -857,6 +868,17 @@
         "unit": "",
         "note": "from the checklist",
         "logged_at": "2026-09-25T03:05:03"
+      },
+      {
+        "id": "2026-09-24T23:08:05-ebolh",
+        "at": "2026-09-24T23:08:05",
+        "date": "2026-09-24",
+        "action": "brushed_pool",
+        "label": "Brushed pool",
+        "amount": null,
+        "unit": "",
+        "note": "",
+        "logged_at": "2026-09-25T03:08:21"
       }
     ]
   },

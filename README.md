@@ -142,6 +142,58 @@ switched on the "New reading" card says so.
 
 Rate limit is 30 requests/hour per user; a poll makes three, every three hours.
 
+## Opening and closing
+
+The pool is either **open** or **closed**, and closed means genuinely dormant: no checklist, no
+doses, no ICO polling, no pushes. That isn't cosmetic — the ICO spends the winter on a shelf, so
+any reading it reports is the temperature of a garage, and an app still computing acid doses off
+that is worse than one that says nothing.
+
+The pro does the physical close. Your steps are the ones they can't do for you, and they're all
+about capturing facts while they're still true:
+
+| Step | Why it matters in April |
+|---|---|
+| Final reading | the baseline everything is compared against |
+| What the pro did | **cover type** is the single biggest predictor of spring chemistry |
+| Where things went | six months later nobody remembers where the drain plugs are |
+| Photo of the pad | valve positions, before anything was taken apart |
+| Anything for spring | carried into the opening wizard instead of rediscovered |
+
+Free order. One gate: the pool can't be marked closed until the final reading and the pro record
+exist, because a closing record missing those is the one that's useless in April.
+
+Then `season.opening_brief()` reads it back as a spring briefing — what to expect, what to put
+back, what to fix:
+
+> Closed 2026-10-12, 188 days ago. Under a mesh safety cover.
+>
+> **What to expect** — You closed at pH 8.3, ORP 558 mV, salt 2,760 ppm, CYA 24 ppm. A mesh
+> cover passes snowmelt straight through all winter, so expect salt and CYA meaningfully diluted
+> and expect some algae. CYA degrades on its own too — expect it near 19.
+>
+> **Put back** — The ICO (garage shelf) · The salt cell (basement workbench) · The drain plugs
+> (labelled bag in the skimmer bucket)
+>
+> **Needs fixing** — skimmer weir flap cracked · return eyeball missing
+>
+> **Also** — Winterizing chemicals: winter algaecide (copper-based). That's copper-based, so
+> watch for staining as pH comes up.
+
+Set `pool.surface_sqft` in config.json and "lowered 18 inches" becomes an actual dilution
+estimate rather than a caution.
+
+```bash
+py engine/season.py status
+py engine/season.py record pro_visit --cover mesh --lowered_inches 18
+py engine/season.py close --on today
+py engine/season.py open --on today     # fresh start: wizard resets, record archived
+py engine/season.py brief
+```
+
+Opening archives the closing record into `history` and resets the spring wizard. Nothing is
+destroyed — readings, actions and every past season stay on disk.
+
 ## Daily loop
 
 With the ICO connected there mostly isn't one — readings arrive on their own and the checklist

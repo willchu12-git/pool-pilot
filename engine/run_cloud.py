@@ -30,6 +30,7 @@ import check_inbox    # noqa: E402
 import checklist      # noqa: E402
 import ondilo         # noqa: E402
 import poolcfg        # noqa: E402
+import season         # noqa: E402
 import pwa            # noqa: E402
 import push as pushmod  # noqa: E402
 import state as state_mod  # noqa: E402
@@ -52,6 +53,9 @@ def pull_ondilo():
     the ICO being unreachable is a reason to fall back to typing a reading in,
     never a reason for the morning checklist not to exist.
     """
+    if season.is_closed():
+        print("  pool is closed -- not polling a device that is in the garage")
+        return None
     if not (poolcfg.CONFIG.get("ondilo") or {}).get("enabled"):
         return None
     rec = ondilo.pull()
@@ -118,8 +122,8 @@ def main():
     step("state", state_mod.main)
     step("build app", pwa.main)
 
-    if mode == "full":
-        step("push", pushmod.main)
+    if mode == "full" and not season.is_closed():
+        step("push", pushmod.main)      # nothing to say about a closed pool
 
     print("== done ==")
 

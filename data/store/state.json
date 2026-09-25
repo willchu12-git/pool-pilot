@@ -1,12 +1,13 @@
 {
-  "generated_at": "2026-09-25",
-  "today": "2026-09-25",
+  "generated_at": "2026-09-24",
+  "today": "2026-09-24",
   "title": "Pool Pilot",
   "pool": {
     "gallons": 18000,
     "type": "inground_vinyl_liner",
     "sanitization": "saltwater",
-    "notes": "Gallons drives every dose on the checklist. If this number is wrong, every dose is wrong by the same ratio."
+    "notes": "Gallons drives every dose on the checklist. If this number is wrong, every dose is wrong by the same ratio. surface_sqft is optional; with it, the spring brief can turn 'lowered 18 inches' into an actual dilution estimate.",
+    "surface_sqft": null
   },
   "equipment": {
     "salt_cell": "Jandy",
@@ -95,32 +96,10 @@
     "The pump must be RUNNING before anything goes in, and keep running afterwards, so a dose disperses instead of sitting in one corner."
   ],
   "checklist": {
-    "date": "2026-09-25",
-    "generated_at": "2026-09-25T08:50:42",
-    "reading": {
-      "id": "ico:2026-09-25 08:38:49",
-      "at": "2026-09-25T08:38:49",
-      "date": "2026-09-25",
-      "source": "ondilo_api",
-      "confirmed": true,
-      "image": "",
-      "note": "",
-      "logged_at": "2026-09-25T08:50:42",
-      "ph": 7.98,
-      "orp_mv": 388.0,
-      "salt_ppm": 2589.0,
-      "water_temp_f": null,
-      "cya_ppm": null,
-      "borates_ppm": null,
-      "ta_ppm": null,
-      "ch_ppm": null,
-      "fc_ppm": null,
-      "tds_ppm": null,
-      "dropped": [
-        "water_temp_f"
-      ]
-    },
-    "reading_age_days": 0,
+    "date": "2026-09-24",
+    "generated_at": "2026-09-24T22:49:37",
+    "reading": null,
+    "reading_age_days": null,
     "pending_confirmation": [],
     "panel": [
       {
@@ -128,10 +107,10 @@
         "label": "pH",
         "unit": "",
         "fmt_unit": "",
-        "value": 7.98,
-        "display": "7.98",
+        "value": null,
+        "display": "not measured",
         "target": "7.6-7.8",
-        "status": "high",
+        "status": "unknown",
         "low": 7.6,
         "high": 7.8
       },
@@ -140,10 +119,10 @@
         "label": "ORP",
         "unit": "mV",
         "fmt_unit": " mV",
-        "value": 388.0,
-        "display": "388 mV",
+        "value": null,
+        "display": "not measured",
         "target": "at least 600 mV",
-        "status": "low",
+        "status": "unknown",
         "low": 600,
         "high": null
       },
@@ -164,10 +143,10 @@
         "label": "Salt",
         "unit": "ppm",
         "fmt_unit": " ppm",
-        "value": 2589.0,
-        "display": "2,589 ppm",
+        "value": null,
+        "display": "not measured",
         "target": "2800-3200 ppm",
-        "status": "low",
+        "status": "unknown",
         "low": 2800,
         "high": 3200
       },
@@ -222,68 +201,21 @@
     ],
     "items": [
       {
-        "id": "salt_up",
-        "key": "salt_up",
-        "title": "Add salt",
-        "kind": "dose",
+        "id": "reading_none",
+        "key": "reading_none",
+        "title": "Take a water reading",
+        "kind": "test",
         "priority": 1,
-        "because": "Salt is 2,589 ppm, below the 2800-3200 ppm the cell needs. A cell run under its salt band makes less chlorine and wears out faster.",
-        "why": "Salt is 2,589 ppm, below the 2800-3200 ppm the cell needs. A cell run under its salt band makes less chlorine and wears out faster.",
-        "how": "Pump running. Broadcast the salt across the deep end, then brush it off the floor until it dissolves so it isn't sitting on the liner. Give it a full circulation -- 24 hours -- before you trust a salt reading.",
-        "dose": {
-          "amount": 61.5,
-          "unit": "lb",
-          "chemical": "pool salt",
-          "label": "61.5 lb of salt (about 1.54 of a 40 lb bag)",
-          "detail": {
-            "lb": 61.5,
-            "want_lb": 61.7,
-            "capped": false,
-            "raises_ppm": 411.0,
-            "bags": 1.54,
-            "whole": 1,
-            "bag_lb": 40.0
-          }
-        },
-        "measured": "2,589 ppm",
-        "target": "2800-3200 ppm",
+        "because": "There's no confirmed reading on record yet. Everything else on this list is waiting on one -- upload an ICO screenshot or type a test in by hand and the checklist fills itself out.",
+        "why": "There's no confirmed reading on record yet. Everything else on this list is waiting on one -- upload an ICO screenshot or type a test in by hand and the checklist fills itself out.",
+        "how": "Drop the ICO in or run a test strip, then upload the screenshot here and confirm what it read.",
+        "dose": null,
+        "measured": null,
+        "target": null,
         "wait_hours": null,
         "after": null,
         "superseded": false,
         "order": 1
-      },
-      {
-        "id": "ph_down",
-        "key": "ph_down",
-        "title": "Bring pH down",
-        "kind": "dose",
-        "priority": 1,
-        "because": "pH is 7.98, above the 7.6-7.8 target. TA wasn't measured, so this dose assumes a mid-band buffer -- treat it as a starting point and retest.",
-        "why": "pH is 7.98, above the 7.6-7.8 target. TA wasn't measured, so this dose assumes a mid-band buffer -- treat it as a starting point and retest.",
-        "how": "Pump running. Measure the acid into a bucket of pool water first -- acid into water, never water into acid -- then walk it slowly around the deep end, away from the skimmer and the returns. Never down the skimmer. Retest tomorrow.",
-        "dose": {
-          "amount": 28,
-          "unit": "fl oz",
-          "chemical": "muriatic acid",
-          "label": "28 fl oz (3.5 cups) of muriatic acid",
-          "detail": {
-            "floz": 28,
-            "want_floz": 28.5,
-            "capped": false,
-            "cups": 3.5,
-            "quarts": 0.88,
-            "ta_used": 80,
-            "ta_assumed": true,
-            "drops_ph": 0.23,
-            "strength_pct": 31.45
-          }
-        },
-        "measured": "7.98",
-        "target": "7.6-7.8",
-        "wait_hours": null,
-        "after": null,
-        "superseded": false,
-        "order": 2
       },
       {
         "id": "backwashed_filter",
@@ -300,48 +232,31 @@
         "wait_hours": null,
         "after": null,
         "superseded": false,
-        "order": 3
+        "order": 2
       },
       {
-        "id": "orp_blocked",
-        "key": "orp_blocked",
-        "title": "Leave the cell alone for now",
-        "kind": "watch",
+        "id": "emptied_skimmer",
+        "key": "emptied_skimmer",
+        "title": "Empty the skimmer basket",
+        "kind": "task",
         "priority": 2,
-        "because": "ORP is 388 mV, under the at least 600 mV floor -- but pH and Salt are out of band too, and ORP sits downstream of all of it. Fix those first, give the water a full day to circulate, then re-read. Turning the cell up now just means running it harder against the same problem.",
-        "why": "ORP is 388 mV, under the at least 600 mV floor -- but pH and Salt are out of band too, and ORP sits downstream of all of it. Fix those first, give the water a full day to circulate, then re-read. Turning the cell up now just means running it harder against the same problem.",
-        "how": "",
-        "dose": null,
-        "measured": "388 mV",
-        "target": "at least 600 mV",
-        "wait_hours": null,
-        "after": null,
-        "superseded": false,
-        "order": 4
-      },
-      {
-        "id": "borate_test",
-        "key": "borate_test",
-        "title": "Test borates",
-        "kind": "test",
-        "priority": 3,
-        "because": "Borates aren't on the ICO panel and haven't been tested. The target is 50 ppm; a strip test once a season is enough to know where you are.",
-        "why": "Borates aren't on the ICO panel and haven't been tested. The target is 50 ppm; a strip test once a season is enough to know where you are.",
-        "how": "A borate test strip takes ten seconds. Once a season is plenty.",
+        "because": "Never logged. The target cadence is every 3 days -- log it once and the clock starts.",
+        "why": "Never logged. The target cadence is every 3 days -- log it once and the clock starts.",
+        "how": "Pump off first. Lift the basket, empty it, check the weir flap still swings freely, drop it back in, pump on.",
         "dose": null,
         "measured": null,
-        "target": "50 ppm",
+        "target": null,
         "wait_hours": null,
         "after": null,
         "superseded": false,
-        "order": 5
+        "order": 3
       }
     ],
     "counts": {
-      "total": 5,
-      "todo": 4,
-      "doses": 2,
-      "out_of_band": 3
+      "total": 3,
+      "todo": 3,
+      "doses": 0,
+      "out_of_band": 0
     },
     "safety_rules": [
       "NEVER pour undiluted acid into the skimmer. Acid down the skimmer runs neat through the pump, heater and salt cell and eats them. Dilute it and pour it slowly around the deep end with the pump running.",
@@ -365,22 +280,17 @@
       "boric_acid_lb_per_10ppm": 8.6
     },
     "basis": {
-      "date": "2026-09-25",
-      "reading_id": "ico:2026-09-25 08:38:49",
+      "date": "2026-09-24",
+      "reading_id": null,
       "items": [
         "backwashed_filter",
-        "borate_test",
-        "orp_blocked",
-        "ph_down",
-        "salt_up"
+        "emptied_skimmer",
+        "reading_none"
       ],
-      "doses": {
-        "salt_up": 61.5,
-        "ph_down": 28
-      }
+      "doses": {}
     },
-    "headline": "Add salt.",
-    "summary": "4 thing(s) on the list today, 2 of them a dose. Reading is 0 day(s) old. Pump running before anything goes in.",
+    "headline": "Upload a reading and this fills in.",
+    "summary": "Nothing is dosed without a measurement. Upload an ICO screenshot or type a test in by hand, confirm what it read, and the checklist builds itself.",
     "source": "fallback"
   },
   "panel": [
@@ -389,10 +299,10 @@
       "label": "pH",
       "unit": "",
       "fmt_unit": "",
-      "value": 7.98,
-      "display": "7.98",
+      "value": null,
+      "display": "not measured",
       "target": "7.6-7.8",
-      "status": "high",
+      "status": "unknown",
       "low": 7.6,
       "high": 7.8
     },
@@ -401,10 +311,10 @@
       "label": "ORP",
       "unit": "mV",
       "fmt_unit": " mV",
-      "value": 388.0,
-      "display": "388 mV",
+      "value": null,
+      "display": "not measured",
       "target": "at least 600 mV",
-      "status": "low",
+      "status": "unknown",
       "low": 600,
       "high": null
     },
@@ -425,10 +335,10 @@
       "label": "Salt",
       "unit": "ppm",
       "fmt_unit": " ppm",
-      "value": 2589.0,
-      "display": "2,589 ppm",
+      "value": null,
+      "display": "not measured",
       "target": "2800-3200 ppm",
-      "status": "low",
+      "status": "unknown",
       "low": 2800,
       "high": 3200
     },
@@ -481,30 +391,8 @@
       "high": null
     }
   ],
-  "latest_reading": {
-    "id": "ico:2026-09-25 08:38:49",
-    "at": "2026-09-25T08:38:49",
-    "date": "2026-09-25",
-    "source": "ondilo_api",
-    "confirmed": true,
-    "image": "",
-    "note": "",
-    "logged_at": "2026-09-25T08:50:42",
-    "ph": 7.98,
-    "orp_mv": 388.0,
-    "salt_ppm": 2589.0,
-    "water_temp_f": null,
-    "cya_ppm": null,
-    "borates_ppm": null,
-    "ta_ppm": null,
-    "ch_ppm": null,
-    "fc_ppm": null,
-    "tds_ppm": null,
-    "dropped": [
-      "water_temp_f"
-    ]
-  },
-  "reading_age_days": 0,
+  "latest_reading": null,
+  "reading_age_days": null,
   "pending_confirmation": [],
   "chips": [
     {
@@ -563,163 +451,13 @@
       "never": false
     }
   ],
-  "timeline": [
-    {
-      "type": "reading",
-      "at": "2026-09-25T08:38:49",
-      "date": "2026-09-25",
-      "id": "ico:2026-09-25 08:38:49",
-      "source": "ondilo_api",
-      "confirmed": true,
-      "values": [
-        {
-          "key": "ph",
-          "label": "pH",
-          "display": "7.98",
-          "status": "high"
-        },
-        {
-          "key": "orp_mv",
-          "label": "ORP",
-          "display": "388 mV",
-          "status": "low"
-        },
-        {
-          "key": "salt_ppm",
-          "label": "Salt",
-          "display": "2,589 ppm",
-          "status": "low"
-        }
-      ],
-      "note": "",
-      "image": ""
-    },
-    {
-      "type": "reading",
-      "at": "2026-09-25T01:38:34",
-      "date": "2026-09-25",
-      "id": "ico:2026-09-25 01:38:34",
-      "source": "ondilo_api",
-      "confirmed": true,
-      "values": [
-        {
-          "key": "ph",
-          "label": "pH",
-          "display": "7.97",
-          "status": "high"
-        },
-        {
-          "key": "orp_mv",
-          "label": "ORP",
-          "display": "403 mV",
-          "status": "low"
-        },
-        {
-          "key": "salt_ppm",
-          "label": "Salt",
-          "display": "2,593 ppm",
-          "status": "low"
-        }
-      ],
-      "note": "",
-      "image": ""
-    },
-    {
-      "type": "action",
-      "at": "2026-09-24T23:08:05",
-      "date": "2026-09-24",
-      "id": "2026-09-24T23:08:05-ebolh",
-      "action": "brushed_pool",
-      "label": "Brushed pool",
-      "amount": null,
-      "unit": "",
-      "note": ""
-    },
-    {
-      "type": "action",
-      "at": "2026-09-24T23:04:52",
-      "date": "2026-09-24",
-      "id": "2026-09-24T23:04:52-ij4el",
-      "action": "emptied_skimmer",
-      "label": "Emptied skimmer",
-      "amount": null,
-      "unit": "",
-      "note": "from the checklist"
-    }
-  ],
+  "timeline": [],
   "trends": {
-    "from": "2026-06-27",
-    "to": "2026-09-25",
+    "from": "2026-06-26",
+    "to": "2026-09-24",
     "days": 90,
-    "series": [
-      {
-        "key": "ph",
-        "label": "pH",
-        "unit": "",
-        "low": 7.6,
-        "high": 7.8,
-        "points": [
-          {
-            "date": "2026-09-25",
-            "at": "2026-09-25T01:38:34",
-            "v": 7.97
-          },
-          {
-            "date": "2026-09-25",
-            "at": "2026-09-25T08:38:49",
-            "v": 7.98
-          }
-        ],
-        "min": 7.97,
-        "max": 7.98,
-        "latest": 7.98
-      },
-      {
-        "key": "orp_mv",
-        "label": "ORP",
-        "unit": "mV",
-        "low": 600,
-        "high": null,
-        "points": [
-          {
-            "date": "2026-09-25",
-            "at": "2026-09-25T01:38:34",
-            "v": 403.0
-          },
-          {
-            "date": "2026-09-25",
-            "at": "2026-09-25T08:38:49",
-            "v": 388.0
-          }
-        ],
-        "min": 388.0,
-        "max": 403.0,
-        "latest": 388.0
-      },
-      {
-        "key": "salt_ppm",
-        "label": "Salt",
-        "unit": "ppm",
-        "low": 2800,
-        "high": 3200,
-        "points": [
-          {
-            "date": "2026-09-25",
-            "at": "2026-09-25T01:38:34",
-            "v": 2593.0
-          },
-          {
-            "date": "2026-09-25",
-            "at": "2026-09-25T08:38:49",
-            "v": 2589.0
-          }
-        ],
-        "min": 2589.0,
-        "max": 2593.0,
-        "latest": 2589.0
-      }
-    ],
-    "n_readings": 2
+    "series": [],
+    "n_readings": 0
   },
   "opening": {
     "year": 2026,
@@ -791,6 +529,168 @@
     "complete": false,
     "updated_at": null
   },
+  "opening_brief": {
+    "closed_at": "2026-10-12",
+    "days_closed": -18,
+    "cover": "solid safety cover",
+    "dilution_risk": "low",
+    "expect": [
+      "You closed on 2026-10-12 at pH 8.3, ORP 558 mV, salt 2,760 ppm, CYA 24 ppm, TA 95 ppm, water temp 79°F.",
+      "A solid cover keeps precipitation out, so the numbers you closed at are mostly still the numbers -- worth testing to confirm, not worth assuming they collapsed.",
+      "The water was lowered about 12 inches. Refilling dilutes salt and CYA proportionally -- test after a full circulation rather than trusting the closing numbers. (Set pool.surface_sqft in config.json and this turns into an actual estimate.)",
+      "CYA degrades on its own over a winter, so expect it a little under the 24 ppm you closed at even before dilution -- somewhere near 19."
+    ],
+    "reinstall": [
+      "The ICO -- garage shelf",
+      "The salt cell -- basement workbench",
+      "The drain plugs -- labelled bag in the skimmer bucket"
+    ],
+    "fix": [
+      "skimmer weir flap cracked",
+      "return eyeball missing"
+    ],
+    "notes": [
+      "Winterizing chemicals that went in: winter algaecide + non-chlorine shock.",
+      "Lines were blown and plugged, so the plugs have to come out before the pump is primed.",
+      "Heater bypass valve is stiff."
+    ],
+    "headline": "Closed 2026-10-12."
+  },
+  "season": {
+    "state": "open",
+    "closed": false,
+    "closed_at": null,
+    "opened_at": "2027-04-18",
+    "days_closed": null,
+    "closing_water": {},
+    "closing_water_words": "",
+    "close_note": "",
+    "closing": {
+      "state": "open",
+      "steps": [
+        {
+          "id": "final_reading",
+          "title": "Take a final reading",
+          "detail": "The last confirmed reading before it all goes quiet. This is the baseline the spring brief compares against, so it is worth it being a real test rather than a week-old one.",
+          "kind": "reading",
+          "n": 1,
+          "required": true,
+          "done": false,
+          "data": {},
+          "recorded_at": null
+        },
+        {
+          "id": "pro_visit",
+          "title": "Record what the pro did",
+          "detail": "Which cover went on, whether the water was lowered and by how much, what winterizing chemicals went in, whether the lines were blown. Two minutes now; nobody remembers any of it in April.",
+          "kind": "pro",
+          "n": 2,
+          "required": true,
+          "done": false,
+          "data": {},
+          "recorded_at": null
+        },
+        {
+          "id": "stored",
+          "title": "Note where everything went",
+          "detail": "The ICO, the salt cell, the baskets, the ladder, the drain plugs. The classic spring morning is spent looking for the drain plugs.",
+          "kind": "stored",
+          "n": 3,
+          "required": false,
+          "done": false,
+          "data": {},
+          "recorded_at": null
+        },
+        {
+          "id": "pad_photo",
+          "title": "Photograph the equipment pad",
+          "detail": "One picture of the pad with the valves as they were. This is the single most useful thing on the list and the one most often skipped.",
+          "kind": "photo",
+          "n": 4,
+          "required": false,
+          "done": false,
+          "data": {},
+          "recorded_at": null
+        },
+        {
+          "id": "punch_list",
+          "title": "Note anything for spring",
+          "detail": "Anything already broken, worn or annoying. It carries straight into the opening wizard instead of being rediscovered.",
+          "kind": "list",
+          "n": 5,
+          "required": false,
+          "done": false,
+          "data": {},
+          "recorded_at": null
+        }
+      ],
+      "done": 0,
+      "total": 5,
+      "can_close": false,
+      "blocking": [
+        "Take a final reading",
+        "Record what the pro did"
+      ]
+    },
+    "seasons_on_record": 2
+  },
+  "closing_steps": [
+    {
+      "id": "final_reading",
+      "title": "Take a final reading",
+      "detail": "The last confirmed reading before it all goes quiet. This is the baseline the spring brief compares against, so it is worth it being a real test rather than a week-old one.",
+      "kind": "reading",
+      "n": 1,
+      "required": true,
+      "done": false,
+      "data": {},
+      "recorded_at": null
+    },
+    {
+      "id": "pro_visit",
+      "title": "Record what the pro did",
+      "detail": "Which cover went on, whether the water was lowered and by how much, what winterizing chemicals went in, whether the lines were blown. Two minutes now; nobody remembers any of it in April.",
+      "kind": "pro",
+      "n": 2,
+      "required": true,
+      "done": false,
+      "data": {},
+      "recorded_at": null
+    },
+    {
+      "id": "stored",
+      "title": "Note where everything went",
+      "detail": "The ICO, the salt cell, the baskets, the ladder, the drain plugs. The classic spring morning is spent looking for the drain plugs.",
+      "kind": "stored",
+      "n": 3,
+      "required": false,
+      "done": false,
+      "data": {},
+      "recorded_at": null
+    },
+    {
+      "id": "pad_photo",
+      "title": "Photograph the equipment pad",
+      "detail": "One picture of the pad with the valves as they were. This is the single most useful thing on the list and the one most often skipped.",
+      "kind": "photo",
+      "n": 4,
+      "required": false,
+      "done": false,
+      "data": {},
+      "recorded_at": null
+    },
+    {
+      "id": "punch_list",
+      "title": "Note anything for spring",
+      "detail": "Anything already broken, worn or annoying. It carries straight into the opening wizard instead of being rediscovered.",
+      "kind": "list",
+      "n": 5,
+      "required": false,
+      "done": false,
+      "data": {},
+      "recorded_at": null
+    }
+  ],
   "action_kinds": [
     {
       "key": "added_salt",
@@ -871,99 +771,24 @@
     "boric_acid_lb_per_10ppm": 8.6
   },
   "counts": {
-    "readings": 2,
-    "confirmed": 2,
-    "actions": 2,
+    "readings": 0,
+    "confirmed": 0,
+    "actions": 0,
     "pending": 0
   },
   "raw": {
-    "readings": [
-      {
-        "id": "ico:2026-09-25 01:38:34",
-        "at": "2026-09-25T01:38:34",
-        "date": "2026-09-25",
-        "source": "ondilo_api",
-        "confirmed": true,
-        "image": "",
-        "note": "",
-        "logged_at": "2026-09-25T02:30:15",
-        "ph": 7.97,
-        "orp_mv": 403.0,
-        "salt_ppm": 2593.0,
-        "water_temp_f": null,
-        "cya_ppm": null,
-        "borates_ppm": null,
-        "ta_ppm": null,
-        "ch_ppm": null,
-        "fc_ppm": null,
-        "tds_ppm": null,
-        "dropped": [
-          "water_temp_f"
-        ]
-      },
-      {
-        "id": "ico:2026-09-25 08:38:49",
-        "at": "2026-09-25T08:38:49",
-        "date": "2026-09-25",
-        "source": "ondilo_api",
-        "confirmed": true,
-        "image": "",
-        "note": "",
-        "logged_at": "2026-09-25T08:50:42",
-        "ph": 7.98,
-        "orp_mv": 388.0,
-        "salt_ppm": 2589.0,
-        "water_temp_f": null,
-        "cya_ppm": null,
-        "borates_ppm": null,
-        "ta_ppm": null,
-        "ch_ppm": null,
-        "fc_ppm": null,
-        "tds_ppm": null,
-        "dropped": [
-          "water_temp_f"
-        ]
-      }
-    ],
-    "actions": [
-      {
-        "id": "2026-09-24T23:04:52-ij4el",
-        "at": "2026-09-24T23:04:52",
-        "date": "2026-09-24",
-        "action": "emptied_skimmer",
-        "label": "Emptied skimmer",
-        "amount": null,
-        "unit": "",
-        "note": "from the checklist",
-        "logged_at": "2026-09-25T03:05:03"
-      },
-      {
-        "id": "2026-09-24T23:08:05-ebolh",
-        "at": "2026-09-24T23:08:05",
-        "date": "2026-09-24",
-        "action": "brushed_pool",
-        "label": "Brushed pool",
-        "amount": null,
-        "unit": "",
-        "note": "",
-        "logged_at": "2026-09-25T03:08:21"
-      }
-    ]
+    "readings": [],
+    "actions": []
   },
   "disclaimer": "Every dose here is an estimate from your pool's volume and one measurement. Add, circulate, retest -- never dose twice against the same reading. Chemicals are handled at your own risk; when a number looks wrong, trust the water and retest before you trust this app.",
   "basis": {
-    "date": "2026-09-25",
-    "reading_id": "ico:2026-09-25 08:38:49",
+    "date": "2026-09-24",
+    "reading_id": null,
     "items": [
       "backwashed_filter",
-      "borate_test",
-      "orp_blocked",
-      "ph_down",
-      "salt_up"
+      "emptied_skimmer",
+      "reading_none"
     ],
-    "doses": {
-      "salt_up": 61.5,
-      "ph_down": 28
-    }
+    "doses": {}
   }
 }

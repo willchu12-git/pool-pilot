@@ -39,6 +39,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import chem      # noqa: E402
 import poolcfg   # noqa: E402
+import season    # noqa: E402
 import store     # noqa: E402
 
 # priority 0 = safety / do first, 1 = today, 2 = this week, 3 = just watching
@@ -539,9 +540,44 @@ def _order(items):
     return items
 
 
+def closed_checklist(today, season_status):
+    """A closed pool has no checklist, and saying so is the honest answer.
+
+    Not an empty list dressed up as "nothing to do today" -- the ICO is on a
+    shelf, there are no readings, and a dose computed from October water in
+    February would be nonsense. The app shows the closing record instead.
+    """
+    days = season_status.get("days_closed")
+    return {
+        "date": today.isoformat(),
+        "generated_at": datetime.now().isoformat(timespec="seconds"),
+        "closed": True,
+        "reading": None, "reading_age_days": None, "pending_confirmation": [],
+        "panel": [], "items": [],
+        "counts": {"total": 0, "todo": 0, "doses": 0, "out_of_band": 0},
+        "safety_rules": poolcfg.safety_lines(),
+        "pool": {"gallons": poolcfg.gallons(), "type": poolcfg.CONFIG["pool"]["type"],
+                 "sanitization": poolcfg.CONFIG["pool"]["sanitization"]},
+        "reference": chem.summary(poolcfg.gallons()),
+        "headline": "Closed for the season.",
+        "summary": ("Closed %s%s. Nothing to dose and nothing to test \u2014 the ICO is out of "
+                    "the water, so there are no readings to be had. Everything from closing is "
+                    "on the Season tab, and it will be waiting when you open."
+                    % (season_status.get("closed_at") or "",
+                       (", %d days ago" % days) if days and days > 0 else "")),
+        "source": "closed",
+        "basis": {"date": today.isoformat(), "closed": True,
+                  "closed_at": season_status.get("closed_at"),
+                  "reading_id": None, "items": [], "doses": {}},
+    }
+
+
 def build(today=None, reading=None):
     """The whole deterministic checklist. No AI anywhere in this function."""
     today = today or date.today()
+    ss = season.status(today)
+    if ss.get("closed"):
+        return closed_checklist(today, ss)
     gallons = poolcfg.gallons()
     chems = poolcfg.CONFIG["chemicals"]
     acts = store.actions()
@@ -693,6 +729,8 @@ DEFAULT_HOW = "Pump running before anything goes in, and keep it running afterwa
 def fallback(cl):
     """A real checklist without the AI: the engine's own reasoning, plus the safe
     method for each item. Same items, same doses -- just plainer sentences."""
+    if cl.get("closed"):
+        return cl                    # already says everything there is to say
     for it in cl["items"]:
         it["why"] = it["because"]
         it["how"] = HOW.get(it["key"], DEFAULT_HOW if it["dose"] else "")
@@ -742,6 +780,8 @@ def context(cl):
 
 
 def generate(cl, offline=False):
+    if cl.get("closed"):
+        return cl, "closed"          # no wording to write, and nothing to pay for
     if offline:
         print("  offline mode -- using the built-in writer")
         return fallback(cl), "fallback"

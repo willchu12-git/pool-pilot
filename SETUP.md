@@ -249,6 +249,24 @@ not. Tap **Save & sync**.
   Use a test strip and type the number into **New reading → Type a reading in by hand**.
 - Anything else you do to the pool goes in **Log something else**.
 
+## Closing up for the winter
+
+Go to the **Season** tab and work down *Closing up*. Any order. It's five short things and
+they're all just writing down what happened — the pro does the actual work.
+
+The one that matters most is **which cover went on**: a mesh cover passes snowmelt all winter and
+dilutes everything, a solid one doesn't. That single fact changes what the app tells you to
+expect in spring.
+
+Once the final reading and the pro record are in, **Mark the pool closed** unlocks. After that
+the app goes quiet — no checklist, no doses, nothing nagging you about a reading that can't
+exist, because the ICO is in your garage.
+
+## Opening again in spring
+
+Season tab → **Open the pool**. Everything from closing turns into a briefing: what the water
+should look like, what to put back and where it is, and what was already broken in October.
+
 ## If something looks wrong
 
 Trust the water, not the app. Every dose is an estimate from your pool's volume and one

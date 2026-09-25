@@ -9,7 +9,8 @@
     "gallons": 18000,
     "type": "inground_vinyl_liner",
     "sanitization": "saltwater",
-    "notes": "Gallons drives every dose on the checklist. If this number is wrong, every dose is wrong by the same ratio."
+    "notes": "Gallons drives every dose on the checklist. If this number is wrong, every dose is wrong by the same ratio. surface_sqft is optional; with it, the spring brief can turn 'lowered 18 inches' into an actual dilution estimate.",
+    "surface_sqft": null
   },
   "equipment": {
     "salt_cell": "Jandy",
@@ -131,6 +132,43 @@
       }
     ],
     "notes": "Strictly sequential on purpose -- each step assumes the one before it is done. Adding salt before the water is clear just means you paid to salt a swamp."
+  },
+  "closing": {
+    "steps": [
+      {
+        "id": "final_reading",
+        "title": "Take a final reading",
+        "kind": "reading",
+        "required_for_close": true,
+        "detail": "The last confirmed reading before it all goes quiet. This is the baseline the spring brief compares against, so it is worth it being a real test rather than a week-old one."
+      },
+      {
+        "id": "pro_visit",
+        "title": "Record what the pro did",
+        "kind": "pro",
+        "required_for_close": true,
+        "detail": "Which cover went on, whether the water was lowered and by how much, what winterizing chemicals went in, whether the lines were blown. Two minutes now; nobody remembers any of it in April."
+      },
+      {
+        "id": "stored",
+        "title": "Note where everything went",
+        "kind": "stored",
+        "detail": "The ICO, the salt cell, the baskets, the ladder, the drain plugs. The classic spring morning is spent looking for the drain plugs."
+      },
+      {
+        "id": "pad_photo",
+        "title": "Photograph the equipment pad",
+        "kind": "photo",
+        "detail": "One picture of the pad with the valves as they were. This is the single most useful thing on the list and the one most often skipped."
+      },
+      {
+        "id": "punch_list",
+        "title": "Note anything for spring",
+        "kind": "list",
+        "detail": "Anything already broken, worn or annoying. It carries straight into the opening wizard instead of being rediscovered."
+      }
+    ],
+    "notes": "The pro does the physical close. These are the owner's steps -- the ones the pro cannot do for you, which are all about capturing facts while they are still true. Free order; required_for_close steps gate marking the pool closed."
   },
   "coach": {
     "claude_model": "",

@@ -253,6 +253,33 @@ input[type=file]{padding:9px;font-size:13px}
 .progress span{display:block;height:100%;background:linear-gradient(90deg,#2d7f8a,var(--aqua));
   border-radius:4px;transition:width .3s}
 
+.closed{background:linear-gradient(160deg,#16222e,#111a22);border-color:#27414f;text-align:center}
+.closed .big{font-size:34px;font-weight:650;letter-spacing:-.5px;margin:2px 0 2px}
+.closed .since{font-size:13.5px;color:var(--dim)}
+.closed .flake{font-size:30px;line-height:1;opacity:.85}
+.recbox{text-align:left;margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
+.recrow{display:grid;grid-template-columns:96px 1fr;gap:10px;font-size:13.5px;padding:5px 0;
+  line-height:1.45}
+.recrow .rk{color:var(--faint);font-size:11px;letter-spacing:.8px;text-transform:uppercase;
+  padding-top:3px}
+.brief h3{font-size:11.5px;letter-spacing:1px;text-transform:uppercase;color:var(--aqua-soft);
+  margin:14px 0 6px}
+.brief h3:first-child{margin-top:0}
+.brief ul{margin:0;padding-left:18px;font-size:14px;line-height:1.55;color:#d7e3ea}
+.brief li{margin:5px 0}
+.cstep{display:grid;grid-template-columns:28px 1fr;gap:11px;padding:13px 0;
+  border-bottom:1px solid var(--line)}
+.cstep:last-child{border-bottom:none}
+.cstep .box{width:24px;height:24px;border-radius:7px;border:1px solid var(--line);display:flex;
+  align-items:center;justify-content:center;font-size:13px;color:var(--faint);flex:none;
+  margin-top:1px}
+.cstep.done .box{background:var(--green);border-color:var(--green);color:#08181c}
+.cstep .ct{font-size:15.5px;font-weight:600}
+.cstep .cd{font-size:13.5px;color:var(--dim);line-height:1.5;margin-top:4px}
+.cstep .req{font-size:10px;letter-spacing:.6px;text-transform:uppercase;color:var(--amber);
+  margin-left:6px}
+.cstep .saved{font-size:12.5px;color:var(--green);margin-top:6px;line-height:1.45}
+.gatebox{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
 .note{font-size:12px;color:var(--faint);margin-top:10px;line-height:1.5}
 .rules{margin:0;padding-left:18px;font-size:13px;color:var(--dim);line-height:1.6}
 .rules li{margin:6px 0}
@@ -291,7 +318,15 @@ nav button.on{color:var(--aqua-soft)}
 <!-- ------------------------------------------------------------- TODAY -->
 <section id="tab-today">
 
-  <div class="card hero">
+  <div class="card closed hide" id="closedToday">
+    <div class="flake">&#10052;</div>
+    <div class="big">Closed</div>
+    <div class="since" id="closedSince">--</div>
+    <div class="note" id="closedBlurb"></div>
+    <button class="btn ghost sm" id="goSeason">See the closing record</button>
+  </div>
+
+  <div class="card hero" id="heroCard">
     <div class="row tight" style="justify-content:space-between;align-items:flex-start">
       <div class="headline" id="headline">--</div>
     </div>
@@ -310,7 +345,7 @@ nav button.on{color:var(--aqua-soft)}
     </div>
   </div>
 
-  <div class="card">
+  <div class="card" id="panelCard">
     <h2>Water</h2>
     <div class="panel" id="panel"></div>
     <div class="note" id="panelAge"></div>
@@ -318,10 +353,10 @@ nav button.on{color:var(--aqua-soft)}
 
   <div class="chips" id="chips"></div>
 
-  <h2 style="margin:16px 0 10px">Today's list</h2>
+  <h2 style="margin:16px 0 10px" id="itemsHead">Today's list</h2>
   <div id="items"></div>
 
-  <div class="card">
+  <div class="card" id="readingCard">
     <h2>New reading</h2>
     <div class="sub" id="readingLead">Upload the ICO screenshot and it gets read in the cloud,
       or type the numbers in yourself.</div>
@@ -335,7 +370,7 @@ nav button.on{color:var(--aqua-soft)}
     </details>
   </div>
 
-  <div class="card">
+  <div class="card" id="logCard">
     <h2>Log something else</h2>
     <div class="row tight" id="actionChips"></div>
     <div class="half" style="margin-top:12px">
@@ -351,7 +386,7 @@ nav button.on{color:var(--aqua-soft)}
     <button class="btn" id="a_save">Log it</button>
   </div>
 
-  <div class="card">
+  <div class="card" id="safetyCard">
     <h2>Safety rules</h2>
     <ol class="rules" id="safety"></ol>
   </div>
@@ -371,19 +406,51 @@ nav button.on{color:var(--aqua-soft)}
   </div>
 </section>
 
-<!-- ----------------------------------------------------------- OPENING -->
-<section id="tab-open" class="hide">
-  <div class="card">
+<!-- ------------------------------------------------------------ SEASON -->
+<section id="tab-season" class="hide">
+
+  <!-- shown while CLOSED -->
+  <div class="card closed hide" id="seasonClosed">
+    <div class="flake">&#10052;</div>
+    <div class="big">Closed</div>
+    <div class="since" id="seasonClosedSince">--</div>
+    <div class="recbox" id="closingRecord"></div>
+  </div>
+  <div class="card hide" id="reopenCard">
+    <h2>Open for the season</h2>
+    <div class="sub">This starts fresh: the spring wizard resets to step one, the ICO starts
+      being read again, and everything below moves into the opening brief.</div>
+    <button class="btn" id="s_open1">Open the pool</button>
+    <button class="btn hide" id="s_open2" style="background:var(--green)">Tap again to confirm</button>
+  </div>
+
+  <!-- shown while OPEN -->
+  <div class="card brief hide" id="briefCard">
+    <h2>From last closing</h2>
+    <div class="sub" id="briefHead">--</div>
+    <div id="briefBody"></div>
+  </div>
+
+  <div class="card hide" id="openingCard">
     <h2>Spring opening</h2>
     <div class="sub" id="openLead">--</div>
     <div class="progress"><span id="openBar" style="width:0%"></span></div>
     <div id="steps"></div>
+    <div class="note">Each step unlocks the next. That order isn't fussiness: every step assumes
+      the one before it actually happened, and salting a pool that's still green is an expensive
+      way to salt a swamp.</div>
   </div>
-  <div class="card">
-    <div class="note">Each step unlocks the next one. That order isn't fussiness: every step
-      assumes the one before it actually happened, and salting a pool that's still green is an
-      expensive way to salt a swamp.</div>
-    <button class="btn ghost sm" id="open_reset">Start a new season</button>
+
+  <div class="card hide" id="closingCard">
+    <h2>Closing up</h2>
+    <div class="sub">The pro does the physical close. These are the bits they can't do for you —
+      writing down what happened while it's still true. Any order.</div>
+    <div id="csteps"></div>
+    <div class="gatebox">
+      <button class="btn" id="s_close1">Mark the pool closed</button>
+      <button class="btn hide" id="s_close2" style="background:var(--amber);color:#1a1016">Tap again to confirm</button>
+      <div class="note" id="closeGate"></div>
+    </div>
   </div>
 </section>
 
@@ -424,7 +491,7 @@ nav button.on{color:var(--aqua-soft)}
 <nav>
   <button data-tab="today" class="on"><span class="ic">&#128167;</span>Today</button>
   <button data-tab="hist"><span class="ic">&#128200;</span>History</button>
-  <button data-tab="open"><span class="ic">&#127774;</span>Opening</button>
+  <button data-tab="season"><span class="ic">&#127774;</span>Season</button>
   <button data-tab="set"><span class="ic">&#9881;</span>Settings</button>
 </nav>
 
@@ -773,8 +840,11 @@ function render(){
     return;
   }
   LIVE = recompute();
-  renderHero(); renderPanel(); renderChips(); renderItems(); renderConfirm();
-  renderActionChips(); renderManual(); renderSafety();
+  renderSeason();
+  if(!closedNow()){
+    renderHero(); renderPanel(); renderChips(); renderItems(); renderConfirm();
+    renderActionChips(); renderManual(); renderSafety();
+  }
   renderChart(); renderTimeline(); renderOpening(); renderSettings();
   $("foot").textContent = (STATE.disclaimer || "") + " Built " + BUILT + ".";
 }
@@ -1148,6 +1218,278 @@ function renderTimeline(){
   }).join("");
 }
 
+/* -------------------------------------------------------------- season */
+function closedNow(){ return !!(STATE && STATE.season && STATE.season.closed); }
+
+/* Everything the Today tab shows is about water that is currently being measured.
+   While the pool is closed none of it exists -- the ICO is on a shelf -- so the
+   honest move is to take the whole screen away rather than render empty cards. */
+const TODAY_CARDS = ["heroCard", "confirmCard", "panelCard", "chipsRow", "itemsHead",
+                     "items", "readingCard", "logCard", "safetyCard"];
+
+function renderSeason(){
+  const closed = closedNow();
+  const ss = (STATE && STATE.season) || {};
+  $("closedToday").classList.toggle("hide", !closed);
+  const chipsEl = $("chips"); if(chipsEl) chipsEl.classList.toggle("hide", closed);
+  TODAY_CARDS.forEach(function(id){
+    const el = $(id); if(el) el.classList.toggle("hide", closed);
+  });
+  const days = ss.days_closed;
+  const since = "since " + (ss.closed_at || "?") +
+                (days && days > 0 ? " \u00b7 " + days + " day" + (days === 1 ? "" : "s") : "");
+  $("closedSince").textContent = since;
+  $("seasonClosedSince").textContent = since;
+  $("closedBlurb").textContent = "Nothing to dose and nothing to test. The checklist comes back " +
+    "when you open.";
+
+  $("seasonClosed").classList.toggle("hide", !closed);
+  $("reopenCard").classList.toggle("hide", !closed);
+  $("openingCard").classList.toggle("hide", closed);
+  $("closingCard").classList.toggle("hide", closed);
+
+  if(closed) renderClosingRecord(ss);
+  renderBrief();
+  renderClosingSteps();
+}
+
+function renderClosingRecord(ss){
+  const byId = {};
+  (STATE.closing_steps || []).forEach(function(st){ byId[st.id] = st.data || {}; });
+  const rows = [];
+  /* season.py formats this -- one place decides how a measurement reads */
+  if(ss.closing_water_words) rows.push(["Closed at", ss.closing_water_words]);
+  const pro = byId.pro_visit || {};
+  if(pro.cover) rows.push(["Cover", COVER_LABEL[pro.cover] || pro.cover]);
+  if(pro.lowered_inches) rows.push(["Water", "lowered about " + pro.lowered_inches + " inches"]);
+  if(pro.chemicals) rows.push(["Chemicals", pro.chemicals]);
+  if(pro.who) rows.push(["Closed by", pro.who]);
+  const st = byId.stored || {};
+  const stored = STORED_FIELDS.filter(function(f){ return st[f.key]; })
+    .map(function(f){ return f.label + ": " + st[f.key]; });
+  if(stored.length) rows.push(["Stored", stored.join(" \u00b7 ")]);
+  const punch = (byId.punch_list || {}).items || [];
+  if(punch.length) rows.push(["For spring", punch.join(" \u00b7 ")]);
+  if(ss.close_note) rows.push(["Note", ss.close_note]);
+
+  $("closingRecord").innerHTML = rows.length
+    ? rows.map(function(r){
+        return '<div class="recrow"><div class="rk">' + esc(r[0]) + '</div><div>' +
+               esc(r[1]) + '</div></div>'; }).join("")
+    : '<div class="note">Nothing was recorded at closing.</div>';
+}
+
+function renderBrief(){
+  const b = STATE.opening_brief;
+  const show = !!b && !closedNow();
+  $("briefCard").classList.toggle("hide", !show);
+  if(!show) return;
+  $("briefHead").textContent = b.headline +
+    (b.cover ? " Under a " + b.cover + "." : "");
+  const blocks = [["What to expect", b.expect], ["Put back", b.reinstall],
+                  ["Needs fixing", b.fix], ["Also", b.notes]];
+  $("briefBody").innerHTML = blocks.filter(function(x){ return x[1] && x[1].length; })
+    .map(function(x){
+      return "<h3>" + esc(x[0]) + "</h3><ul>" +
+        x[1].map(function(l){ return "<li>" + esc(l) + "</li>"; }).join("") + "</ul>";
+    }).join("");
+}
+
+const COVER_LABEL = {solid_safety:"solid safety cover", mesh:"mesh safety cover",
+                     tarp:"tarp / water bags", none:"no cover"};
+const STORED_FIELDS = [
+  {key:"ico", label:"ICO"}, {key:"salt_cell", label:"salt cell"},
+  {key:"plugs", label:"plugs"}, {key:"baskets", label:"baskets"},
+  {key:"ladder", label:"ladder"}, {key:"other", label:"other"}];
+
+function renderClosingSteps(){
+  if(closedNow()) return;
+  const steps = STATE.closing_steps || [];
+  $("csteps").innerHTML = steps.map(function(st){
+    let h = '<div class="cstep ' + (st.done ? "done" : "") + '"><div class="box">' +
+            (st.done ? "\u2713" : st.n) + '</div><div>';
+    h += '<div class="ct">' + esc(st.title) +
+         (st.required ? '<span class="req">required</span>' : '') + '</div>';
+    h += '<div class="cd">' + esc(st.detail) + '</div>';
+    h += renderClosingForm(st);
+    h += '</div></div>';
+    return h;
+  }).join("");
+  wireClosingForms();
+
+  const blocking = (STATE.season && STATE.season.closing &&
+                    STATE.season.closing.blocking) || [];
+  const ok = blocking.length === 0;
+  $("s_close1").disabled = !ok;
+  $("closeGate").textContent = ok
+    ? "Everything required is recorded."
+    : "Still needed before closing: " + blocking.join(", ") + ".";
+}
+
+function renderClosingForm(st){
+  const d = st.data || {};
+  if(st.kind === "reading"){
+    const r = LIVE && LIVE.latest;
+    if(st.done) return '<div class="saved">\u2713 Recorded' +
+      (d.note ? " \u2014 " + esc(d.note) : "") + '</div>';
+    return r
+      ? '<div class="saved" style="color:var(--dim)">Latest confirmed reading: ' +
+        esc(fmtDay(r.date)) + '</div>' +
+        '<button class="btn sm" data-cstep="final_reading" data-use="reading">Use that reading</button>'
+      : '<div class="note">No confirmed reading yet \u2014 take one on the Today tab first.</div>';
+  }
+  if(st.kind === "pro"){
+    if(st.done) return '<div class="saved">\u2713 ' +
+      esc([COVER_LABEL[d.cover] || d.cover,
+           d.lowered_inches ? "lowered " + d.lowered_inches + '"' : "",
+           d.chemicals || "", d.who || ""].filter(Boolean).join(" \u00b7 ")) + '</div>' +
+      '<button class="btn ghost sm" data-cclear="pro_visit">Change</button>';
+    return '<label for="cv_cover">Cover that went on</label>' +
+      '<select id="cv_cover"><option value="solid_safety">Solid safety cover</option>' +
+      '<option value="mesh">Mesh safety cover</option>' +
+      '<option value="tarp">Tarp / water bags</option>' +
+      '<option value="none">No cover</option></select>' +
+      '<label for="cv_lowered">Water lowered (inches, blank if not)</label>' +
+      '<input type="number" inputmode="decimal" step="any" id="cv_lowered">' +
+      '<label for="cv_chem">Winterizing chemicals added</label>' +
+      '<input type="text" id="cv_chem" placeholder="algaecide, shock, sequestrant...">' +
+      '<label for="cv_who">Who closed it</label>' +
+      '<input type="text" id="cv_who" placeholder="optional">' +
+      '<div class="check"><input type="checkbox" id="cv_lines" checked>' +
+      '<label for="cv_lines" style="margin:0">Lines blown out and plugged</label></div>' +
+      '<button class="btn sm" data-cstep="pro_visit">Save</button>';
+  }
+  if(st.kind === "stored"){
+    if(st.done) return '<div class="saved">\u2713 ' +
+      esc(STORED_FIELDS.filter(function(f){ return d[f.key]; })
+        .map(function(f){ return f.label + ": " + d[f.key]; }).join(" \u00b7 ")) + '</div>' +
+      '<button class="btn ghost sm" data-cclear="stored">Change</button>';
+    return STORED_FIELDS.map(function(f){
+      return '<label for="cs_' + f.key + '">' + esc(f.label) + '</label>' +
+             '<input type="text" id="cs_' + f.key + '" placeholder="where it went">';
+    }).join("") + '<button class="btn sm" data-cstep="stored">Save</button>';
+  }
+  if(st.kind === "photo"){
+    if(st.done) return '<div class="saved">\u2713 Photo saved</div>';
+    return '<input type="file" id="cv_photo" accept="image/*" capture="environment">' +
+           '<button class="btn sm" data-cphoto="1">Upload photo</button>';
+  }
+  if(st.kind === "list"){
+    const items = d.items || [];
+    return (items.length
+        ? '<div class="saved">\u2713 ' + items.map(esc).join("<br>\u2713 ") + '</div>'
+        : "") +
+      '<label for="cv_punch">One per line</label>' +
+      '<textarea id="cv_punch" placeholder="skimmer weir cracked\npump basket lid gasket">' +
+      esc(items.join("\n")) + '</textarea>' +
+      '<button class="btn sm" data-cstep="punch_list">Save</button>';
+  }
+  return "";
+}
+
+function wireClosingForms(){
+  Array.prototype.forEach.call(document.querySelectorAll("[data-cstep]"), function(b){
+    b.addEventListener("click", function(){ saveClosingStep(b.dataset.cstep); });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-cclear]"), function(b){
+    b.addEventListener("click", function(){ clearClosingStep(b.dataset.cclear); });
+  });
+  const ph = document.querySelector("[data-cphoto]");
+  if(ph) ph.addEventListener("click", sendPadPhoto);
+}
+
+function markClosingLocal(id, data){
+  /* mirror it locally so the gate and the tick move on this tap, not next sync */
+  (STATE.closing_steps || []).forEach(function(st){
+    if(st.id === id){ st.done = true; st.data = data; }
+  });
+  const bl = (STATE.season && STATE.season.closing && STATE.season.closing.blocking) || [];
+  if(STATE.season && STATE.season.closing){
+    STATE.season.closing.blocking = bl.filter(function(t){
+      const m = (STATE.closing_steps || []).filter(function(x){ return x.title === t; })[0];
+      return !(m && m.done);
+    });
+  }
+}
+
+async function saveClosingStep(id){
+  let data = {};
+  if(id === "final_reading"){
+    const r = LIVE && LIVE.latest;
+    if(!r){ toast("No confirmed reading yet"); return; }
+    data = {reading_id: r.id, note: "reading of " + r.date};
+  } else if(id === "pro_visit"){
+    data = {cover: $("cv_cover").value,
+            lowered_inches: $("cv_lowered").value.trim() || null,
+            chemicals: $("cv_chem").value.trim(),
+            who: $("cv_who").value.trim(),
+            lines_blown: $("cv_lines").checked};
+  } else if(id === "stored"){
+    STORED_FIELDS.forEach(function(f){
+      const v = $("cs_" + f.key); if(v && v.value.trim()) data[f.key] = v.value.trim(); });
+    if(!Object.keys(data).length){ toast("Nothing filled in"); return; }
+  } else if(id === "punch_list"){
+    data = {items: $("cv_punch").value.split("\n")
+      .map(function(x){ return x.trim(); }).filter(Boolean)};
+  }
+  markClosingLocal(id, data);
+  render();
+  await sendJson("season", Object.assign({kind:"season", action:"record", step:id}, data),
+                 "Recorded");
+}
+
+async function clearClosingStep(id){
+  (STATE.closing_steps || []).forEach(function(st){
+    if(st.id === id){ st.done = false; st.data = {}; } });
+  render();
+  await sendJson("season", {kind:"season", action:"clear", step:id}, "Cleared");
+}
+
+async function sendPadPhoto(){
+  const f = ($("cv_photo").files || [])[0];
+  if(!f){ toast("Pick a photo first"); return; }
+  try {
+    const b64 = await shrink(f, 1600);
+    await send("inbox/" + nowStamp() + "-padphoto.jpg", b64,
+               "chore: equipment pad photo", "Photo uploaded");
+  } catch(e){ toast("Couldn't process that image"); }
+}
+
+async function doClose(){
+  const note = "";
+  STATE.season.closed = true;
+  STATE.season.closed_at = today();
+  STATE.season.days_closed = 0;
+  render(); showTab("season");
+  await sendJson("season", {kind:"season", action:"close", on:today(), note:note},
+                 "Pool closed");
+}
+
+async function doOpen(){
+  STATE.season.closed = false;
+  STATE.season.closed_at = null;
+  ls.set("pp_pending", Object.assign(pending(), {opening:{}}));
+  render(); showTab("season");
+  await sendJson("season", {kind:"season", action:"open", on:today()},
+                 "Pool open \u2014 fresh start");
+}
+
+/* a two-tap confirm: both of these reshape the whole app, and a mis-tap on a
+   phone in a wet hand is not a thing to design around casually */
+function armTwoTap(firstId, secondId, fn){
+  let t = null;
+  $(firstId).addEventListener("click", function(){
+    $(firstId).classList.add("hide"); $(secondId).classList.remove("hide");
+    t = setTimeout(function(){
+      $(secondId).classList.add("hide"); $(firstId).classList.remove("hide"); }, 4000);
+  });
+  $(secondId).addEventListener("click", function(){
+    clearTimeout(t);
+    $(secondId).classList.add("hide"); $(firstId).classList.remove("hide");
+    fn();
+  });
+}
+
 /* ------------------------------------------------------------- opening */
 function renderOpening(){
   const op = STATE.opening || {steps:[], done:0, total:0};
@@ -1245,7 +1587,7 @@ async function forceRebuild(){
 
 /* ----------------------------------------------------------------- tabs */
 function showTab(name){
-  ["today","hist","open","set"].forEach(function(t){
+  ["today","hist","season","set"].forEach(function(t){
     $("tab-" + t).classList.toggle("hide", t !== name);
   });
   Array.prototype.forEach.call(document.querySelectorAll("nav button"), function(b){
@@ -1288,10 +1630,9 @@ $("shot").addEventListener("change", function(e){
   $("shot_send").disabled = !shotFile;
 });
 $("shot_send").addEventListener("click", sendShot);
-$("open_reset").addEventListener("click", async function(){
-  ls.set("pp_pending", Object.assign(pending(), {opening:{}}));
-  await sendJson("opening_reset", {kind:"opening_reset", date:today()}, "New season started");
-});
+armTwoTap("s_close1", "s_close2", doClose);
+armTwoTap("s_open1", "s_open2", doOpen);
+$("goSeason").addEventListener("click", function(){ showTab("season"); });
 $("hrefresh").addEventListener("click", function(){ load(); toast("Refreshing…", 1200); });
 
 load();

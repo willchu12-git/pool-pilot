@@ -150,11 +150,23 @@ def process(path):
     return rec
 
 
-def inbox_images():
-    """Every image sitting in inbox/, oldest name first."""
+def is_reading_image(fn):
+    """Only `*-reading.*` goes to the vision pass.
+
+    The app also uploads photos that are not water tests -- the equipment pad at
+    closing, for one. Running OCR over a picture of a pump and filing whatever
+    numbers it hallucinates as a reading would be a genuinely bad outcome, so the
+    filename decides, and anything unrecognised is simply kept as a picture.
+    """
+    return "-reading." in os.path.basename(fn).lower()
+
+
+def inbox_images(readings_only=True):
+    """Images sitting in inbox/, oldest name first."""
     base = poolcfg.path_of("inbox")
-    return [os.path.join(base, f) for f in sorted(os.listdir(base))
-            if f.lower().endswith(IMAGE_EXT) and os.path.isfile(os.path.join(base, f))]
+    out = [os.path.join(base, f) for f in sorted(os.listdir(base))
+           if f.lower().endswith(IMAGE_EXT) and os.path.isfile(os.path.join(base, f))]
+    return [f for f in out if is_reading_image(f)] if readings_only else out
 
 
 def main(argv=None):

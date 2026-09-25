@@ -29,6 +29,7 @@ sys.path.insert(0, HERE)
 import chem       # noqa: E402
 import checklist  # noqa: E402
 import poolcfg    # noqa: E402
+import season     # noqa: E402
 import store      # noqa: E402
 
 DISCLAIMER = ("Every dose here is an estimate from your pool's volume and one measurement. "
@@ -172,6 +173,10 @@ def build(today=None, with_checklist=True):
         "timeline": timeline(readings, acts),
         "trends": trends(readings, 90, today),
         "opening": store.opening_state(),
+        # what last autumn knows that this spring needs
+        "opening_brief": season.opening_brief(today),
+        "season": season.status(today),
+        "closing_steps": season.closing_state()["steps"],
         "action_kinds": store.ACTION_KINDS,
         # only whether it is switched on -- no token, no pool id, nothing that
         # would be a leak in a public repo
@@ -192,6 +197,12 @@ def main():
     st = build()
     p = poolcfg.store_path("state.json")
     json.dump(st, open(p, "w", encoding="utf-8"), indent=2, ensure_ascii=False)
+    if st["season"]["closed"]:
+        d = st["season"]["days_closed"]
+        print("state written: CLOSED since %s%s -> %s"
+              % (st["season"]["closed_at"],
+                 (" (%d days)" % d) if d and d > 0 else "", p))
+        return st
     r = st["latest_reading"]
     if r:
         print("state written: reading %s (%s days old), %d item(s) on the list -> %s"

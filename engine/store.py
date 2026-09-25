@@ -424,6 +424,10 @@ def ingest(rec):
                               rec.get("on") or rec.get("date"), rec.get("note", ""))
         return "opening", {"date": rec.get("on") or rec.get("date", "")}
 
+    if kind == "season":
+        import season                       # local: season imports store
+        return season.ingest(rec)
+
     if kind in ("opening_reset", "reset_opening"):
         reset_opening(rec.get("year"))
         return "opening-reset", {"date": rec.get("date", "")}

@@ -30,6 +30,7 @@ from datetime import datetime
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import poolcfg  # noqa: E402
+import season   # noqa: E402
 import store    # noqa: E402
 import vision   # noqa: E402
 
@@ -49,12 +50,16 @@ def _move(fp, arch, fn, tag=""):
 
 
 def images():
-    """inbox/*.jpg -> an unconfirmed reading, waiting for me to say yes."""
+    """inbox/*-reading.jpg -> an unconfirmed reading, waiting for me to say yes.
+
+    Any other image is a picture rather than a measurement -- the equipment pad
+    at closing being the one that matters -- so it is filed and kept, never sent
+    to the vision pass.
+    """
     base = poolcfg.path_of("inbox")
     arch = _archive_dir(base)
-    files = vision.inbox_images()
     n = 0
-    for fp in files:
+    for fp in vision.inbox_images(readings_only=True):
         fn = os.path.basename(fp)
         try:
             vision.process(fp)
@@ -63,7 +68,24 @@ def images():
             print("  ! %s failed to process (%s)" % (fn, e))
         _move(fp, arch, fn)
     print("images: %d read" % n)
-    return n
+
+    kept = 0
+    for fp in vision.inbox_images(readings_only=False):
+        fn = os.path.basename(fp)
+        rel = vision._archive_image(fp, fn.rsplit(".", 1)[0])
+        if "padphoto" in fn.lower():
+            try:
+                season.record_step("pad_photo", image=rel)
+                print("  + pad photo -> %s" % rel)
+            except ValueError as e:
+                print("  ! %s" % e)
+        else:
+            print("  + photo kept -> %s" % rel)
+        _move(fp, arch, fn)
+        kept += 1
+    if kept:
+        print("photos: %d kept" % kept)
+    return n + kept
 
 
 def json_drops():

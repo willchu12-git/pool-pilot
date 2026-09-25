@@ -89,11 +89,31 @@ def _fmt(key, v):
     return ("%g%s" % (round(v, 2), unit)) if key != "salt_ppm" else "%s ppm" % format(int(v), ",")
 
 
+# How far under the borate target still counts as fine. Borate is a buffer you
+# build once and top up rarely, not a band you hold -- so 47 ppm against a 50 ppm
+# target is a success, not a deficiency.
+BORATE_SLACK_PPM = 5.0
+
+
+def _bounds(key):
+    """The (low, high) actually used to judge a value.
+
+    A scalar target like borates_ppm comes back from poolcfg.band() as (50, 50),
+    a zero-width band that calls 49 "low" and 51 "high". Nothing about borates
+    works that way, and it made the panel disagree with the checklist, which
+    treats anything within BORATE_SLACK_PPM as fine.
+    """
+    lo, hi = poolcfg.band(key)
+    if key == "borates_ppm" and lo is not None and lo == hi:
+        return lo - BORATE_SLACK_PPM, None
+    return lo, hi
+
+
 def _status(key, v):
     """low / ok / high / unknown against the configured band."""
     if v is None:
         return "unknown"
-    lo, hi = poolcfg.band(key)
+    lo, hi = _bounds(key)
     if lo is not None and v < lo:
         return "low"
     if hi is not None and v > hi:
@@ -105,13 +125,15 @@ def panel(reading):
     """Every measured value with its target and its verdict -- the dials on Today."""
     r = reading or {}
     out = []
-    for key in ("ph", "orp_mv", "salt_ppm", "cya_ppm", "borates_ppm", "ta_ppm", "water_temp_f"):
-        lo, hi = poolcfg.band(key)
+    for key in ("ph", "orp_mv", "fc_ppm", "salt_ppm", "cya_ppm", "borates_ppm", "ta_ppm",
+                "water_temp_f"):
+        lo, hi = _bounds(key)
         if lo is None and hi is None and key != "water_temp_f":
             continue
         v = r.get(key)
         label, unit = MEASURE_LABELS[key]
-        out.append({"key": key, "label": label, "unit": unit.strip(), "value": v,
+        out.append({"key": key, "label": label, "unit": unit.strip(),
+                    "fmt_unit": unit, "value": v,
                     "display": _fmt(key, v),
                     "target": "" if key == "water_temp_f" else _band_text(key),
                     "status": _status(key, v) if key != "water_temp_f" else
@@ -177,8 +199,14 @@ def _ph_items(r, gallons, chems):
     return []
 
 
-FC_FLOOR_PPM = 2.0          # below this the water isn't protected, whatever ORP says
+# The floor comes from config.targets.fc_ppm so the panel and the shock rule can
+# never disagree about what "low" means. 2.0 is only the fallback.
 FC_SHOCK_TARGET_PPM = 6.0   # where a shock dose aims
+
+
+def _fc_floor():
+    lo, _ = poolcfg.band("fc_ppm")
+    return lo if lo is not None else 2.0
 
 
 def _shock_items(r, gallons, chems):
@@ -188,8 +216,9 @@ def _shock_items(r, gallons, chems):
     salt and temperature, and "the proxy looks low so add a gallon of chlorine" is
     exactly the reflex that overshoots a pool. No FC number, no shock item.
     """
+    floor = _fc_floor()
     fc = r.get("fc_ppm")
-    if fc is None or fc >= FC_FLOOR_PPM:
+    if fc is None or fc >= floor:
         return []
     d = chem.chlorine_gal(FC_SHOCK_TARGET_PPM - fc, gallons,
                           chems["chlorine"].get("strength_pct", 12.5))
@@ -202,9 +231,9 @@ def _shock_items(r, gallons, chems):
     return [_item("shock", "Raise free chlorine", "dose", P_SAFETY,
                   "Free chlorine is %s, under the %g ppm floor. That's the one number where "
                   "low means the water genuinely isn't protected, so it goes first."
-                  % (_fmt("fc_ppm", fc), FC_FLOOR_PPM),
+                  % (_fmt("fc_ppm", fc), floor),
                   dose=dose, measured=_fmt("fc_ppm", fc),
-                  target="at least %g ppm" % FC_FLOOR_PPM)]
+                  target=_band_text("fc_ppm"))]
 
 
 def _ta_items(r, items_so_far):
@@ -312,7 +341,7 @@ def _borate_items(r, gallons, chems):
                       "Borates aren't on the ICO panel and haven't been tested. The target is "
                       "%g ppm; a strip test once a season is enough to know where you are." % tgt,
                       target="%g ppm" % tgt)]
-    if cur >= tgt - 5:
+    if cur >= tgt - BORATE_SLACK_PPM:
         return []
     d = chem.borate_lb(cur, tgt, gallons, chems["borate"].get("boron_pct", 17.5))
     if not d:
@@ -475,6 +504,40 @@ def _apply_gap(items):
     return items
 
 
+def _order(items):
+    """Sort by urgency, then force any item that must FOLLOW another to sit below it.
+
+    Sorting on priority alone got this dangerously wrong: a shock item is
+    P_SAFETY (low free chlorine is the one genuine emergency) and acid is
+    P_TODAY, so the list rendered "Raise free chlorine -- wait at least 4 hours
+    after the acid" ABOVE the acid it was waiting for. A safety gap you have to
+    read the list backwards to honour is not a safety gap.
+
+    So `after` is enforced here rather than merely recorded: the dependent item
+    is lifted out and reinserted directly below whatever it depends on.
+    """
+    items.sort(key=lambda i: (i["priority"], 0 if i["dose"] else 1, i["title"]))
+    for _ in range(len(items)):                  # bounded; chains here are length 1
+        moved = False
+        for it in list(items):
+            dep = it.get("after")
+            if not dep:
+                continue
+            di = next((n for n, x in enumerate(items) if x["id"] == dep), None)
+            if di is None:
+                it["after"] = None               # dependency vanished (superseded)
+                continue
+            ii = items.index(it)
+            if ii < di:
+                items.insert(di + 1, items.pop(ii))
+                moved = True
+        if not moved:
+            break
+    for n, it in enumerate(items, 1):
+        it["order"] = n
+    return items
+
+
 def build(today=None, reading=None):
     """The whole deterministic checklist. No AI anywhere in this function."""
     today = today or date.today()
@@ -501,9 +564,7 @@ def build(today=None, reading=None):
 
     items = _apply_supersedes(items, (r or {}).get("at"), acts)
     items = _apply_gap(items)
-    items.sort(key=lambda i: (i["priority"], 0 if i["dose"] else 1, i["title"]))
-    for n, it in enumerate(items, 1):
-        it["order"] = n
+    items = _order(items)
 
     todo = [i for i in items if i["priority"] <= P_SOON and not i["superseded"]]
     return {
@@ -672,8 +733,9 @@ def context(cl):
         "panel": cl["panel"],
         "recent_actions": [{k: a.get(k) for k in ("date", "label", "amount", "unit", "note")}
                            for a in store.recent_actions(7)],
-        "items": [{k: i[k] for k in ("id", "title", "kind", "priority", "because", "dose",
-                                     "measured", "target", "wait_hours", "superseded")}
+        "items": [{k: i[k] for k in ("id", "order", "title", "kind", "priority", "because",
+                                     "dose", "measured", "target", "wait_hours", "after",
+                                     "superseded")}
                   for i in cl["items"]],
     }
 
@@ -693,8 +755,12 @@ def generate(cl, offline=False):
     return fallback(cl), "fallback"
 
 
-def main():
-    offline = "--offline" in sys.argv
+def main(argv=None):
+    """argv is explicit so callers other than the CLI can pick the offline path --
+    engine/serve.py does, because it answers a browser fetch synchronously and
+    must not sit on a 300-second CLI call to do it."""
+    argv = sys.argv[1:] if argv is None else argv
+    offline = "--offline" in argv
     cl = build()
     cl, source = generate(cl, offline=offline)
     cl["source"] = source

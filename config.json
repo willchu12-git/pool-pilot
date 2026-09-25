@@ -20,20 +20,43 @@
     "notes": "salt_cell_increment_pct is how big one nudge of the cell output is -- the engine never suggests more than one nudge per checklist."
   },
   "targets": {
-    "orp_mv": [600, null],
-    "ph": [7.6, 7.8],
-    "salt_ppm": [2800, 3200],
-    "cya_ppm": [30, 50],
+    "orp_mv": [
+      600,
+      null
+    ],
+    "fc_ppm": [
+      2,
+      null
+    ],
+    "ph": [
+      7.6,
+      7.8
+    ],
+    "salt_ppm": [
+      2800,
+      3200
+    ],
+    "cya_ppm": [
+      30,
+      50
+    ],
     "borates_ppm": 50,
-    "ta_ppm": [60, 80],
-    "water_temp_f": [null, null],
+    "ta_ppm": [
+      60,
+      80
+    ],
+    "water_temp_f": [
+      null,
+      null
+    ],
     "notes": "[low, high]; null on either side means 'no ceiling/floor, don't nag about it'. borates_ppm is a single target, not a band.",
     "why_these": {
       "ph": "7.6-7.8 rather than 7.8-8.1. The ICO reads ORP, and ORP tracks the ACTIVE fraction of your chlorine, which collapses as pH rises: roughly 40% of free chlorine is active HOCl at 7.7, but only ~22% at 8.0. Holding a 600 mV floor at pH 8.0+ means running the cell hard to make up for chemistry, not for demand. 7.6-7.8 is also high enough that the cell's own upward pH drift doesn't need acid every week -- targeting 7.4 on a saltwater pool is a treadmill.",
       "ta_ppm": "60-80 rather than 60-100. Carbonate out-gassing is what drives the pH climb on a saltwater pool, and lower TA means a slower climb and less acid over a season. The usual reason to hold TA high is protecting plaster from etching -- a vinyl liner has no such floor, so there is nothing to buy with the extra 20 ppm.",
       "cya_ppm": "Left at 30-50 on purpose, even though saltwater pools are often run at 70-80. CYA binds chlorine, and an ORP probe only sees what is unbound -- high CYA would push ORP down and make the 600 mV floor unreachable no matter what the cell does. 30-50 is the band that keeps ORP-based control honest.",
       "salt_ppm": "2800-3200 centers on 3000, which is in-spec for essentially every Jandy cell. Check your cell's manual: if it asks for 3000-3500, move this band up to match it -- a cell run under its own band makes less chlorine and wears out faster.",
-      "borates_ppm": "50 ppm is what makes the pH band above hold. Borates are a second buffer working where carbonate alkalinity is weakest, and they are most of the reason pH stops climbing every week."
+      "borates_ppm": "50 ppm is what makes the pH band above hold. Borates are a second buffer working where carbonate alkalinity is weakest, and they are most of the reason pH stops climbing every week.",
+      "fc_ppm": "At least 2 ppm. This is the one number where 'low' means the water genuinely is not protected, whatever ORP says -- so it outranks everything else on the list. The ICO does not measure it; a strip does."
     }
   },
   "cadence_days": {
@@ -45,11 +68,25 @@
     "notes": "Days before the app starts asking. These are reminders, not deadlines -- a stale one is a nudge, never an alarm."
   },
   "chemicals": {
-    "acid": {"name": "muriatic acid", "strength_pct": 31.45},
-    "chlorine": {"name": "liquid chlorine", "strength_pct": 12.5},
-    "salt": {"name": "pool salt", "bag_lb": 40},
-    "cya": {"name": "stabilizer (cyanuric acid)"},
-    "borate": {"name": "boric acid", "boron_pct": 17.5},
+    "acid": {
+      "name": "muriatic acid",
+      "strength_pct": 31.45
+    },
+    "chlorine": {
+      "name": "liquid chlorine",
+      "strength_pct": 12.5
+    },
+    "salt": {
+      "name": "pool salt",
+      "bag_lb": 40
+    },
+    "cya": {
+      "name": "stabilizer (cyanuric acid)"
+    },
+    "borate": {
+      "name": "boric acid",
+      "boron_pct": 17.5
+    },
     "notes": "Strengths matter: a dose computed for 31.45% acid is wrong for 14.5% acid. Change these if you buy something different."
   },
   "safety_rules": [
@@ -62,18 +99,36 @@
   ],
   "opening": {
     "steps": [
-      {"id": "physical_prep", "title": "Physical prep",
-       "detail": "Cover off, cleaned and stored. Skim the surface, brush the walls and floor, vacuum out the winter debris. Reinstall the ladder, rails and return fittings."},
-      {"id": "mechanical_start", "title": "Mechanical start",
-       "detail": "Reinstall drain plugs, prime the pump, open the valves, start the filter. Run it 24h continuously and watch for leaks and pressure. Do NOT run the salt cell yet."},
-      {"id": "base_sanitization", "title": "Base sanitization",
-       "detail": "Water is unstabilized and probably green-ish. Bring chlorine up with liquid chlorine while the pump runs, then keep filtering until the water clears."},
-      {"id": "cya_anchor", "title": "CYA anchor",
-       "detail": "Stabilizer goes in BEFORE the salt cell carries the load -- without CYA the sun burns off chlorine faster than the cell can make it. Sock it in the skimmer, never broadcast it on a vinyl liner."},
-      {"id": "salt_addition", "title": "Salt addition",
-       "detail": "Now bring salt into the cell's band. Broadcast into the deep end with the pump running, brush until dissolved, then wait a full circulation before you trust a salt reading."},
-      {"id": "borate_buffer", "title": "Borate buffer",
-       "detail": "Last, because it's the expensive one and it locks in a stable pH. Predissolve in a bucket in batches, and retest pH after it has circulated."}
+      {
+        "id": "physical_prep",
+        "title": "Physical prep",
+        "detail": "Cover off, cleaned and stored. Skim the surface, brush the walls and floor, vacuum out the winter debris. Reinstall the ladder, rails and return fittings."
+      },
+      {
+        "id": "mechanical_start",
+        "title": "Mechanical start",
+        "detail": "Reinstall drain plugs, prime the pump, open the valves, start the filter. Run it 24h continuously and watch for leaks and pressure. Do NOT run the salt cell yet."
+      },
+      {
+        "id": "base_sanitization",
+        "title": "Base sanitization",
+        "detail": "Water is unstabilized and probably green-ish. Bring chlorine up with liquid chlorine while the pump runs, then keep filtering until the water clears."
+      },
+      {
+        "id": "cya_anchor",
+        "title": "CYA anchor",
+        "detail": "Stabilizer goes in BEFORE the salt cell carries the load -- without CYA the sun burns off chlorine faster than the cell can make it. Sock it in the skimmer, never broadcast it on a vinyl liner."
+      },
+      {
+        "id": "salt_addition",
+        "title": "Salt addition",
+        "detail": "Now bring salt into the cell's band. Broadcast into the deep end with the pump running, brush until dissolved, then wait a full circulation before you trust a salt reading."
+      },
+      {
+        "id": "borate_buffer",
+        "title": "Borate buffer",
+        "detail": "Last, because it's the expensive one and it locks in a stable pH. Predissolve in a bucket in batches, and retest pH after it has circulated."
+      }
     ],
     "notes": "Strictly sequential on purpose -- each step assumes the one before it is done. Adding salt before the water is clear just means you paid to salt a swamp."
   },
@@ -90,8 +145,9 @@
     "notes": "Pick an unguessable topic -- anyone who knows it can read it. Install the free ntfy app and subscribe. Or set the NTFY_TOPIC secret instead."
   },
   "app": {
-    "data_repo": "willchu12-git/pool-pilot-data",
+    "data_repo": "willchu12-git/pool-pilot",
     "title": "Pool Pilot",
-    "notes": "data_repo is the PRIVATE repo the PWA reads from and writes readings into, owner/name."
+    "public_data_url": "../data/store/state.json",
+    "notes": "Single PUBLIC repo: GitHub Pages serves app/ and data/store/ from the same origin, so the phone READS with no token at all. public_data_url is relative to app/index.html. A token is only needed to WRITE (log a reading, tick an item off). To switch to a private two-repo setup instead, blank public_data_url and point data_repo at the private repo."
   }
 }

@@ -57,8 +57,12 @@ def scale(gallons):
     return (g / 10000.0) if g > 0 else 1.8
 
 
-def _round_to(x, step):
-    return round(round(x / step) * step, 2)
+def _round_to(x, step, down=False):
+    """Round to a pourable increment. `down` when the value is already at a cap --
+    rounding a limit UP would quietly hand back more than the cap allows."""
+    n = (x / step)
+    n = int(n) if down else round(n)
+    return round(n * step, 2)
 
 
 def _capped(want, cap, gallons):
@@ -76,7 +80,7 @@ def salt_lb(current_ppm, target_ppm, gallons):
         return None
     lb = (tgt - cur) * scale(gallons) / PPM_PER_LB_PER_10K
     dose, capped = _capped(lb, MAX_SALT_LB_PER_10K, gallons)
-    return {"lb": _round_to(dose, 0.5), "want_lb": round(lb, 1), "capped": capped,
+    return {"lb": _round_to(dose, 0.5, capped), "want_lb": round(lb, 1), "capped": capped,
             "raises_ppm": round(tgt - cur, 0)}
 
 
@@ -96,7 +100,7 @@ def cya_lb(current_ppm, target_ppm, gallons):
         return None
     lb = (tgt - cur) * scale(gallons) / PPM_PER_LB_PER_10K
     dose, capped = _capped(lb, MAX_CYA_LB_PER_10K, gallons)
-    return {"lb": _round_to(dose, 0.25), "want_lb": round(lb, 1), "capped": capped,
+    return {"lb": _round_to(dose, 0.25, capped), "want_lb": round(lb, 1), "capped": capped,
             "raises_ppm": round(tgt - cur, 0)}
 
 
@@ -128,7 +132,7 @@ def chlorine_gal(fc_delta_ppm, gallons, strength_pct=12.5):
     ppm_per_gal = FC_PPM_PER_GAL_12_5_PER_10K * (s / 12.5) / scale(gallons)
     gal = d / ppm_per_gal
     dose, capped = _capped(gal, MAX_CHLORINE_GAL_PER_10K, gallons)
-    return {"gal": _round_to(dose, 0.25), "want_gal": round(gal, 2), "capped": capped,
+    return {"gal": _round_to(dose, 0.25, capped), "want_gal": round(gal, 2), "capped": capped,
             "raises_ppm": round(d, 1), "strength_pct": s}
 
 
@@ -138,10 +142,10 @@ def acid_floz(ph_now, ph_target, gallons, ta_ppm=None, strength_pct=31.45):
     """Fluid ounces of muriatic acid to bring pH down to target.
 
     Acid demand is driven by TOTAL ALKALINITY, not by pH -- TA is the buffer the
-    acid actually has to chew through. With TA unknown we assume a mid-band %d and
-    say so in the result, because a dose computed against a guessed buffer is a
-    starting point to retest from, not an answer.
-    """ % DEFAULT_TA
+    acid actually has to chew through. With TA unknown we assume the mid-band
+    DEFAULT_TA and say so in the result, because a dose computed against a
+    guessed buffer is a starting point to retest from, not an answer.
+    """
     now, tgt = _f(ph_now), _f(ph_target)
     s = _f(strength_pct, 31.45) or 31.45
     if now is None or tgt is None or now <= tgt:
@@ -150,8 +154,11 @@ def acid_floz(ph_now, ph_target, gallons, ta_ppm=None, strength_pct=31.45):
     assumed = ta is None
     ta = DEFAULT_TA if assumed else ta
     floz = ACID_FLOZ_PER_TA_PER_PH_PER_10K * ta * (now - tgt) * scale(gallons) * (31.45 / s)
+    if floz < 1.0:
+        return None          # nothing worth pouring; a "0 fl oz" instruction is noise
     dose, capped = _capped(floz, MAX_ACID_FLOZ_PER_10K, gallons)
-    return {"floz": _round_to(dose, 1), "want_floz": round(floz, 1), "capped": capped,
+    dose = _round_to(dose, 1, capped)
+    return {"floz": dose, "want_floz": round(floz, 1), "capped": capped,
             "cups": round(dose / 8.0, 2), "quarts": round(dose / 32.0, 2),
             "ta_used": ta, "ta_assumed": assumed, "drops_ph": round(now - tgt, 2),
             "strength_pct": s}
@@ -189,7 +196,7 @@ def cell_nudge(current_pct, direction, step_pct=10):
 
 # ------------------------------------------------------------------- reporting
 
-def summary(gallons):
+def summary(gallons, boron_pct=17.5):
     """What one unit of each chemical does to THIS pool -- the numbers worth knowing
     by heart, shown in the app so the doses never feel like magic."""
     sc = scale(gallons)
@@ -201,7 +208,8 @@ def summary(gallons):
             ACID_FLOZ_PER_TA_PER_PH_PER_10K * DEFAULT_TA * 0.1 * sc, 1),
         "chlorine_gal_per_1ppm": round(sc / FC_PPM_PER_GAL_12_5_PER_10K, 2),
         "boric_acid_lb_per_10ppm": round(10 * (_f(gallons, 18000) or 18000)
-                                         * LB_PER_GAL_WATER / 1e6 / 0.175, 1),
+                                         * LB_PER_GAL_WATER / 1e6
+                                         / ((_f(boron_pct, 17.5) or 17.5) / 100.0), 1),
     }
 
 

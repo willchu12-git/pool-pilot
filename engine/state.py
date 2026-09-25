@@ -173,7 +173,9 @@ def build(today=None, with_checklist=True):
         "trends": trends(readings, 90, today),
         "opening": store.opening_state(),
         "action_kinds": store.ACTION_KINDS,
-        "reference": chem.summary(poolcfg.gallons()),
+        "reference": chem.summary(
+            poolcfg.gallons(),
+            poolcfg.CONFIG["chemicals"]["borate"].get("boron_pct", 17.5)),
         "counts": {"readings": len(readings), "confirmed": len(readings) - len(pending),
                    "actions": len(acts), "pending": len(pending)},
         "raw": {"readings": readings[-120:], "actions": acts[-200:]},

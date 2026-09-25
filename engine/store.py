@@ -216,17 +216,43 @@ def confirm_reading(rid, **fixes):
 
     Appends rather than edits -- the original OCR guess stays on disk forever,
     which is the only way to ever find out whether the vision pass is any good.
+
+    Two things this refuses to do, both for the same reason (a confirmed reading
+    is what the checklist doses off, so it has to mean something):
+
+      * It will not confirm an id that isn't on disk. That happens when a
+        confirmation overtakes the screenshot it belongs to, and confirming it
+        anyway would mint a "confirmed" reading with no measurements and no date.
+      * It will not silently swallow a correction that fails the sanity check.
+        _num returns None for an out-of-range value and _collapse ignores None,
+        so a fat-fingered "81" for pH used to vanish while the record still
+        flipped to confirmed -- leaving the original bad OCR number confirmed and
+        doseable. Now the whole confirmation is refused and says which field.
     """
-    rec = {"id": rid, "confirmed": True, "logged_at": _now()}
+    prior = next((r for r in readings(False) if r.get("id") == rid), None)
+    if not prior:
+        raise ValueError("no reading with id %r to confirm -- it may not have been "
+                         "read yet; try again once the screenshot has been processed" % rid)
+
+    rec = {"id": rid, "confirmed": True, "logged_at": _now(),
+           "at": prior.get("at"), "date": prior.get("date")}
+    rejected = []
     for f in MEASURES:
-        if f in fixes:
-            rec[f] = _num(f, fixes[f])
+        if f not in fixes:
+            continue
+        raw = fixes[f]
+        val = _num(f, raw)
+        if val is None and raw not in (None, "", "null"):
+            rejected.append("%s=%s" % (f, raw))
+            continue
+        rec[f] = val
+    if rejected:
+        lo_hi = ", ".join("%s (expected %g-%g)" % (r.split("=")[0], *SANE[r.split("=")[0]])
+                          for r in rejected if r.split("=")[0] in SANE)
+        raise ValueError("refusing to confirm: %s is out of range -- %s. Re-enter it; "
+                         "nothing was changed." % (", ".join(rejected), lo_hi))
     if fixes.get("note"):
         rec["note"] = str(fixes["note"]).strip()
-    prior = next((r for r in readings(False) if r.get("id") == rid), None)
-    if prior:
-        rec["at"] = prior.get("at")
-        rec["date"] = prior.get("date")
     return append_jsonl(READINGS, rec)
 
 

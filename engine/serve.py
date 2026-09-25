@@ -98,11 +98,28 @@ class Handler(BaseHTTPRequestHandler):
             os.makedirs(os.path.dirname(dest), exist_ok=True)
             open(dest, "wb").write(raw)
             print("  wrote %s (%d bytes)" % (rel, len(raw)))
-            check_inbox.main()
-            checklist.main()
-            state_mod.main()
-            pwa.main()
-            return self._send(200, json.dumps({"ok": True}))
+            # The file is on disk, so the write has already succeeded -- everything
+            # after this is a rebuild, and a rebuild that blows up must not turn
+            # into a failed save the phone then queues and retries. Each step is
+            # wrapped, and the response reports what actually ran.
+            #
+            # checklist runs OFFLINE here on purpose: the AI path shells out to
+            # the CLI with a 300s timeout while the browser sits on this fetch.
+            # The cloud does the AI wording; locally, instant and deterministic
+            # beats waiting five minutes for nicer sentences.
+            ran, failed = [], []
+            for label, fn, args in (("ingest", check_inbox.main, ()),
+                                    ("checklist", checklist.main, (["--offline"],)),
+                                    ("state", state_mod.main, ()),
+                                    ("app", pwa.main, ())):
+                try:
+                    fn(*args)
+                    ran.append(label)
+                except Exception as e:
+                    print("  ! %s failed: %s" % (label, e))
+                    failed.append("%s: %s" % (label, e))
+            return self._send(200, json.dumps({"ok": True, "saved": rel,
+                                               "ran": ran, "failed": failed}))
 
         return self._send(404, json.dumps({"error": "not found"}))
 

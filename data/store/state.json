@@ -42,13 +42,18 @@
       null,
       null
     ],
+    "fc_ppm": [
+      2,
+      null
+    ],
     "notes": "[low, high]; null on either side means 'no ceiling/floor, don't nag about it'. borates_ppm is a single target, not a band.",
     "why_these": {
       "ph": "7.6-7.8 rather than 7.8-8.1. The ICO reads ORP, and ORP tracks the ACTIVE fraction of your chlorine, which collapses as pH rises: roughly 40% of free chlorine is active HOCl at 7.7, but only ~22% at 8.0. Holding a 600 mV floor at pH 8.0+ means running the cell hard to make up for chemistry, not for demand. 7.6-7.8 is also high enough that the cell's own upward pH drift doesn't need acid every week -- targeting 7.4 on a saltwater pool is a treadmill.",
       "ta_ppm": "60-80 rather than 60-100. Carbonate out-gassing is what drives the pH climb on a saltwater pool, and lower TA means a slower climb and less acid over a season. The usual reason to hold TA high is protecting plaster from etching -- a vinyl liner has no such floor, so there is nothing to buy with the extra 20 ppm.",
       "cya_ppm": "Left at 30-50 on purpose, even though saltwater pools are often run at 70-80. CYA binds chlorine, and an ORP probe only sees what is unbound -- high CYA would push ORP down and make the 600 mV floor unreachable no matter what the cell does. 30-50 is the band that keeps ORP-based control honest.",
       "salt_ppm": "2800-3200 centers on 3000, which is in-spec for essentially every Jandy cell. Check your cell's manual: if it asks for 3000-3500, move this band up to match it -- a cell run under its own band makes less chlorine and wears out faster.",
-      "borates_ppm": "50 ppm is what makes the pH band above hold. Borates are a second buffer working where carbonate alkalinity is weakest, and they are most of the reason pH stops climbing every week."
+      "borates_ppm": "50 ppm is what makes the pH band above hold. Borates are a second buffer working where carbonate alkalinity is weakest, and they are most of the reason pH stops climbing every week.",
+      "fc_ppm": "At least 2 ppm. This is the one number where 'low' means the water genuinely is not protected, whatever ORP says -- so it outranks everything else on the list. The ICO does not measure it; a strip does."
     }
   },
   "cadence_days": {
@@ -91,37 +96,20 @@
   ],
   "checklist": {
     "date": "2026-09-24",
-    "generated_at": "2026-09-24T21:44:46",
-    "reading": {
-      "id": "2026-09-22T09:15:00",
-      "at": "2026-09-22T09:15:00",
-      "date": "2026-09-22",
-      "source": "ico",
-      "confirmed": true,
-      "image": "",
-      "note": "",
-      "logged_at": "2026-09-24T21:44:42",
-      "ph": 8.3,
-      "orp_mv": 558.0,
-      "salt_ppm": 2760.0,
-      "water_temp_f": 79.0,
-      "cya_ppm": 24.0,
-      "borates_ppm": null,
-      "ta_ppm": 95.0,
-      "ch_ppm": null,
-      "fc_ppm": null
-    },
-    "reading_age_days": 2,
+    "generated_at": "2026-09-24T21:53:33",
+    "reading": null,
+    "reading_age_days": null,
     "pending_confirmation": [],
     "panel": [
       {
         "key": "ph",
         "label": "pH",
         "unit": "",
-        "value": 8.3,
-        "display": "8.3",
+        "fmt_unit": "",
+        "value": null,
+        "display": "not measured",
         "target": "7.6-7.8",
-        "status": "high",
+        "status": "unknown",
         "low": 7.6,
         "high": 7.8
       },
@@ -129,21 +117,35 @@
         "key": "orp_mv",
         "label": "ORP",
         "unit": "mV",
-        "value": 558.0,
-        "display": "558 mV",
+        "fmt_unit": " mV",
+        "value": null,
+        "display": "not measured",
         "target": "at least 600 mV",
-        "status": "low",
+        "status": "unknown",
         "low": 600,
+        "high": null
+      },
+      {
+        "key": "fc_ppm",
+        "label": "Free chlorine",
+        "unit": "ppm",
+        "fmt_unit": " ppm",
+        "value": null,
+        "display": "not measured",
+        "target": "at least 2 ppm",
+        "status": "unknown",
+        "low": 2,
         "high": null
       },
       {
         "key": "salt_ppm",
         "label": "Salt",
         "unit": "ppm",
-        "value": 2760.0,
-        "display": "2,760 ppm",
+        "fmt_unit": " ppm",
+        "value": null,
+        "display": "not measured",
         "target": "2800-3200 ppm",
-        "status": "low",
+        "status": "unknown",
         "low": 2800,
         "high": 3200
       },
@@ -151,10 +153,11 @@
         "key": "cya_ppm",
         "label": "CYA",
         "unit": "ppm",
-        "value": 24.0,
-        "display": "24 ppm",
+        "fmt_unit": " ppm",
+        "value": null,
+        "display": "not measured",
         "target": "30-50 ppm",
-        "status": "low",
+        "status": "unknown",
         "low": 30,
         "high": 50
       },
@@ -162,21 +165,23 @@
         "key": "borates_ppm",
         "label": "Borates",
         "unit": "ppm",
+        "fmt_unit": " ppm",
         "value": null,
         "display": "not measured",
         "target": "50 ppm",
         "status": "unknown",
-        "low": 50,
-        "high": 50
+        "low": 45.0,
+        "high": null
       },
       {
         "key": "ta_ppm",
         "label": "TA",
         "unit": "ppm",
-        "value": 95.0,
-        "display": "95 ppm",
+        "fmt_unit": " ppm",
+        "value": null,
+        "display": "not measured",
         "target": "60-80 ppm",
-        "status": "high",
+        "status": "unknown",
         "low": 60,
         "high": 80
       },
@@ -184,123 +189,32 @@
         "key": "water_temp_f",
         "label": "Water temp",
         "unit": "°F",
-        "value": 79.0,
-        "display": "79°F",
+        "fmt_unit": "°F",
+        "value": null,
+        "display": "not measured",
         "target": "",
-        "status": "ok",
+        "status": "unknown",
         "low": null,
         "high": null
       }
     ],
     "items": [
       {
-        "id": "salt_up",
-        "key": "salt_up",
-        "title": "Add salt",
-        "kind": "dose",
+        "id": "reading_none",
+        "key": "reading_none",
+        "title": "Take a water reading",
+        "kind": "test",
         "priority": 1,
-        "because": "Salt is 2,760 ppm, below the 2800-3200 ppm the cell needs. A cell run under its salt band makes less chlorine and wears out faster.",
-        "why": "Salt is 2,760 ppm, below the 2800-3200 ppm the cell needs. A cell run under its salt band makes less chlorine and wears out faster.",
-        "how": "Pump running. Broadcast the salt across the deep end, then brush it off the floor until it dissolves so it isn't sitting on the liner. Give it a full circulation -- 24 hours -- before you trust a salt reading.",
-        "dose": {
-          "amount": 36.0,
-          "unit": "lb",
-          "chemical": "pool salt",
-          "label": "36 lb of salt (about 0.9 of a 40 lb bag)",
-          "detail": {
-            "lb": 36.0,
-            "want_lb": 36.0,
-            "capped": false,
-            "raises_ppm": 240.0,
-            "bags": 0.9,
-            "whole": 0,
-            "bag_lb": 40.0
-          }
-        },
-        "measured": "2,760 ppm",
-        "target": "2800-3200 ppm",
-        "wait_hours": null,
-        "after": null,
-        "superseded": false,
-        "order": 1
-      },
-      {
-        "id": "cya_up",
-        "key": "cya_up",
-        "title": "Add stabilizer",
-        "kind": "dose",
-        "priority": 1,
-        "because": "CYA is 24 ppm, under the 30-50 ppm target. Without stabilizer the sun strips chlorine faster than the cell can replace it, so the cell runs flat out and the ORP still sags.",
-        "why": "CYA is 24 ppm, under the 30-50 ppm target. Without stabilizer the sun strips chlorine faster than the cell can replace it, so the cell runs flat out and the ORP still sags.",
-        "how": "Predissolve it in a 5-gallon bucket of pool water, or hang it in a sock in front of a return. Never broadcast granules onto a vinyl liner. It reads slowly -- wait a week before retesting.",
-        "dose": {
-          "amount": 2.5,
-          "unit": "lb",
-          "chemical": "stabilizer (cyanuric acid)",
-          "label": "2.5 lb of stabilizer (cyanuric acid)",
-          "detail": {
-            "lb": 2.5,
-            "want_lb": 2.4,
-            "capped": false,
-            "raises_ppm": 16.0
-          }
-        },
-        "measured": "24 ppm",
-        "target": "30-50 ppm",
-        "wait_hours": null,
-        "after": null,
-        "superseded": false,
-        "order": 2
-      },
-      {
-        "id": "ph_down",
-        "key": "ph_down",
-        "title": "Bring pH down",
-        "kind": "dose",
-        "priority": 1,
-        "because": "pH is 8.3, above the 7.6-7.8 target. Computed against the measured TA of 95. This is a partial dose on purpose -- it should land near pH 7.92, not all the way to target. Past about half a pH unit you're pouring against water you can't see any more, so the rest goes in tomorrow after a retest.",
-        "why": "pH is 8.3, above the 7.6-7.8 target. Computed against the measured TA of 95. This is a partial dose on purpose -- it should land near pH 7.92, not all the way to target. Past about half a pH unit you're pouring against water you can't see any more, so the rest goes in tomorrow after a retest.",
-        "how": "Pump running. Measure the acid into a bucket of pool water first -- acid into water, never water into acid -- then walk it slowly around the deep end, away from the skimmer and the returns. Never down the skimmer. Retest tomorrow.",
-        "dose": {
-          "amount": 56,
-          "unit": "fl oz",
-          "chemical": "muriatic acid",
-          "label": "56 fl oz (6.97 cups) of muriatic acid",
-          "detail": {
-            "floz": 56,
-            "want_floz": 80.9,
-            "capped": true,
-            "cups": 6.97,
-            "quarts": 1.74,
-            "ta_used": 95.0,
-            "ta_assumed": false,
-            "drops_ph": 0.55,
-            "strength_pct": 31.45
-          }
-        },
-        "measured": "8.3",
-        "target": "7.6-7.8",
-        "wait_hours": null,
-        "after": null,
-        "superseded": false,
-        "order": 3
-      },
-      {
-        "id": "emptied_skimmer",
-        "key": "emptied_skimmer",
-        "title": "Empty the skimmer basket",
-        "kind": "task",
-        "priority": 1,
-        "because": "Last emptied 5 days ago; the cadence is every 3.",
-        "why": "Last emptied 5 days ago; the cadence is every 3.",
-        "how": "Pump off first. Lift the basket, empty it, check the weir flap still swings freely, drop it back in, pump on.",
+        "because": "There's no confirmed reading on record yet. Everything else on this list is waiting on one -- upload an ICO screenshot or type a test in by hand and the checklist fills itself out.",
+        "why": "There's no confirmed reading on record yet. Everything else on this list is waiting on one -- upload an ICO screenshot or type a test in by hand and the checklist fills itself out.",
+        "how": "Drop the ICO in or run a test strip, then upload the screenshot here and confirm what it read.",
         "dose": null,
         "measured": null,
         "target": null,
         "wait_hours": null,
         "after": null,
         "superseded": false,
-        "order": 4
+        "order": 1
       },
       {
         "id": "backwashed_filter",
@@ -308,8 +222,8 @@
         "title": "Backwash the filter",
         "kind": "task",
         "priority": 2,
-        "because": "Last backwashed 20 days ago; the cadence is every 14.",
-        "why": "Last backwashed 20 days ago; the cadence is every 14.",
+        "because": "Never logged. The target cadence is every 14 days -- log it once and the clock starts.",
+        "why": "Never logged. The target cadence is every 14 days -- log it once and the clock starts.",
         "how": "Pump off, valve to backwash, pump on until the sight glass runs clear, then rinse for 20 seconds before going back to filter. Top the water level back up afterwards.",
         "dose": null,
         "measured": null,
@@ -317,65 +231,31 @@
         "wait_hours": null,
         "after": null,
         "superseded": false,
-        "order": 5
+        "order": 2
       },
       {
-        "id": "orp_blocked",
-        "key": "orp_blocked",
-        "title": "Leave the cell alone for now",
-        "kind": "watch",
+        "id": "emptied_skimmer",
+        "key": "emptied_skimmer",
+        "title": "Empty the skimmer basket",
+        "kind": "task",
         "priority": 2,
-        "because": "ORP is 558 mV, under the at least 600 mV floor -- but pH, Salt and CYA are out of band too, and ORP sits downstream of all of it. Fix those first, give the water a full day to circulate, then re-read. Turning the cell up now just means running it harder against the same problem.",
-        "why": "ORP is 558 mV, under the at least 600 mV floor -- but pH, Salt and CYA are out of band too, and ORP sits downstream of all of it. Fix those first, give the water a full day to circulate, then re-read. Turning the cell up now just means running it harder against the same problem.",
-        "how": "",
-        "dose": null,
-        "measured": "558 mV",
-        "target": "at least 600 mV",
-        "wait_hours": null,
-        "after": null,
-        "superseded": false,
-        "order": 6
-      },
-      {
-        "id": "borate_test",
-        "key": "borate_test",
-        "title": "Test borates",
-        "kind": "test",
-        "priority": 3,
-        "because": "Borates aren't on the ICO panel and haven't been tested. The target is 50 ppm; a strip test once a season is enough to know where you are.",
-        "why": "Borates aren't on the ICO panel and haven't been tested. The target is 50 ppm; a strip test once a season is enough to know where you are.",
-        "how": "A borate test strip takes ten seconds. Once a season is plenty.",
+        "because": "Never logged. The target cadence is every 3 days -- log it once and the clock starts.",
+        "why": "Never logged. The target cadence is every 3 days -- log it once and the clock starts.",
+        "how": "Pump off first. Lift the basket, empty it, check the weir flap still swings freely, drop it back in, pump on.",
         "dose": null,
         "measured": null,
-        "target": "50 ppm",
+        "target": null,
         "wait_hours": null,
         "after": null,
         "superseded": false,
-        "order": 7
-      },
-      {
-        "id": "ta_high",
-        "key": "ta_high",
-        "title": "Total alkalinity is running high",
-        "kind": "watch",
-        "priority": 3,
-        "because": "TA is 95 ppm, over the 60-80 ppm band, and high TA is what makes pH climb every week on a saltwater pool. The acid already on today's list pulls TA down with the pH, so this needs no separate dose -- just keep an eye on it as the pH corrections land.",
-        "why": "TA is 95 ppm, over the 60-80 ppm band, and high TA is what makes pH climb every week on a saltwater pool. The acid already on today's list pulls TA down with the pH, so this needs no separate dose -- just keep an eye on it as the pH corrections land.",
-        "how": "",
-        "dose": null,
-        "measured": "95 ppm",
-        "target": "60-80 ppm",
-        "wait_hours": null,
-        "after": null,
-        "superseded": false,
-        "order": 8
+        "order": 3
       }
     ],
     "counts": {
-      "total": 8,
-      "todo": 6,
-      "doses": 3,
-      "out_of_band": 5
+      "total": 3,
+      "todo": 3,
+      "doses": 0,
+      "out_of_band": 0
     },
     "safety_rules": [
       "NEVER pour undiluted acid into the skimmer. Acid down the skimmer runs neat through the pump, heater and salt cell and eats them. Dilute it and pour it slowly around the deep end with the pump running.",
@@ -400,25 +280,16 @@
     },
     "basis": {
       "date": "2026-09-24",
-      "reading_id": "2026-09-22T09:15:00",
+      "reading_id": null,
       "items": [
         "backwashed_filter",
-        "borate_test",
-        "cya_up",
         "emptied_skimmer",
-        "orp_blocked",
-        "ph_down",
-        "salt_up",
-        "ta_high"
+        "reading_none"
       ],
-      "doses": {
-        "salt_up": 36.0,
-        "cya_up": 2.5,
-        "ph_down": 56
-      }
+      "doses": {}
     },
-    "headline": "Add salt.",
-    "summary": "6 thing(s) on the list today, 3 of them a dose. Reading is 2 day(s) old. Pump running before anything goes in.",
+    "headline": "Upload a reading and this fills in.",
+    "summary": "Nothing is dosed without a measurement. Upload an ICO screenshot or type a test in by hand, confirm what it read, and the checklist builds itself.",
     "source": "fallback"
   },
   "panel": [
@@ -426,10 +297,11 @@
       "key": "ph",
       "label": "pH",
       "unit": "",
-      "value": 8.3,
-      "display": "8.3",
+      "fmt_unit": "",
+      "value": null,
+      "display": "not measured",
       "target": "7.6-7.8",
-      "status": "high",
+      "status": "unknown",
       "low": 7.6,
       "high": 7.8
     },
@@ -437,21 +309,35 @@
       "key": "orp_mv",
       "label": "ORP",
       "unit": "mV",
-      "value": 558.0,
-      "display": "558 mV",
+      "fmt_unit": " mV",
+      "value": null,
+      "display": "not measured",
       "target": "at least 600 mV",
-      "status": "low",
+      "status": "unknown",
       "low": 600,
+      "high": null
+    },
+    {
+      "key": "fc_ppm",
+      "label": "Free chlorine",
+      "unit": "ppm",
+      "fmt_unit": " ppm",
+      "value": null,
+      "display": "not measured",
+      "target": "at least 2 ppm",
+      "status": "unknown",
+      "low": 2,
       "high": null
     },
     {
       "key": "salt_ppm",
       "label": "Salt",
       "unit": "ppm",
-      "value": 2760.0,
-      "display": "2,760 ppm",
+      "fmt_unit": " ppm",
+      "value": null,
+      "display": "not measured",
       "target": "2800-3200 ppm",
-      "status": "low",
+      "status": "unknown",
       "low": 2800,
       "high": 3200
     },
@@ -459,10 +345,11 @@
       "key": "cya_ppm",
       "label": "CYA",
       "unit": "ppm",
-      "value": 24.0,
-      "display": "24 ppm",
+      "fmt_unit": " ppm",
+      "value": null,
+      "display": "not measured",
       "target": "30-50 ppm",
-      "status": "low",
+      "status": "unknown",
       "low": 30,
       "high": 50
     },
@@ -470,21 +357,23 @@
       "key": "borates_ppm",
       "label": "Borates",
       "unit": "ppm",
+      "fmt_unit": " ppm",
       "value": null,
       "display": "not measured",
       "target": "50 ppm",
       "status": "unknown",
-      "low": 50,
-      "high": 50
+      "low": 45.0,
+      "high": null
     },
     {
       "key": "ta_ppm",
       "label": "TA",
       "unit": "ppm",
-      "value": 95.0,
-      "display": "95 ppm",
+      "fmt_unit": " ppm",
+      "value": null,
+      "display": "not measured",
       "target": "60-80 ppm",
-      "status": "high",
+      "status": "unknown",
       "low": 60,
       "high": 80
     },
@@ -492,46 +381,29 @@
       "key": "water_temp_f",
       "label": "Water temp",
       "unit": "°F",
-      "value": 79.0,
-      "display": "79°F",
+      "fmt_unit": "°F",
+      "value": null,
+      "display": "not measured",
       "target": "",
-      "status": "ok",
+      "status": "unknown",
       "low": null,
       "high": null
     }
   ],
-  "latest_reading": {
-    "id": "2026-09-22T09:15:00",
-    "at": "2026-09-22T09:15:00",
-    "date": "2026-09-22",
-    "source": "ico",
-    "confirmed": true,
-    "image": "",
-    "note": "",
-    "logged_at": "2026-09-24T21:44:42",
-    "ph": 8.3,
-    "orp_mv": 558.0,
-    "salt_ppm": 2760.0,
-    "water_temp_f": 79.0,
-    "cya_ppm": 24.0,
-    "borates_ppm": null,
-    "ta_ppm": 95.0,
-    "ch_ppm": null,
-    "fc_ppm": null
-  },
-  "reading_age_days": 2,
+  "latest_reading": null,
+  "reading_age_days": null,
   "pending_confirmation": [],
   "chips": [
     {
       "key": "added_salt",
       "label": "Salt",
-      "days": 30,
-      "date": "2026-08-25",
-      "amount": 40.0,
-      "unit": "lb",
+      "days": null,
+      "date": null,
+      "amount": null,
+      "unit": null,
       "every": 30,
-      "due": true,
-      "never": false
+      "due": false,
+      "never": true
     },
     {
       "key": "added_shock",
@@ -547,926 +419,44 @@
     {
       "key": "added_acid",
       "label": "Acid",
-      "days": 22,
-      "date": "2026-09-02",
-      "amount": 28.0,
-      "unit": "fl oz",
+      "days": null,
+      "date": null,
+      "amount": null,
+      "unit": null,
       "every": null,
       "due": false,
-      "never": false
+      "never": true
     },
     {
       "key": "backwashed_filter",
       "label": "Backwash",
-      "days": 20,
-      "date": "2026-09-04",
+      "days": null,
+      "date": null,
       "amount": null,
-      "unit": "",
+      "unit": null,
       "every": 14,
-      "due": true,
-      "never": false
+      "due": false,
+      "never": true
     },
     {
       "key": "emptied_skimmer",
       "label": "Skimmer",
-      "days": 5,
-      "date": "2026-09-19",
+      "days": null,
+      "date": null,
       "amount": null,
-      "unit": "",
+      "unit": null,
       "every": 3,
-      "due": true,
-      "never": false
+      "due": false,
+      "never": true
     }
   ],
-  "timeline": [
-    {
-      "type": "reading",
-      "at": "2026-09-22T09:15:00",
-      "date": "2026-09-22",
-      "id": "2026-09-22T09:15:00",
-      "source": "ico",
-      "confirmed": true,
-      "values": [
-        {
-          "key": "ph",
-          "label": "pH",
-          "display": "8.3",
-          "status": "high"
-        },
-        {
-          "key": "orp_mv",
-          "label": "ORP",
-          "display": "558 mV",
-          "status": "low"
-        },
-        {
-          "key": "salt_ppm",
-          "label": "Salt",
-          "display": "2,760 ppm",
-          "status": "low"
-        },
-        {
-          "key": "water_temp_f",
-          "label": "Water temp",
-          "display": "79°F",
-          "status": "ok"
-        },
-        {
-          "key": "cya_ppm",
-          "label": "CYA",
-          "display": "24 ppm",
-          "status": "low"
-        },
-        {
-          "key": "ta_ppm",
-          "label": "TA",
-          "display": "95 ppm",
-          "status": "high"
-        }
-      ],
-      "note": "",
-      "image": ""
-    },
-    {
-      "type": "action",
-      "at": "2026-09-19T17:00:00",
-      "date": "2026-09-19",
-      "id": "2026-09-19T17:00:00",
-      "action": "emptied_skimmer",
-      "label": "Emptied skimmer",
-      "amount": null,
-      "unit": "",
-      "note": ""
-    },
-    {
-      "type": "reading",
-      "at": "2026-09-17T09:15:00",
-      "date": "2026-09-17",
-      "id": "2026-09-17T09:15:00",
-      "source": "ico",
-      "confirmed": true,
-      "values": [
-        {
-          "key": "ph",
-          "label": "pH",
-          "display": "8.2",
-          "status": "high"
-        },
-        {
-          "key": "orp_mv",
-          "label": "ORP",
-          "display": "571 mV",
-          "status": "low"
-        },
-        {
-          "key": "salt_ppm",
-          "label": "Salt",
-          "display": "2,810 ppm",
-          "status": "ok"
-        },
-        {
-          "key": "water_temp_f",
-          "label": "Water temp",
-          "display": "80°F",
-          "status": "ok"
-        },
-        {
-          "key": "cya_ppm",
-          "label": "CYA",
-          "display": "26 ppm",
-          "status": "low"
-        },
-        {
-          "key": "ta_ppm",
-          "label": "TA",
-          "display": "95 ppm",
-          "status": "high"
-        }
-      ],
-      "note": "",
-      "image": ""
-    },
-    {
-      "type": "action",
-      "at": "2026-09-15T17:00:00",
-      "date": "2026-09-15",
-      "id": "2026-09-15T17:00:00",
-      "action": "added_cya",
-      "label": "Added stabilizer",
-      "amount": 2.0,
-      "unit": "lb",
-      "note": ""
-    },
-    {
-      "type": "action",
-      "at": "2026-09-12T17:00:00",
-      "date": "2026-09-12",
-      "id": "2026-09-12T17:00:00",
-      "action": "emptied_skimmer",
-      "label": "Emptied skimmer",
-      "amount": null,
-      "unit": "",
-      "note": ""
-    },
-    {
-      "type": "reading",
-      "at": "2026-09-10T09:15:00",
-      "date": "2026-09-10",
-      "id": "2026-09-10T09:15:00",
-      "source": "ico",
-      "confirmed": true,
-      "values": [
-        {
-          "key": "ph",
-          "label": "pH",
-          "display": "8.2",
-          "status": "high"
-        },
-        {
-          "key": "orp_mv",
-          "label": "ORP",
-          "display": "588 mV",
-          "status": "low"
-        },
-        {
-          "key": "salt_ppm",
-          "label": "Salt",
-          "display": "2,860 ppm",
-          "status": "ok"
-        },
-        {
-          "key": "water_temp_f",
-          "label": "Water temp",
-          "display": "83°F",
-          "status": "ok"
-        },
-        {
-          "key": "cya_ppm",
-          "label": "CYA",
-          "display": "28 ppm",
-          "status": "low"
-        },
-        {
-          "key": "ta_ppm",
-          "label": "TA",
-          "display": "86 ppm",
-          "status": "high"
-        }
-      ],
-      "note": "",
-      "image": ""
-    },
-    {
-      "type": "action",
-      "at": "2026-09-09T17:00:00",
-      "date": "2026-09-09",
-      "id": "2026-09-09T17:00:00",
-      "action": "cell_output",
-      "label": "Changed cell output",
-      "amount": 60.0,
-      "unit": "%",
-      "note": ""
-    },
-    {
-      "type": "action",
-      "at": "2026-09-05T17:00:00",
-      "date": "2026-09-05",
-      "id": "2026-09-05T17:00:00",
-      "action": "emptied_skimmer",
-      "label": "Emptied skimmer",
-      "amount": null,
-      "unit": "",
-      "note": ""
-    },
-    {
-      "type": "action",
-      "at": "2026-09-04T17:00:00",
-      "date": "2026-09-04",
-      "id": "2026-09-04T17:00:00",
-      "action": "backwashed_filter",
-      "label": "Backwashed filter",
-      "amount": null,
-      "unit": "",
-      "note": ""
-    },
-    {
-      "type": "reading",
-      "at": "2026-09-03T09:15:00",
-      "date": "2026-09-03",
-      "id": "2026-09-03T09:15:00",
-      "source": "ico",
-      "confirmed": true,
-      "values": [
-        {
-          "key": "ph",
-          "label": "pH",
-          "display": "8.1",
-          "status": "high"
-        },
-        {
-          "key": "orp_mv",
-          "label": "ORP",
-          "display": "602 mV",
-          "status": "ok"
-        },
-        {
-          "key": "salt_ppm",
-          "label": "Salt",
-          "display": "2,900 ppm",
-          "status": "ok"
-        },
-        {
-          "key": "water_temp_f",
-          "label": "Water temp",
-          "display": "85°F",
-          "status": "ok"
-        },
-        {
-          "key": "cya_ppm",
-          "label": "CYA",
-          "display": "31 ppm",
-          "status": "ok"
-        },
-        {
-          "key": "ta_ppm",
-          "label": "TA",
-          "display": "86 ppm",
-          "status": "high"
-        }
-      ],
-      "note": "",
-      "image": ""
-    },
-    {
-      "type": "action",
-      "at": "2026-09-02T17:00:00",
-      "date": "2026-09-02",
-      "id": "2026-09-02T17:00:00",
-      "action": "added_acid",
-      "label": "Added acid",
-      "amount": 28.0,
-      "unit": "fl oz",
-      "note": ""
-    },
-    {
-      "type": "action",
-      "at": "2026-08-29T17:00:00",
-      "date": "2026-08-29",
-      "id": "2026-08-29T17:00:00",
-      "action": "emptied_skimmer",
-      "label": "Emptied skimmer",
-      "amount": null,
-      "unit": "",
-      "note": ""
-    },
-    {
-      "type": "reading",
-      "at": "2026-08-27T09:15:00",
-      "date": "2026-08-27",
-      "id": "2026-08-27T09:15:00",
-      "source": "ico",
-      "confirmed": true,
-      "values": [
-        {
-          "key": "ph",
-          "label": "pH",
-          "display": "8.1",
-          "status": "high"
-        },
-        {
-          "key": "orp_mv",
-          "label": "ORP",
-          "display": "615 mV",
-          "status": "ok"
-        },
-        {
-          "key": "salt_ppm",
-          "label": "Salt",
-          "display": "2,960 ppm",
-          "status": "ok"
-        },
-        {
-          "key": "water_temp_f",
-          "label": "Water temp",
-          "display": "84°F",
-          "status": "ok"
-        },
-        {
-          "key": "cya_ppm",
-          "label": "CYA",
-          "display": "34 ppm",
-          "status": "ok"
-        },
-        {
-          "key": "ta_ppm",
-          "label": "TA",
-          "display": "88 ppm",
-          "status": "high"
-        }
-      ],
-      "note": "",
-      "image": ""
-    },
-    {
-      "type": "action",
-      "at": "2026-08-26T17:00:00",
-      "date": "2026-08-26",
-      "id": "2026-08-26T17:00:00",
-      "action": "vacuumed_pool",
-      "label": "Vacuumed",
-      "amount": null,
-      "unit": "",
-      "note": ""
-    },
-    {
-      "type": "action",
-      "at": "2026-08-25T17:00:00",
-      "date": "2026-08-25",
-      "id": "2026-08-25T17:00:00",
-      "action": "added_salt",
-      "label": "Added salt",
-      "amount": 40.0,
-      "unit": "lb",
-      "note": ""
-    },
-    {
-      "type": "action",
-      "at": "2026-08-22T17:00:00",
-      "date": "2026-08-22",
-      "id": "2026-08-22T17:00:00",
-      "action": "emptied_skimmer",
-      "label": "Emptied skimmer",
-      "amount": null,
-      "unit": "",
-      "note": ""
-    },
-    {
-      "type": "action",
-      "at": "2026-08-21T17:00:00",
-      "date": "2026-08-21",
-      "id": "2026-08-21T17:00:00",
-      "action": "backwashed_filter",
-      "label": "Backwashed filter",
-      "amount": null,
-      "unit": "",
-      "note": ""
-    },
-    {
-      "type": "reading",
-      "at": "2026-08-20T09:15:00",
-      "date": "2026-08-20",
-      "id": "2026-08-20T09:15:00",
-      "source": "ico",
-      "confirmed": true,
-      "values": [
-        {
-          "key": "ph",
-          "label": "pH",
-          "display": "8",
-          "status": "high"
-        },
-        {
-          "key": "orp_mv",
-          "label": "ORP",
-          "display": "628 mV",
-          "status": "ok"
-        },
-        {
-          "key": "salt_ppm",
-          "label": "Salt",
-          "display": "3,010 ppm",
-          "status": "ok"
-        },
-        {
-          "key": "water_temp_f",
-          "label": "Water temp",
-          "display": "80°F",
-          "status": "ok"
-        },
-        {
-          "key": "cya_ppm",
-          "label": "CYA",
-          "display": "37 ppm",
-          "status": "ok"
-        },
-        {
-          "key": "ta_ppm",
-          "label": "TA",
-          "display": "88 ppm",
-          "status": "high"
-        }
-      ],
-      "note": "",
-      "image": ""
-    },
-    {
-      "type": "action",
-      "at": "2026-08-16T17:00:00",
-      "date": "2026-08-16",
-      "id": "2026-08-16T17:00:00",
-      "action": "emptied_skimmer",
-      "label": "Emptied skimmer",
-      "amount": null,
-      "unit": "",
-      "note": ""
-    },
-    {
-      "type": "action",
-      "at": "2026-08-15T17:00:00",
-      "date": "2026-08-15",
-      "id": "2026-08-15T17:00:00",
-      "action": "added_acid",
-      "label": "Added acid",
-      "amount": 24.0,
-      "unit": "fl oz",
-      "note": ""
-    },
-    {
-      "type": "reading",
-      "at": "2026-08-13T09:15:00",
-      "date": "2026-08-13",
-      "id": "2026-08-13T09:15:00",
-      "source": "ico",
-      "confirmed": true,
-      "values": [
-        {
-          "key": "ph",
-          "label": "pH",
-          "display": "8",
-          "status": "high"
-        },
-        {
-          "key": "orp_mv",
-          "label": "ORP",
-          "display": "641 mV",
-          "status": "ok"
-        },
-        {
-          "key": "salt_ppm",
-          "label": "Salt",
-          "display": "3,060 ppm",
-          "status": "ok"
-        },
-        {
-          "key": "water_temp_f",
-          "label": "Water temp",
-          "display": "76°F",
-          "status": "ok"
-        },
-        {
-          "key": "cya_ppm",
-          "label": "CYA",
-          "display": "40 ppm",
-          "status": "ok"
-        },
-        {
-          "key": "ta_ppm",
-          "label": "TA",
-          "display": "90 ppm",
-          "status": "high"
-        }
-      ],
-      "note": "",
-      "image": ""
-    },
-    {
-      "type": "action",
-      "at": "2026-08-12T17:00:00",
-      "date": "2026-08-12",
-      "id": "2026-08-12T17:00:00",
-      "action": "emptied_skimmer",
-      "label": "Emptied skimmer",
-      "amount": null,
-      "unit": "",
-      "note": ""
-    },
-    {
-      "type": "action",
-      "at": "2026-08-11T17:00:00",
-      "date": "2026-08-11",
-      "id": "2026-08-11T17:00:00",
-      "action": "brushed_pool",
-      "label": "Brushed pool",
-      "amount": null,
-      "unit": "",
-      "note": ""
-    },
-    {
-      "type": "action",
-      "at": "2026-08-08T17:00:00",
-      "date": "2026-08-08",
-      "id": "2026-08-08T17:00:00",
-      "action": "emptied_skimmer",
-      "label": "Emptied skimmer",
-      "amount": null,
-      "unit": "",
-      "note": ""
-    },
-    {
-      "type": "action",
-      "at": "2026-08-07T17:00:00",
-      "date": "2026-08-07",
-      "id": "2026-08-07T17:00:00",
-      "action": "backwashed_filter",
-      "label": "Backwashed filter",
-      "amount": null,
-      "unit": "",
-      "note": ""
-    },
-    {
-      "type": "reading",
-      "at": "2026-08-06T09:15:00",
-      "date": "2026-08-06",
-      "id": "2026-08-06T09:15:00",
-      "source": "ico",
-      "confirmed": true,
-      "values": [
-        {
-          "key": "ph",
-          "label": "pH",
-          "display": "7.9",
-          "status": "high"
-        },
-        {
-          "key": "orp_mv",
-          "label": "ORP",
-          "display": "650 mV",
-          "status": "ok"
-        },
-        {
-          "key": "salt_ppm",
-          "label": "Salt",
-          "display": "3,120 ppm",
-          "status": "ok"
-        },
-        {
-          "key": "water_temp_f",
-          "label": "Water temp",
-          "display": "72°F",
-          "status": "ok"
-        },
-        {
-          "key": "cya_ppm",
-          "label": "CYA",
-          "display": "43 ppm",
-          "status": "ok"
-        },
-        {
-          "key": "ta_ppm",
-          "label": "TA",
-          "display": "90 ppm",
-          "status": "high"
-        }
-      ],
-      "note": "",
-      "image": ""
-    },
-    {
-      "type": "action",
-      "at": "2026-08-04T17:00:00",
-      "date": "2026-08-04",
-      "id": "2026-08-04T17:00:00",
-      "action": "emptied_skimmer",
-      "label": "Emptied skimmer",
-      "amount": null,
-      "unit": "",
-      "note": ""
-    },
-    {
-      "type": "action",
-      "at": "2026-08-01T17:00:00",
-      "date": "2026-08-01",
-      "id": "2026-08-01T17:00:00",
-      "action": "emptied_skimmer",
-      "label": "Emptied skimmer",
-      "amount": null,
-      "unit": "",
-      "note": ""
-    },
-    {
-      "type": "reading",
-      "at": "2026-07-30T09:15:00",
-      "date": "2026-07-30",
-      "id": "2026-07-30T09:15:00",
-      "source": "ico",
-      "confirmed": true,
-      "values": [
-        {
-          "key": "ph",
-          "label": "pH",
-          "display": "7.8",
-          "status": "ok"
-        },
-        {
-          "key": "orp_mv",
-          "label": "ORP",
-          "display": "665 mV",
-          "status": "ok"
-        },
-        {
-          "key": "salt_ppm",
-          "label": "Salt",
-          "display": "3,180 ppm",
-          "status": "ok"
-        },
-        {
-          "key": "water_temp_f",
-          "label": "Water temp",
-          "display": "68°F",
-          "status": "ok"
-        },
-        {
-          "key": "cya_ppm",
-          "label": "CYA",
-          "display": "46 ppm",
-          "status": "ok"
-        },
-        {
-          "key": "ta_ppm",
-          "label": "TA",
-          "display": "92 ppm",
-          "status": "high"
-        }
-      ],
-      "note": "",
-      "image": ""
-    }
-  ],
+  "timeline": [],
   "trends": {
     "from": "2026-06-26",
     "to": "2026-09-24",
     "days": 90,
-    "series": [
-      {
-        "key": "ph",
-        "label": "pH",
-        "unit": "",
-        "low": 7.6,
-        "high": 7.8,
-        "points": [
-          {
-            "date": "2026-07-30",
-            "at": "2026-07-30T09:15:00",
-            "v": 7.8
-          },
-          {
-            "date": "2026-08-06",
-            "at": "2026-08-06T09:15:00",
-            "v": 7.9
-          },
-          {
-            "date": "2026-08-13",
-            "at": "2026-08-13T09:15:00",
-            "v": 8.0
-          },
-          {
-            "date": "2026-08-20",
-            "at": "2026-08-20T09:15:00",
-            "v": 8.0
-          },
-          {
-            "date": "2026-08-27",
-            "at": "2026-08-27T09:15:00",
-            "v": 8.1
-          },
-          {
-            "date": "2026-09-03",
-            "at": "2026-09-03T09:15:00",
-            "v": 8.1
-          },
-          {
-            "date": "2026-09-10",
-            "at": "2026-09-10T09:15:00",
-            "v": 8.2
-          },
-          {
-            "date": "2026-09-17",
-            "at": "2026-09-17T09:15:00",
-            "v": 8.2
-          },
-          {
-            "date": "2026-09-22",
-            "at": "2026-09-22T09:15:00",
-            "v": 8.3
-          }
-        ],
-        "min": 7.8,
-        "max": 8.3,
-        "latest": 8.3
-      },
-      {
-        "key": "orp_mv",
-        "label": "ORP",
-        "unit": "mV",
-        "low": 600,
-        "high": null,
-        "points": [
-          {
-            "date": "2026-07-30",
-            "at": "2026-07-30T09:15:00",
-            "v": 665.0
-          },
-          {
-            "date": "2026-08-06",
-            "at": "2026-08-06T09:15:00",
-            "v": 650.0
-          },
-          {
-            "date": "2026-08-13",
-            "at": "2026-08-13T09:15:00",
-            "v": 641.0
-          },
-          {
-            "date": "2026-08-20",
-            "at": "2026-08-20T09:15:00",
-            "v": 628.0
-          },
-          {
-            "date": "2026-08-27",
-            "at": "2026-08-27T09:15:00",
-            "v": 615.0
-          },
-          {
-            "date": "2026-09-03",
-            "at": "2026-09-03T09:15:00",
-            "v": 602.0
-          },
-          {
-            "date": "2026-09-10",
-            "at": "2026-09-10T09:15:00",
-            "v": 588.0
-          },
-          {
-            "date": "2026-09-17",
-            "at": "2026-09-17T09:15:00",
-            "v": 571.0
-          },
-          {
-            "date": "2026-09-22",
-            "at": "2026-09-22T09:15:00",
-            "v": 558.0
-          }
-        ],
-        "min": 558.0,
-        "max": 665.0,
-        "latest": 558.0
-      },
-      {
-        "key": "salt_ppm",
-        "label": "Salt",
-        "unit": "ppm",
-        "low": 2800,
-        "high": 3200,
-        "points": [
-          {
-            "date": "2026-07-30",
-            "at": "2026-07-30T09:15:00",
-            "v": 3180.0
-          },
-          {
-            "date": "2026-08-06",
-            "at": "2026-08-06T09:15:00",
-            "v": 3120.0
-          },
-          {
-            "date": "2026-08-13",
-            "at": "2026-08-13T09:15:00",
-            "v": 3060.0
-          },
-          {
-            "date": "2026-08-20",
-            "at": "2026-08-20T09:15:00",
-            "v": 3010.0
-          },
-          {
-            "date": "2026-08-27",
-            "at": "2026-08-27T09:15:00",
-            "v": 2960.0
-          },
-          {
-            "date": "2026-09-03",
-            "at": "2026-09-03T09:15:00",
-            "v": 2900.0
-          },
-          {
-            "date": "2026-09-10",
-            "at": "2026-09-10T09:15:00",
-            "v": 2860.0
-          },
-          {
-            "date": "2026-09-17",
-            "at": "2026-09-17T09:15:00",
-            "v": 2810.0
-          },
-          {
-            "date": "2026-09-22",
-            "at": "2026-09-22T09:15:00",
-            "v": 2760.0
-          }
-        ],
-        "min": 2760.0,
-        "max": 3180.0,
-        "latest": 2760.0
-      },
-      {
-        "key": "water_temp_f",
-        "label": "Water temp",
-        "unit": "°F",
-        "low": null,
-        "high": null,
-        "points": [
-          {
-            "date": "2026-07-30",
-            "at": "2026-07-30T09:15:00",
-            "v": 68.0
-          },
-          {
-            "date": "2026-08-06",
-            "at": "2026-08-06T09:15:00",
-            "v": 72.0
-          },
-          {
-            "date": "2026-08-13",
-            "at": "2026-08-13T09:15:00",
-            "v": 76.0
-          },
-          {
-            "date": "2026-08-20",
-            "at": "2026-08-20T09:15:00",
-            "v": 80.0
-          },
-          {
-            "date": "2026-08-27",
-            "at": "2026-08-27T09:15:00",
-            "v": 84.0
-          },
-          {
-            "date": "2026-09-03",
-            "at": "2026-09-03T09:15:00",
-            "v": 85.0
-          },
-          {
-            "date": "2026-09-10",
-            "at": "2026-09-10T09:15:00",
-            "v": 83.0
-          },
-          {
-            "date": "2026-09-17",
-            "at": "2026-09-17T09:15:00",
-            "v": 80.0
-          },
-          {
-            "date": "2026-09-22",
-            "at": "2026-09-22T09:15:00",
-            "v": 79.0
-          }
-        ],
-        "min": 68.0,
-        "max": 85.0,
-        "latest": 79.0
-      }
-    ],
-    "n_readings": 9
+    "series": [],
+    "n_readings": 0
   },
   "opening": {
     "year": 2026,
@@ -1476,37 +466,37 @@
         "title": "Physical prep",
         "detail": "Cover off, cleaned and stored. Skim the surface, brush the walls and floor, vacuum out the winter debris. Reinstall the ladder, rails and return fittings.",
         "n": 1,
-        "state": "done",
-        "confirmed_date": "2026-07-24",
+        "state": "current",
+        "confirmed_date": null,
         "note": "",
-        "done_at": "2026-09-24T21:44:42"
+        "done_at": null
       },
       {
         "id": "mechanical_start",
         "title": "Mechanical start",
         "detail": "Reinstall drain plugs, prime the pump, open the valves, start the filter. Run it 24h continuously and watch for leaks and pressure. Do NOT run the salt cell yet.",
         "n": 2,
-        "state": "done",
-        "confirmed_date": "2026-07-25",
+        "state": "locked",
+        "confirmed_date": null,
         "note": "",
-        "done_at": "2026-09-24T21:44:43"
+        "done_at": null
       },
       {
         "id": "base_sanitization",
         "title": "Base sanitization",
         "detail": "Water is unstabilized and probably green-ish. Bring chlorine up with liquid chlorine while the pump runs, then keep filtering until the water clears.",
         "n": 3,
-        "state": "done",
-        "confirmed_date": "2026-07-26",
+        "state": "locked",
+        "confirmed_date": null,
         "note": "",
-        "done_at": "2026-09-24T21:44:43"
+        "done_at": null
       },
       {
         "id": "cya_anchor",
         "title": "CYA anchor",
         "detail": "Stabilizer goes in BEFORE the salt cell carries the load -- without CYA the sun burns off chlorine faster than the cell can make it. Sock it in the skimmer, never broadcast it on a vinyl liner.",
         "n": 4,
-        "state": "current",
+        "state": "locked",
         "confirmed_date": null,
         "note": "",
         "done_at": null
@@ -1532,11 +522,11 @@
         "done_at": null
       }
     ],
-    "done": 3,
+    "done": 0,
     "total": 6,
-    "current": "cya_anchor",
+    "current": "physical_prep",
     "complete": false,
-    "updated_at": "2026-09-24T21:44:43"
+    "updated_at": null
   },
   "action_kinds": [
     {
@@ -1615,426 +605,24 @@
     "boric_acid_lb_per_10ppm": 8.6
   },
   "counts": {
-    "readings": 9,
-    "confirmed": 9,
-    "actions": 20,
+    "readings": 0,
+    "confirmed": 0,
+    "actions": 0,
     "pending": 0
   },
   "raw": {
-    "readings": [
-      {
-        "id": "2026-07-30T09:15:00",
-        "at": "2026-07-30T09:15:00",
-        "date": "2026-07-30",
-        "source": "ico",
-        "confirmed": true,
-        "image": "",
-        "note": "",
-        "logged_at": "2026-09-24T21:44:42",
-        "ph": 7.8,
-        "orp_mv": 665.0,
-        "salt_ppm": 3180.0,
-        "water_temp_f": 68.0,
-        "cya_ppm": 46.0,
-        "borates_ppm": null,
-        "ta_ppm": 92.0,
-        "ch_ppm": null,
-        "fc_ppm": null
-      },
-      {
-        "id": "2026-08-06T09:15:00",
-        "at": "2026-08-06T09:15:00",
-        "date": "2026-08-06",
-        "source": "ico",
-        "confirmed": true,
-        "image": "",
-        "note": "",
-        "logged_at": "2026-09-24T21:44:42",
-        "ph": 7.9,
-        "orp_mv": 650.0,
-        "salt_ppm": 3120.0,
-        "water_temp_f": 72.0,
-        "cya_ppm": 43.0,
-        "borates_ppm": null,
-        "ta_ppm": 90.0,
-        "ch_ppm": null,
-        "fc_ppm": null
-      },
-      {
-        "id": "2026-08-13T09:15:00",
-        "at": "2026-08-13T09:15:00",
-        "date": "2026-08-13",
-        "source": "ico",
-        "confirmed": true,
-        "image": "",
-        "note": "",
-        "logged_at": "2026-09-24T21:44:42",
-        "ph": 8.0,
-        "orp_mv": 641.0,
-        "salt_ppm": 3060.0,
-        "water_temp_f": 76.0,
-        "cya_ppm": 40.0,
-        "borates_ppm": null,
-        "ta_ppm": 90.0,
-        "ch_ppm": null,
-        "fc_ppm": null
-      },
-      {
-        "id": "2026-08-20T09:15:00",
-        "at": "2026-08-20T09:15:00",
-        "date": "2026-08-20",
-        "source": "ico",
-        "confirmed": true,
-        "image": "",
-        "note": "",
-        "logged_at": "2026-09-24T21:44:42",
-        "ph": 8.0,
-        "orp_mv": 628.0,
-        "salt_ppm": 3010.0,
-        "water_temp_f": 80.0,
-        "cya_ppm": 37.0,
-        "borates_ppm": null,
-        "ta_ppm": 88.0,
-        "ch_ppm": null,
-        "fc_ppm": null
-      },
-      {
-        "id": "2026-08-27T09:15:00",
-        "at": "2026-08-27T09:15:00",
-        "date": "2026-08-27",
-        "source": "ico",
-        "confirmed": true,
-        "image": "",
-        "note": "",
-        "logged_at": "2026-09-24T21:44:42",
-        "ph": 8.1,
-        "orp_mv": 615.0,
-        "salt_ppm": 2960.0,
-        "water_temp_f": 84.0,
-        "cya_ppm": 34.0,
-        "borates_ppm": null,
-        "ta_ppm": 88.0,
-        "ch_ppm": null,
-        "fc_ppm": null
-      },
-      {
-        "id": "2026-09-03T09:15:00",
-        "at": "2026-09-03T09:15:00",
-        "date": "2026-09-03",
-        "source": "ico",
-        "confirmed": true,
-        "image": "",
-        "note": "",
-        "logged_at": "2026-09-24T21:44:42",
-        "ph": 8.1,
-        "orp_mv": 602.0,
-        "salt_ppm": 2900.0,
-        "water_temp_f": 85.0,
-        "cya_ppm": 31.0,
-        "borates_ppm": null,
-        "ta_ppm": 86.0,
-        "ch_ppm": null,
-        "fc_ppm": null
-      },
-      {
-        "id": "2026-09-10T09:15:00",
-        "at": "2026-09-10T09:15:00",
-        "date": "2026-09-10",
-        "source": "ico",
-        "confirmed": true,
-        "image": "",
-        "note": "",
-        "logged_at": "2026-09-24T21:44:42",
-        "ph": 8.2,
-        "orp_mv": 588.0,
-        "salt_ppm": 2860.0,
-        "water_temp_f": 83.0,
-        "cya_ppm": 28.0,
-        "borates_ppm": null,
-        "ta_ppm": 86.0,
-        "ch_ppm": null,
-        "fc_ppm": null
-      },
-      {
-        "id": "2026-09-17T09:15:00",
-        "at": "2026-09-17T09:15:00",
-        "date": "2026-09-17",
-        "source": "ico",
-        "confirmed": true,
-        "image": "",
-        "note": "",
-        "logged_at": "2026-09-24T21:44:42",
-        "ph": 8.2,
-        "orp_mv": 571.0,
-        "salt_ppm": 2810.0,
-        "water_temp_f": 80.0,
-        "cya_ppm": 26.0,
-        "borates_ppm": null,
-        "ta_ppm": 95.0,
-        "ch_ppm": null,
-        "fc_ppm": null
-      },
-      {
-        "id": "2026-09-22T09:15:00",
-        "at": "2026-09-22T09:15:00",
-        "date": "2026-09-22",
-        "source": "ico",
-        "confirmed": true,
-        "image": "",
-        "note": "",
-        "logged_at": "2026-09-24T21:44:42",
-        "ph": 8.3,
-        "orp_mv": 558.0,
-        "salt_ppm": 2760.0,
-        "water_temp_f": 79.0,
-        "cya_ppm": 24.0,
-        "borates_ppm": null,
-        "ta_ppm": 95.0,
-        "ch_ppm": null,
-        "fc_ppm": null
-      }
-    ],
-    "actions": [
-      {
-        "id": "2026-08-01T17:00:00",
-        "at": "2026-08-01T17:00:00",
-        "date": "2026-08-01",
-        "action": "emptied_skimmer",
-        "label": "Emptied skimmer",
-        "amount": null,
-        "unit": "",
-        "note": "",
-        "logged_at": "2026-09-24T21:44:42"
-      },
-      {
-        "id": "2026-08-04T17:00:00",
-        "at": "2026-08-04T17:00:00",
-        "date": "2026-08-04",
-        "action": "emptied_skimmer",
-        "label": "Emptied skimmer",
-        "amount": null,
-        "unit": "",
-        "note": "",
-        "logged_at": "2026-09-24T21:44:42"
-      },
-      {
-        "id": "2026-08-07T17:00:00",
-        "at": "2026-08-07T17:00:00",
-        "date": "2026-08-07",
-        "action": "backwashed_filter",
-        "label": "Backwashed filter",
-        "amount": null,
-        "unit": "",
-        "note": "",
-        "logged_at": "2026-09-24T21:44:42"
-      },
-      {
-        "id": "2026-08-08T17:00:00",
-        "at": "2026-08-08T17:00:00",
-        "date": "2026-08-08",
-        "action": "emptied_skimmer",
-        "label": "Emptied skimmer",
-        "amount": null,
-        "unit": "",
-        "note": "",
-        "logged_at": "2026-09-24T21:44:42"
-      },
-      {
-        "id": "2026-08-11T17:00:00",
-        "at": "2026-08-11T17:00:00",
-        "date": "2026-08-11",
-        "action": "brushed_pool",
-        "label": "Brushed pool",
-        "amount": null,
-        "unit": "",
-        "note": "",
-        "logged_at": "2026-09-24T21:44:42"
-      },
-      {
-        "id": "2026-08-12T17:00:00",
-        "at": "2026-08-12T17:00:00",
-        "date": "2026-08-12",
-        "action": "emptied_skimmer",
-        "label": "Emptied skimmer",
-        "amount": null,
-        "unit": "",
-        "note": "",
-        "logged_at": "2026-09-24T21:44:42"
-      },
-      {
-        "id": "2026-08-15T17:00:00",
-        "at": "2026-08-15T17:00:00",
-        "date": "2026-08-15",
-        "action": "added_acid",
-        "label": "Added acid",
-        "amount": 24.0,
-        "unit": "fl oz",
-        "note": "",
-        "logged_at": "2026-09-24T21:44:42"
-      },
-      {
-        "id": "2026-08-16T17:00:00",
-        "at": "2026-08-16T17:00:00",
-        "date": "2026-08-16",
-        "action": "emptied_skimmer",
-        "label": "Emptied skimmer",
-        "amount": null,
-        "unit": "",
-        "note": "",
-        "logged_at": "2026-09-24T21:44:42"
-      },
-      {
-        "id": "2026-08-21T17:00:00",
-        "at": "2026-08-21T17:00:00",
-        "date": "2026-08-21",
-        "action": "backwashed_filter",
-        "label": "Backwashed filter",
-        "amount": null,
-        "unit": "",
-        "note": "",
-        "logged_at": "2026-09-24T21:44:42"
-      },
-      {
-        "id": "2026-08-22T17:00:00",
-        "at": "2026-08-22T17:00:00",
-        "date": "2026-08-22",
-        "action": "emptied_skimmer",
-        "label": "Emptied skimmer",
-        "amount": null,
-        "unit": "",
-        "note": "",
-        "logged_at": "2026-09-24T21:44:42"
-      },
-      {
-        "id": "2026-08-25T17:00:00",
-        "at": "2026-08-25T17:00:00",
-        "date": "2026-08-25",
-        "action": "added_salt",
-        "label": "Added salt",
-        "amount": 40.0,
-        "unit": "lb",
-        "note": "",
-        "logged_at": "2026-09-24T21:44:42"
-      },
-      {
-        "id": "2026-08-26T17:00:00",
-        "at": "2026-08-26T17:00:00",
-        "date": "2026-08-26",
-        "action": "vacuumed_pool",
-        "label": "Vacuumed",
-        "amount": null,
-        "unit": "",
-        "note": "",
-        "logged_at": "2026-09-24T21:44:42"
-      },
-      {
-        "id": "2026-08-29T17:00:00",
-        "at": "2026-08-29T17:00:00",
-        "date": "2026-08-29",
-        "action": "emptied_skimmer",
-        "label": "Emptied skimmer",
-        "amount": null,
-        "unit": "",
-        "note": "",
-        "logged_at": "2026-09-24T21:44:42"
-      },
-      {
-        "id": "2026-09-02T17:00:00",
-        "at": "2026-09-02T17:00:00",
-        "date": "2026-09-02",
-        "action": "added_acid",
-        "label": "Added acid",
-        "amount": 28.0,
-        "unit": "fl oz",
-        "note": "",
-        "logged_at": "2026-09-24T21:44:42"
-      },
-      {
-        "id": "2026-09-04T17:00:00",
-        "at": "2026-09-04T17:00:00",
-        "date": "2026-09-04",
-        "action": "backwashed_filter",
-        "label": "Backwashed filter",
-        "amount": null,
-        "unit": "",
-        "note": "",
-        "logged_at": "2026-09-24T21:44:42"
-      },
-      {
-        "id": "2026-09-05T17:00:00",
-        "at": "2026-09-05T17:00:00",
-        "date": "2026-09-05",
-        "action": "emptied_skimmer",
-        "label": "Emptied skimmer",
-        "amount": null,
-        "unit": "",
-        "note": "",
-        "logged_at": "2026-09-24T21:44:42"
-      },
-      {
-        "id": "2026-09-09T17:00:00",
-        "at": "2026-09-09T17:00:00",
-        "date": "2026-09-09",
-        "action": "cell_output",
-        "label": "Changed cell output",
-        "amount": 60.0,
-        "unit": "%",
-        "note": "",
-        "logged_at": "2026-09-24T21:44:42"
-      },
-      {
-        "id": "2026-09-12T17:00:00",
-        "at": "2026-09-12T17:00:00",
-        "date": "2026-09-12",
-        "action": "emptied_skimmer",
-        "label": "Emptied skimmer",
-        "amount": null,
-        "unit": "",
-        "note": "",
-        "logged_at": "2026-09-24T21:44:42"
-      },
-      {
-        "id": "2026-09-15T17:00:00",
-        "at": "2026-09-15T17:00:00",
-        "date": "2026-09-15",
-        "action": "added_cya",
-        "label": "Added stabilizer",
-        "amount": 2.0,
-        "unit": "lb",
-        "note": "",
-        "logged_at": "2026-09-24T21:44:42"
-      },
-      {
-        "id": "2026-09-19T17:00:00",
-        "at": "2026-09-19T17:00:00",
-        "date": "2026-09-19",
-        "action": "emptied_skimmer",
-        "label": "Emptied skimmer",
-        "amount": null,
-        "unit": "",
-        "note": "",
-        "logged_at": "2026-09-24T21:44:42"
-      }
-    ]
+    "readings": [],
+    "actions": []
   },
   "disclaimer": "Every dose here is an estimate from your pool's volume and one measurement. Add, circulate, retest -- never dose twice against the same reading. Chemicals are handled at your own risk; when a number looks wrong, trust the water and retest before you trust this app.",
   "basis": {
     "date": "2026-09-24",
-    "reading_id": "2026-09-22T09:15:00",
+    "reading_id": null,
     "items": [
       "backwashed_filter",
-      "borate_test",
-      "cya_up",
       "emptied_skimmer",
-      "orp_blocked",
-      "ph_down",
-      "salt_up",
-      "ta_high"
+      "reading_none"
     ],
-    "doses": {
-      "salt_up": 36.0,
-      "cya_up": 2.5,
-      "ph_down": 56
-    }
+    "doses": {}
   }
 }

@@ -391,13 +391,13 @@ nav button.on{color:var(--aqua-soft)}
 <section id="tab-set" class="hide">
   <div class="card">
     <h2>Settings &amp; connection</h2>
-    <label for="s_repo">Private data repo (owner/name)</label>
-    <input type="text" id="s_repo" placeholder="yourname/pool-pilot-data" autocapitalize="off" autocorrect="off">
+    <div class="note" id="s_mode"></div>
+    <label for="s_repo">Data repo (owner/name)</label>
+    <input type="text" id="s_repo" placeholder="yourname/pool-pilot" autocapitalize="off" autocorrect="off">
     <label for="s_token">GitHub token (fine-grained, Contents: read &amp; write on that repo)</label>
     <input type="password" id="s_token" placeholder="github_pat_..." autocapitalize="off" autocorrect="off">
     <div class="note">Stored only in this browser's local storage on this device. It never leaves
-      your phone except in requests to github.com. Nothing about your pool is ever stored in the
-      public app repo.</div>
+      your phone except in requests to github.com.</div>
     <button class="btn" id="s_save">Save &amp; sync</button>
     <button class="btn ghost" id="s_refresh">Refresh from cloud</button>
     <button class="btn ghost" id="s_rebuild">Force a cloud rebuild</button>
@@ -431,6 +431,7 @@ nav button.on{color:var(--aqua-soft)}
 <script>
 const EMBED = __DATA__;
 const DEFAULT_REPO = "__REPO__";
+const DATA_URL = "__DATA_URL__";      /* same-origin state.json, when the repo is public */
 const BUILT = "__BUILT__";
 const CHEM = __CHEM__;                /* kept in step with engine/chem.py at build time */
 const LOCAL_API = "http://127.0.0.1:8778";
@@ -466,6 +467,11 @@ function fmtDay(iso){
 function nowIso(){ const d = new Date();
   return new Date(d.getTime() - d.getTimezoneOffset()*60000).toISOString().slice(0,19); }
 function nowStamp(){ return nowIso().replace(/[:.]/g, "-"); }
+/* The id is the collapse key in store.py: two records sharing one get MERGED,
+   and the second silently overwrites the first. Second-resolution timestamps
+   collide easily -- two items ticked off within the same second, or two actions
+   backdated to the same day, both land on an identical string. */
+function uid(at){ return at + "-" + Math.random().toString(36).slice(2, 7); }
 
 /* ============================================================ THE MIRROR
    A JavaScript twin of the ARITHMETIC in engine/chem.py and the two cheap
@@ -480,13 +486,17 @@ const SUPERSEDED_BY = {ph_down:"added_acid", salt_up:"added_salt", cya_up:"added
 const SUPERSEDED_NOUN = {ph_down:"pH", salt_up:"salt", cya_up:"stabilizer",
                          borate_up:"borates", shock:"chlorine", orp_cell:"the cell"};
 
-function scale(gal){ return (gal > 0 ? gal/10000 : 1.8); }
-function saltLb(cur, tgt, gal){ return (tgt - cur) * scale(gal) / CHEM.ppm_per_lb_per_10k; }
-function cyaLb(cur, tgt, gal){ return (tgt - cur) * scale(gal) / CHEM.ppm_per_lb_per_10k; }
-function acidFloz(now, tgt, gal, ta){
-  return CHEM.acid_floz_per_ta_per_ph_per_10k * (ta || CHEM.default_ta) * (now - tgt) * scale(gal);
-}
-function chlorineGal(d, gal){ return d * scale(gal) / CHEM.fc_ppm_per_gal_per_10k; }
+/* No dose arithmetic lives here, on purpose.
+
+   An earlier version carried JS copies of the four formulas. Nothing ever called
+   them, and they were already wrong -- no chemical-strength factor, none of the
+   MAX_*_PER_10K caps -- which is exactly how a mirror rots: the copy nobody runs
+   is the copy nobody notices is broken. Doses come from the cloud, and when a
+   local change invalidates them recompute() blanks them instead of guessing.
+   What IS mirrored below is only what cannot be wrong in a dangerous way: which
+   band a value falls in, and how many days since something happened.
+
+*/
 
 function statusOf(v, lo, hi){
   if(v === null || v === undefined) return "unknown";
@@ -501,13 +511,25 @@ function addPending(kind, rec){
   const p = pending(); (p[kind] = p[kind] || []).push(rec); ls.set("pp_pending", p);
 }
 function clearConfirmedPending(){
-  /* drop anything the cloud has now echoed back, matched on id */
+  /* Drop anything the cloud has now echoed back.
+
+     Matching on id ALONE was wrong for confirmations: a confirmation reuses the
+     id of the reading it confirms, which is already in raw.readings, so the
+     local confirmation was dropped on the very next sync -- before the cloud had
+     ingested it -- and the reading flipped straight back to unconfirmed with the
+     confirm card reappearing. A pending record has only really landed when the
+     cloud copy agrees about the thing that actually changed. */
   const p = pending(), raw = (STATE && STATE.raw) || {readings:[], actions:[]};
-  const have = {};
-  (raw.readings || []).forEach(function(r){ have[r.id] = 1; });
-  (raw.actions  || []).forEach(function(a){ have[a.id] = 1; });
-  p.readings = (p.readings || []).filter(function(r){ return !have[r.id]; });
-  p.actions  = (p.actions  || []).filter(function(a){ return !have[a.id]; });
+  const cloudR = {}, cloudA = {};
+  (raw.readings || []).forEach(function(r){ cloudR[r.id] = r; });
+  (raw.actions  || []).forEach(function(a){ cloudA[a.id] = a; });
+  p.readings = (p.readings || []).filter(function(r){
+    const c = cloudR[r.id];
+    if(!c) return true;                            /* not ingested yet */
+    if(r.confirmed && !c.confirmed) return true;   /* our confirmation hasn't landed */
+    return false;
+  });
+  p.actions  = (p.actions  || []).filter(function(a){ return !cloudA[a.id]; });
   if(STATE && STATE.opening && STATE.opening.steps){
     STATE.opening.steps.forEach(function(s){
       if(s.state === "done" && p.opening) delete p.opening[s.id];
@@ -549,9 +571,11 @@ function recompute(){
     const v = latest ? latest[p.key] : null;
     const st = p.key === "water_temp_f" ? (v === null || v === undefined ? "unknown" : "ok")
                                         : statusOf(v, p.low, p.high);
+    /* p.fmt_unit is the unit string Python's _fmt() uses, its spacing included,
+       so the two sides cannot drift ("78" + "\u00b0F" here vs "78 \u00b0F" before). */
     const disp = (v === null || v === undefined) ? "not measured"
       : (p.key === "salt_ppm" ? Math.round(v).toLocaleString() + " ppm"
-                              : (Math.round(v*100)/100) + (p.unit ? " " + p.unit : ""));
+                              : (Math.round(v*100)/100) + (p.fmt_unit || ""));
     return Object.assign({}, p, {value:v, display:disp, status:st});
   });
 
@@ -583,12 +607,30 @@ function recompute(){
     return copy;
   });
 
+  /* If a reading was logged or confirmed locally that the cloud's checklist
+     hasn't seen yet, every dose on screen was computed from water that no longer
+     exists -- while the panel directly above it has already updated, which makes
+     the pairing look authoritative when it is stale by one reading. Pull the
+     numbers rather than show them. */
+  const clReadingId = (cl.reading || {}).id || null;
+  const staleDoses = !!(latest && clReadingId && latest.id !== clReadingId);
+  if(staleDoses){
+    items.forEach(function(it){
+      if(!it.dose && !it.measured) return;
+      it.dose = null;
+      it.staleReading = true;
+      it.why = "There's a newer reading than the one this was worked out from. The dose " +
+               "recomputes in the cloud in about a minute \u2014 refresh then.";
+      it.how = "";
+    });
+  }
+
   const done = ls.get("pp_done", {});
   items.forEach(function(it){ it.doneToday = done[today() + "|" + it.id] === true; });
 
   const age = latest ? daysBetween(latest.date, today()) : null;
   return {panel:panel, chips:chips, items:items, latest:latest, age:age, gallons:gal,
-          readings:reads, actions:acts};
+          readings:reads, actions:acts, staleDoses:staleDoses};
 }
 
 /* ---------------------------------------------------------------- github */
@@ -659,6 +701,19 @@ function sendJson(name, obj, okMsg){
 }
 
 /* ----------------------------------------------------------------- load */
+/* Reading and writing are separate problems now.
+
+   When the repo is public, state.json sits next to this page on the same origin,
+   so READING needs no credential at all -- open the app and it just works. Only
+   WRITING (which is a commit) needs the token. On a private setup DATA_URL is
+   empty and both go through the API, same as before. */
+async function fetchPublicState(){
+  if(!DATA_URL) return null;
+  const r = await fetch(DATA_URL + "?t=" + Date.now(), {cache: "no-store"});
+  if(!r.ok) return null;
+  return await r.json();
+}
+
 async function load(quiet){
   if(EMBED){
     STATE = EMBED.state;
@@ -667,7 +722,7 @@ async function load(quiet){
   }
   const cached = ls.get("pp_cache", null);
   if(cached && !STATE){ STATE = cached; render(); }
-  if(!connected()){
+  if(!DATA_URL && !connected()){
     $("sync").textContent = "not connected"; $("sync").className = "chip warn";
     if(!cached) showTab("set");
     render(); return;
@@ -675,11 +730,20 @@ async function load(quiet){
   if(!quiet){ $("sync").textContent = "syncing"; $("sync").className = "chip"; }
   $("hrefresh").classList.add("spin");
   try {
-    const s = await ghGet("data/store/state.json");
-    STATE = s ? JSON.parse(s) : null;
+    let st = await fetchPublicState();
+    if(st === null && connected()){
+      const s = await ghGet("data/store/state.json");
+      st = s ? JSON.parse(s) : null;
+    }
+    if(st === null) throw new Error("couldn't reach the data");
+    STATE = st;
     ls.set("pp_cache", STATE);
     clearConfirmedPending();
-    $("sync").textContent = "synced"; $("sync").className = "chip ok";
+    /* read-only is a perfectly good state to sit in -- say so rather than
+       nagging, because everything except logging still works without a token */
+    const w = connected();
+    $("sync").textContent = w ? "synced" : "read-only";
+    $("sync").className = w ? "chip ok" : "chip";
     render();
   } catch(e){
     $("sync").textContent = "sync failed"; $("sync").className = "chip warn";
@@ -812,7 +876,8 @@ async function didItem(id){
   const it = LIVE.items.filter(function(i){ return i.id === id; })[0];
   if(!it) return;
   const akey = LOGGABLE[it.key];
-  const rec = {kind:"action", id:nowIso(), action:akey, at:nowIso(),
+  const at = nowIso();
+  const rec = {kind:"action", id:uid(at), action:akey, at:at,
                amount:(it.dose && it.dose.amount) || null,
                unit:(it.dose && it.dose.unit) || "", note:"from the checklist"};
   if(it.key === "orp_cell" && it.dose && it.dose.detail && it.dose.detail.to_pct != null){
@@ -892,8 +957,9 @@ async function saveManual(){
     toast("Nothing to save — fill in at least one number"); return;
   }
   const at = nowIso();
-  const rec = Object.assign({kind:"reading", id:at, at:at, source:"manual", confirmed:true}, vals);
-  addPending("readings", Object.assign({id:at, at:at, date:at.slice(0,10),
+  const rid = uid(at);
+  const rec = Object.assign({kind:"reading", id:rid, at:at, source:"manual", confirmed:true}, vals);
+  addPending("readings", Object.assign({id:rid, at:at, date:at.slice(0,10),
     confirmed:true, source:"manual"}, vals));
   MEASURES.forEach(function(m){ if($("mn_" + m.key)) $("mn_" + m.key).value = ""; });
   render();
@@ -957,10 +1023,11 @@ async function saveAction(){
   const at = d === today() ? nowIso() : d + "T12:00:00";
   const amt = $("a_amount").value.trim();
   const label = (STATE.action_kinds.filter(function(k){ return k.key === pickedAction; })[0] || {}).label;
-  const rec = {kind:"action", id:at, at:at, action:pickedAction,
+  const aid = uid(at);
+  const rec = {kind:"action", id:aid, at:at, action:pickedAction,
                amount: amt === "" ? null : Number(amt), unit:$("a_unit").value.trim(),
                note:$("a_note").value.trim()};
-  addPending("actions", {id:at, at:at, date:d, action:pickedAction, label:label || pickedAction,
+  addPending("actions", {id:aid, at:at, date:d, action:pickedAction, label:label || pickedAction,
                          amount:rec.amount, unit:rec.unit, note:rec.note});
   $("a_amount").value = ""; $("a_note").value = ""; $("a_unit").value = "";
   pickedAction = null;
@@ -1070,8 +1137,12 @@ function renderTimeline(){
 function renderOpening(){
   const op = STATE.opening || {steps:[], done:0, total:0};
   const pend = pending().opening || {};
+  /* copy EVERY step, not just the pending ones -- the unlock loop below assigns
+     to .state, and on a step that wasn't copied that rewrites STATE.opening and
+     the pp_cache copy along with it */
   const steps = (op.steps || []).map(function(s){
-    return pend[s.id] ? Object.assign({}, s, {state:"done", confirmed_date:pend[s.id]}) : s;
+    return pend[s.id] ? Object.assign({}, s, {state:"done", confirmed_date:pend[s.id]})
+                      : Object.assign({}, s);
   });
   /* a locally-ticked step unlocks the next one immediately, same as the engine would */
   let unlocked = true;
@@ -1122,8 +1193,10 @@ async function doStep(id){
 async function undoStep(id){
   const op = STATE.opening || {steps:[]};
   const ids = (op.steps || []).map(function(s){ return s.id; });
+  const at = ids.indexOf(id);
+  if(at < 0) return;                  /* slice(-1) would have cleared the LAST step */
   const p = pending(); p.opening = p.opening || {};
-  ids.slice(ids.indexOf(id)).forEach(function(k){ delete p.opening[k]; });
+  ids.slice(at).forEach(function(k){ delete p.opening[k]; });
   ls.set("pp_pending", p);
   renderOpening();
   await sendJson("opening", {kind:"opening", step:id, undo:true}, "Step reopened");
@@ -1169,6 +1242,10 @@ function showTab(name){
 /* ------------------------------------------------------------------ init */
 function initSettings(){
   const c = cfgApp();
+  $("s_mode").textContent = DATA_URL
+    ? "Readings load without a token. The token below is only needed to LOG things — " +
+      "uploading a screenshot, confirming a reading, ticking an item off."
+    : "This setup needs a token to read as well as write.";
   $("s_repo").value = c.repo; $("s_token").value = c.token;
   $("s_save").addEventListener("click", async function(){
     ls.set("pp_repo", $("s_repo").value.trim());
@@ -1245,6 +1322,10 @@ self.addEventListener("activate", function(e){
 self.addEventListener("fetch", function(e){
   const url = new URL(e.request.url);
   if(url.hostname.indexOf("github") >= 0 || url.hostname === "127.0.0.1") return;  // always live
+  // On a public single-repo setup the pool data is same-origin, so it would
+  // otherwise land in the shell cache and the app would show one stale reading
+  // forever. The shell is cacheable; the data never is.
+  if(url.pathname.indexOf("/data/store/") >= 0) return;
   if(e.request.method !== "GET") return;
   e.respondWith(
     fetch(e.request).then(function(r){
@@ -1282,23 +1363,43 @@ def _read_json(name, default=None):
     return default
 
 
-def _html(data_json, title, repo, built):
+def _html(data_json, title, repo, built, data_url=""):
     return (TEMPLATE.replace("__DATA__", data_json)
                     .replace("__CHEM__", json.dumps(chem_constants()))
                     .replace("__TITLE__", title)
                     .replace("__REPO__", repo)
+                    .replace("__DATA_URL__", data_url)
                     .replace("__BUILT__", built))
+
+
+# Served from the repo root by GitHub Pages, so the home-screen URL is just
+# /pool-pilot/ rather than /pool-pilot/app/index.html. Also keeps the app one
+# folder deep, which is what the private two-repo layout would want.
+ROOT_INDEX = """<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>__TITLE__</title>
+<link rel="canonical" href="app/">
+<meta http-equiv="refresh" content="0; url=app/">
+<script>location.replace("app/" + location.search + location.hash);</script>
+</head><body style="background:#0d141a"><a href="app/" style="color:#40c4d0">__TITLE__</a></body></html>
+"""
 
 
 def main():
     title = poolcfg.title()
-    repo = poolcfg.CONFIG["app"].get("data_repo", "")
+    app_cfg = poolcfg.CONFIG["app"]
+    repo = app_cfg.get("data_repo", "")
+    # Relative to app/index.html. Set when the repo is public and Pages serves
+    # the data alongside the app, which is what lets the phone read with no token.
+    data_url = (app_cfg.get("public_data_url") or "").strip()
     built = datetime.now().strftime("%Y-%m-%d %H:%M")
     app_dir, out_dir = poolcfg.path_of("app"), poolcfg.path_of("out")
 
-    # public shell -- no pool data, ever
+    # public shell -- no pool data baked in, ever
     open(os.path.join(app_dir, "index.html"), "w", encoding="utf-8").write(
-        _html("null", title, repo, built))
+        _html("null", title, repo, built, data_url))
     manifest = dict(MANIFEST, name=title, short_name=title)
     json.dump(manifest, open(os.path.join(app_dir, "manifest.webmanifest"), "w",
                              encoding="utf-8"), indent=2)
@@ -1309,6 +1410,14 @@ def main():
     open(os.path.join(app_dir, ".nojekyll"), "w", encoding="utf-8").write("")
     open(os.path.join(app_dir, "robots.txt"), "w", encoding="utf-8").write(
         "User-agent: *\nDisallow: /\n")
+
+    # repo root: redirect + the two files Pages wants there
+    root = os.path.dirname(HERE)
+    open(os.path.join(root, "index.html"), "w", encoding="utf-8").write(
+        ROOT_INDEX.replace("__TITLE__", title))
+    open(os.path.join(root, ".nojekyll"), "w", encoding="utf-8").write("")
+    open(os.path.join(root, "robots.txt"), "w", encoding="utf-8").write(
+        "User-agent: *" + chr(10) + "Disallow: /" + chr(10))
 
     # local copy -- data inlined, opens straight off disk
     embedded = {"state": _read_json("state.json")}

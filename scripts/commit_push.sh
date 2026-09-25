@@ -30,11 +30,14 @@ if git diff --cached --quiet; then
 fi
 git commit -q -m "$MSG"
 
+# 5 pushes, 4 rebases: rebasing after the final attempt would throw away the work
+# of resolving the race without ever retrying the push it was resolving for.
 for attempt in 1 2 3 4 5; do
   if git push -q; then
     echo "pushed"
     exit 0
   fi
+  if [ "$attempt" -eq 5 ]; then break; fi
   echo "push rejected (attempt $attempt) -- rebasing onto the latest main"
   git fetch -q origin main
   git rebase -q -X theirs origin/main

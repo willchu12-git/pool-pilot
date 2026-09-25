@@ -139,7 +139,7 @@
     "notes": "Leave claude_model empty to use your default Max-plan model. vision_flags is what lets `claude -p` actually open the screenshot file."
   },
   "ondilo": {
-    "enabled": false,
+    "enabled": true,
     "pool_id": "",
     "client_id": "customer_api",
     "client_secret": "",

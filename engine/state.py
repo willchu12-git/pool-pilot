@@ -145,7 +145,14 @@ def build(today=None, with_checklist=True):
             cl = json.load(open(p, encoding="utf-8"))
         except (json.JSONDecodeError, OSError):
             cl = None
-    if cl is None or cl.get("date") != today.isoformat():
+    # A checklist is stale if it is from another day OR if it was computed from a
+    # different reading than the one now on top. Date alone was not enough: a
+    # reading can land hours after the morning checklist was written, and the old
+    # list would keep being served all day because it still carried today's date.
+    stale = (cl is None
+             or cl.get("date") != today.isoformat()
+             or (cl.get("basis") or {}).get("reading_id") != (latest or {}).get("id"))
+    if stale:
         # Never leave the app without a list. Written back to disk as well as used
         # here, so checklist.json always matches what the phone is actually showing
         # -- and so run_cloud's "did the checklist go stale?" check has something

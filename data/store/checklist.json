@@ -1,8 +1,30 @@
 {
   "date": "2026-09-24",
-  "generated_at": "2026-09-24T22:49:37",
-  "reading": null,
-  "reading_age_days": null,
+  "generated_at": "2026-09-24T22:53:52",
+  "reading": {
+    "id": "ico:2026-09-25 01:38:34",
+    "at": "2026-09-25T01:38:34",
+    "date": "2026-09-25",
+    "source": "ondilo_api",
+    "confirmed": true,
+    "image": "",
+    "note": "",
+    "logged_at": "2026-09-25T02:30:15",
+    "ph": 7.97,
+    "orp_mv": 403.0,
+    "salt_ppm": 2593.0,
+    "water_temp_f": null,
+    "cya_ppm": null,
+    "borates_ppm": null,
+    "ta_ppm": null,
+    "ch_ppm": null,
+    "fc_ppm": null,
+    "tds_ppm": null,
+    "dropped": [
+      "water_temp_f"
+    ]
+  },
+  "reading_age_days": 0,
   "pending_confirmation": [],
   "panel": [
     {
@@ -10,10 +32,10 @@
       "label": "pH",
       "unit": "",
       "fmt_unit": "",
-      "value": null,
-      "display": "not measured",
+      "value": 7.97,
+      "display": "7.97",
       "target": "7.6-7.8",
-      "status": "unknown",
+      "status": "high",
       "low": 7.6,
       "high": 7.8
     },
@@ -22,10 +44,10 @@
       "label": "ORP",
       "unit": "mV",
       "fmt_unit": " mV",
-      "value": null,
-      "display": "not measured",
+      "value": 403.0,
+      "display": "403 mV",
       "target": "at least 600 mV",
-      "status": "unknown",
+      "status": "low",
       "low": 600,
       "high": null
     },
@@ -46,10 +68,10 @@
       "label": "Salt",
       "unit": "ppm",
       "fmt_unit": " ppm",
-      "value": null,
-      "display": "not measured",
+      "value": 2593.0,
+      "display": "2,593 ppm",
       "target": "2800-3200 ppm",
-      "status": "unknown",
+      "status": "low",
       "low": 2800,
       "high": 3200
     },
@@ -104,21 +126,68 @@
   ],
   "items": [
     {
-      "id": "reading_none",
-      "key": "reading_none",
-      "title": "Take a water reading",
-      "kind": "test",
+      "id": "salt_up",
+      "key": "salt_up",
+      "title": "Add salt",
+      "kind": "dose",
       "priority": 1,
-      "because": "There's no confirmed reading on record yet. Everything else on this list is waiting on one -- upload an ICO screenshot or type a test in by hand and the checklist fills itself out.",
-      "why": "There's no confirmed reading on record yet. Everything else on this list is waiting on one -- upload an ICO screenshot or type a test in by hand and the checklist fills itself out.",
-      "how": "Drop the ICO in or run a test strip, then upload the screenshot here and confirm what it read.",
-      "dose": null,
-      "measured": null,
-      "target": null,
+      "because": "Salt is 2,593 ppm, below the 2800-3200 ppm the cell needs. A cell run under its salt band makes less chlorine and wears out faster.",
+      "why": "Salt is 2,593 ppm, below the 2800-3200 ppm the cell needs. A cell run under its salt band makes less chlorine and wears out faster.",
+      "how": "Pump running. Broadcast the salt across the deep end, then brush it off the floor until it dissolves so it isn't sitting on the liner. Give it a full circulation -- 24 hours -- before you trust a salt reading.",
+      "dose": {
+        "amount": 61.0,
+        "unit": "lb",
+        "chemical": "pool salt",
+        "label": "61 lb of salt (about 1.52 of a 40 lb bag)",
+        "detail": {
+          "lb": 61.0,
+          "want_lb": 61.1,
+          "capped": false,
+          "raises_ppm": 407.0,
+          "bags": 1.52,
+          "whole": 1,
+          "bag_lb": 40.0
+        }
+      },
+      "measured": "2,593 ppm",
+      "target": "2800-3200 ppm",
       "wait_hours": null,
       "after": null,
       "superseded": false,
       "order": 1
+    },
+    {
+      "id": "ph_down",
+      "key": "ph_down",
+      "title": "Bring pH down",
+      "kind": "dose",
+      "priority": 1,
+      "because": "pH is 7.97, above the 7.6-7.8 target. TA wasn't measured, so this dose assumes a mid-band buffer -- treat it as a starting point and retest.",
+      "why": "pH is 7.97, above the 7.6-7.8 target. TA wasn't measured, so this dose assumes a mid-band buffer -- treat it as a starting point and retest.",
+      "how": "Pump running. Measure the acid into a bucket of pool water first -- acid into water, never water into acid -- then walk it slowly around the deep end, away from the skimmer and the returns. Never down the skimmer. Retest tomorrow.",
+      "dose": {
+        "amount": 27,
+        "unit": "fl oz",
+        "chemical": "muriatic acid",
+        "label": "27 fl oz (3.38 cups) of muriatic acid",
+        "detail": {
+          "floz": 27,
+          "want_floz": 27.2,
+          "capped": false,
+          "cups": 3.38,
+          "quarts": 0.84,
+          "ta_used": 80,
+          "ta_assumed": true,
+          "drops_ph": 0.22,
+          "strength_pct": 31.45
+        }
+      },
+      "measured": "7.97",
+      "target": "7.6-7.8",
+      "wait_hours": null,
+      "after": null,
+      "superseded": false,
+      "order": 2
     },
     {
       "id": "backwashed_filter",
@@ -135,7 +204,7 @@
       "wait_hours": null,
       "after": null,
       "superseded": false,
-      "order": 2
+      "order": 3
     },
     {
       "id": "emptied_skimmer",
@@ -152,14 +221,48 @@
       "wait_hours": null,
       "after": null,
       "superseded": false,
-      "order": 3
+      "order": 4
+    },
+    {
+      "id": "orp_blocked",
+      "key": "orp_blocked",
+      "title": "Leave the cell alone for now",
+      "kind": "watch",
+      "priority": 2,
+      "because": "ORP is 403 mV, under the at least 600 mV floor -- but pH and Salt are out of band too, and ORP sits downstream of all of it. Fix those first, give the water a full day to circulate, then re-read. Turning the cell up now just means running it harder against the same problem.",
+      "why": "ORP is 403 mV, under the at least 600 mV floor -- but pH and Salt are out of band too, and ORP sits downstream of all of it. Fix those first, give the water a full day to circulate, then re-read. Turning the cell up now just means running it harder against the same problem.",
+      "how": "",
+      "dose": null,
+      "measured": "403 mV",
+      "target": "at least 600 mV",
+      "wait_hours": null,
+      "after": null,
+      "superseded": false,
+      "order": 5
+    },
+    {
+      "id": "borate_test",
+      "key": "borate_test",
+      "title": "Test borates",
+      "kind": "test",
+      "priority": 3,
+      "because": "Borates aren't on the ICO panel and haven't been tested. The target is 50 ppm; a strip test once a season is enough to know where you are.",
+      "why": "Borates aren't on the ICO panel and haven't been tested. The target is 50 ppm; a strip test once a season is enough to know where you are.",
+      "how": "A borate test strip takes ten seconds. Once a season is plenty.",
+      "dose": null,
+      "measured": null,
+      "target": "50 ppm",
+      "wait_hours": null,
+      "after": null,
+      "superseded": false,
+      "order": 6
     }
   ],
   "counts": {
-    "total": 3,
-    "todo": 3,
-    "doses": 0,
-    "out_of_band": 0
+    "total": 6,
+    "todo": 5,
+    "doses": 2,
+    "out_of_band": 3
   },
   "safety_rules": [
     "NEVER pour undiluted acid into the skimmer. Acid down the skimmer runs neat through the pump, heater and salt cell and eats them. Dilute it and pour it slowly around the deep end with the pump running.",
@@ -184,15 +287,21 @@
   },
   "basis": {
     "date": "2026-09-24",
-    "reading_id": null,
+    "reading_id": "ico:2026-09-25 01:38:34",
     "items": [
       "backwashed_filter",
+      "borate_test",
       "emptied_skimmer",
-      "reading_none"
+      "orp_blocked",
+      "ph_down",
+      "salt_up"
     ],
-    "doses": {}
+    "doses": {
+      "salt_up": 61.0,
+      "ph_down": 27
+    }
   },
-  "headline": "Upload a reading and this fills in.",
-  "summary": "Nothing is dosed without a measurement. Upload an ICO screenshot or type a test in by hand, confirm what it read, and the checklist builds itself.",
+  "headline": "Add salt.",
+  "summary": "5 thing(s) on the list today, 2 of them a dose. Reading is 0 day(s) old. Pump running before anything goes in.",
   "source": "fallback"
 }

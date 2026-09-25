@@ -153,10 +153,17 @@ def _item(key, title, kind, priority, because, **kw):
 
 
 def _age_days(iso_at, today):
+    """Whole days old, never negative.
+
+    The cloud runs in UTC and a phone does not, so a reading taken at 01:38 UTC
+    is stamped tomorrow as far as an evening in New York is concerned. That is
+    not a reading from the future, it is a reading from ten minutes ago, and
+    "-1 days old" reads as a bug to anyone who sees it.
+    """
     if not iso_at:
         return None
     try:
-        return (today - date.fromisoformat(str(iso_at)[:10])).days
+        return max(0, (today - date.fromisoformat(str(iso_at)[:10])).days)
     except ValueError:
         return None
 

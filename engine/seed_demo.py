@@ -22,7 +22,8 @@ sys.path.insert(0, HERE)
 import poolcfg  # noqa: E402
 import store    # noqa: E402
 
-FILES = (store.READINGS, store.ACTIONS, store.OPENING, "checklist.json", "state.json")
+FILES = (store.READINGS, store.ACTIONS, store.OPENING, "season.json",
+         "checklist.json", "state.json")
 
 # A season that drifts the way a saltwater pool actually drifts: pH climbing week
 # on week, salt sagging as rain dilutes it, CYA burning off in the sun.

@@ -221,19 +221,38 @@ def _c_to_f(c):
     return c * 9.0 / 5.0 + 32.0
 
 
-def _temp_f(value, units):
-    """The API reports temperature in the ACCOUNT's preferred unit, not always C.
+# Where the two scales stop overlapping for liquid pool water. Below 32 it
+# cannot be Fahrenheit (that is ice); above 40 it cannot be Celsius (that is a
+# hot tub, and a hot one). Between them, both readings are physically possible.
+MIN_PLAUSIBLE_F = 32.0
+MAX_PLAUSIBLE_C = 40.0
 
-    Guessing from the magnitude is tempting and wrong -- 40 is a plausible pool
-    in either scale (104F, or 40F in April). So ask /user/units, and only fall
-    back to a magnitude guess if that call failed.
+
+def _temp_f(value, units):
+    """Water temperature as Fahrenheit, whatever the account is set to.
+
+    /user/units reports what the account PREFERS, and the first live pull showed
+    that is not always the unit the measurement actually arrives in: a Celsius
+    value came through while the preference said Fahrenheit, which stored "24
+    degrees F" and had it dropped as impossible. A dropped temperature is a
+    harmless failure, but the same mismatch in the other direction would have
+    stored a plausible-looking wrong number.
+
+    So the preference is a hint and the magnitude is the check: a pool at 24 is
+    not Fahrenheit, a pool at 78 is not Celsius, and where the two disagree,
+    physics wins. Only inside the genuinely ambiguous 32-40 band does the stated
+    preference get the final say, because there nothing else can decide it.
     """
-    pref = str((units or {}).get("temperature") or "").lower()
-    if pref.startswith("f"):
+    pref = str((units or {}).get("temperature") or "").strip().lower()
+    said = "F" if pref.startswith("f") else ("C" if pref.startswith("c") else "")
+
+    if value > MAX_PLAUSIBLE_C:
+        return value, "F" if said == "F" else "F by magnitude"
+    if value < MIN_PLAUSIBLE_F:
+        return _c_to_f(value), "C" if said == "C" else "C by magnitude"
+    if said == "F":
         return value, "F"
-    if pref.startswith("c"):
-        return _c_to_f(value), "C"
-    return (_c_to_f(value), "C?") if value < 46 else (value, "F?")
+    return _c_to_f(value), "C" if said == "C" else "C assumed"
 
 
 def _salt_ppm(value):
@@ -263,9 +282,14 @@ def to_reading(measures, units=None, pool_id=""):
         if v is None:
             continue
         if t == "temperature":
-            v, src = _temp_f(float(v), units)
-            if src in ("C?", "F?"):
-                notes.append("temperature unit unconfirmed, assumed %s" % src[0])
+            raw = float(v)
+            v, src = _temp_f(raw, units)
+            if "magnitude" in src:
+                notes.append("temperature read as %s (%g) -- the account says %s, but that "
+                             "value can't be" % (src[0], raw,
+                                                 "F" if src[0] == "C" else "C"))
+            elif "assumed" in src:
+                notes.append("temperature unit unconfirmed, assumed Celsius")
         elif t == "salt":
             v, src = _salt_ppm(float(v))
             if src == "g/L":
@@ -291,6 +315,7 @@ def pull(token=None, pool_id=None, write=True):
 
     try:
         units = user_units(token)
+        print("  units: %s" % json.dumps(units)[:160])
     except (urllib.error.HTTPError, urllib.error.URLError, ValueError) as e:
         print("  ! couldn't read unit preferences (%s) -- will infer" % e)
         units = {}
@@ -302,19 +327,27 @@ def pull(token=None, pool_id=None, write=True):
         return None
 
     at = newest or datetime.now().isoformat(timespec="seconds")
-    # keyed on the ICO's own measurement time, so polling repeatedly over one
-    # measurement collapses onto a single record instead of piling up
-    rid = "ico:" + str(at)[:19]
+    # Keyed on the ICO's own measurement time, so polling repeatedly over one
+    # measurement collapses onto a single record instead of piling up. The API
+    # sends "2026-09-25 01:38:34" with a space; normalise it so the id matches
+    # the `at` the store ends up holding.
+    rid = "ico:" + str(at)[:19].replace(" ", "T")
     shown = ", ".join("%s %s" % (k, v) for k, v in sorted(vals.items()))
     if not write:
         print("  would file %s -> %s" % (rid, shown))
         return {"id": rid, "at": at, **vals}
 
-    existing = {r.get("id") for r in store.readings(False)}
+    # An append-only store collapses duplicates on read, so re-filing the same
+    # measurement is harmless -- but the ICO only measures hourly and this polls
+    # more often than that, so without this every unchanged poll would add a line
+    # forever.
+    prior = next((r for r in store.readings(False) if r.get("id") == rid), None)
+    if prior and all(prior.get(k) == v for k, v in vals.items()):
+        print("  = unchanged since %s, nothing to file" % rid)
+        return prior
     rec = store.add_reading(at=at, source="ondilo_api", confirmed=True,
                             note="; ".join(notes)[:200], rid=rid, **vals)
-    print("  %s %s -> %s" % ("updated" if rid in existing else "+ new reading",
-                             rid, shown))
+    print("  %s %s -> %s" % ("updated" if prior else "+ new reading", rid, shown))
     for n in notes:
         print("    note: %s" % n)
     if rec.get("dropped"):

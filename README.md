@@ -72,6 +72,9 @@ that changes.
 
 ## Setup
 
+**New to this? [SETUP.md](SETUP.md) is the same thing spelled out click by click.**
+What follows is the short version.
+
 1. **Create the repo** — `pool-pilot`, public, and push this directory to it.
 
 2. **Settings → Pages** — Source: *Deploy from a branch*, Branch: `main`, folder:

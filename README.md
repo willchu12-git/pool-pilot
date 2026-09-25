@@ -31,52 +31,67 @@ Two more rules that live in code, not in a prompt:
 
 ## Layout
 
-```
-pool-pilot-data/          PRIVATE — the real repo
-  config.json             pool volume, targets, cadences, chemicals, safety rules, opening steps
-  engine/
-    poolcfg.py            loads config.json; renders safety_rules into every prompt
-    chem.py               pure dose arithmetic — the only place a number is produced
-    store.py              append-only JSONL: readings, actions, opening progress
-    vision.py             `claude -p --allowedTools Read` on an ICO screenshot -> strict JSON
-    vision_prompt.md
-    checklist.py          the rules; builds the list, then asks Claude for the wording
-    checklist_prompt.md
-    state.py              one JSON bundle the PWA renders
-    pwa.py                builds app/ (public shell) and out/ (local, data inlined)
-    check_inbox.py        files whatever the phone dropped
-    run_cloud.py          the orchestrator Actions runs
-    push.py               ntfy.sh morning push, quiet on a day with nothing to do
-    serve.py              local server for when you're at the PC
-  data/store/*.jsonl      the data
-  data/images/            archived screenshots, next to the readings they produced
-  inbox/                  what the phone drops; archived after ingest
-  app/                    the built public shell
-  scripts/                commit_push.sh (race-safe), publish_app.sh
-  .github/workflows/      daily.yml, interactive.yml
+One **public** repo. GitHub Pages serves it, which means the app and the data sit
+on the same origin — so the phone reads with no credential at all, and a token is
+only needed to write.
 
-pool-pilot-app/           PUBLIC — GitHub Pages only. Zero pool data.
 ```
+pool-pilot/                 PUBLIC — Pages serves this whole repo
+  index.html                redirect, so the home-screen URL is just /pool-pilot/
+  config.json               volume, targets, cadences, chemicals, safety rules, opening steps
+  engine/
+    poolcfg.py              loads config.json; renders safety_rules into every prompt
+    chem.py                 pure dose arithmetic — the only place a number is produced
+    store.py                append-only JSONL: readings, actions, opening progress
+    vision.py               `claude -p --allowedTools Read` on a screenshot -> strict JSON
+    vision_prompt.md
+    checklist.py            the rules; builds the list, then asks Claude for the wording
+    checklist_prompt.md
+    state.py                one JSON bundle the PWA renders
+    pwa.py                  builds app/ (shell) and out/ (local, data inlined)
+    check_inbox.py          files whatever the phone dropped
+    run_cloud.py            the orchestrator Actions runs
+    push.py                 ntfy.sh push, quiet on a day with nothing to do
+    serve.py                local server for when you are at the PC
+    seed_demo.py            a plausible season, for looking around
+  data/store/*.jsonl        the data — read by the phone over plain HTTPS, no token
+  data/images/              archived screenshots, next to the readings they produced
+  inbox/                    what the phone drops; archived after ingest
+  app/                      the built app
+  scripts/commit_push.sh    race-safe commit + push
+  .github/workflows/        daily.yml, interactive.yml
+```
+
+Everything in this repo is public, including your readings. They are pH numbers
+and "backwashed the filter" — but it is a public record, so decide that
+deliberately. To go private instead: blank `app.public_data_url` in config.json,
+make the repo private, and publish `app/` to a separate public repo by hand. The
+app falls back to reading over the API with the token, which is the only thing
+that changes.
 
 ## Setup
 
-1. **Two repos.** `pool-pilot-data` (private, this) and `pool-pilot-app` (public, Pages on,
-   serving from the `main` branch root).
+1. **Create the repo** — `pool-pilot`, public, and push this directory to it.
 
-2. **In the private repo's settings:**
-   - Secret `CLAUDE_CODE_OAUTH_TOKEN` — run `claude setup-token` locally and paste the result.
-     This is what rides the Max plan instead of a pay-per-token API key.
-   - Variable `APP_REPO` — `yourname/pool-pilot-app`
-   - Secret `APP_REPO_TOKEN` — a fine-grained PAT with **Contents: read & write** on the app repo
-   - Secret `NTFY_TOPIC` (optional) — an unguessable topic for phone pushes
+2. **Settings → Pages** — Source: *Deploy from a branch*, Branch: `main`, folder:
+   `/ (root)`. Give it a minute; your URL is
+   `https://<you>.github.io/pool-pilot/`.
 
-3. **Edit `config.json`.** `pool.gallons` drives every dose; if it's wrong, every dose is wrong
-   by the same ratio. Then `targets`, `cadence_days`, and the chemical strengths you actually buy.
+3. **Settings → Secrets and variables → Actions → New repository secret**
+   - `CLAUDE_CODE_OAUTH_TOKEN` — run `claude setup-token` locally and paste the
+     result. This is what rides your Max plan instead of a pay-per-token API key.
+     Without it everything still works except screenshot reading and the AI
+     wording.
+   - `NTFY_TOPIC` (optional) — an unguessable topic for phone pushes.
 
-4. **On the phone:** open the Pages URL, Share → Add to Home Screen. In Settings, paste the
-   private repo (`owner/name`) and a fine-grained PAT with **Contents: read & write** on it.
-   The token is stored in that browser's local storage and never leaves the phone except in
-   requests to github.com.
+4. **Check `config.json`.** `pool.gallons` drives every dose; if it is wrong,
+   every dose is wrong by the same ratio. `targets.why_these` explains each band.
+
+5. **On the phone** — open the Pages URL, Share → Add to Home Screen. It will
+   already be showing your data. To *log* anything, go to Settings and paste a
+   fine-grained PAT with **Contents: read & write** on this one repo. It is
+   stored in that browser only and never leaves the phone except in requests to
+   github.com.
 
 ## Daily loop
 
@@ -118,10 +133,11 @@ py engine/store.py opening physical_prep --on today
 - **Acid demand depends on TA**, which the ICO doesn't measure. With TA unknown the engine
   assumes a mid-band buffer and says so on the item. Test TA occasionally and the acid doses
   get sharper.
-- **The JS mirror is arithmetic only.** The phone recomputes panel status, the days-since chips,
-  supersede marking and the four dose formulas so taps land instantly. It does *not* duplicate
-  the rules — which items exist, the ORP gating, the acid/shock gap. Those only ever come from
-  the cloud, because two copies of a safety rule is one too many.
+- **The JS mirror never computes a dose.** The phone recomputes panel status, the days-since
+  chips and supersede marking so taps land instantly. It does not duplicate the rules, and it
+  does not duplicate the arithmetic — when a local change invalidates a dose it blanks it and
+  waits for the cloud rather than guessing. Two copies of a safety rule is one too many, and an
+  unused copy of a formula is the one nobody notices has rotted.
 
 ## Safety
 

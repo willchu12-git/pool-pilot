@@ -208,7 +208,15 @@ Address him as "you". Never use an exclamation mark.
       "high": null
     }
   ],
-  "recent_actions": [],
+  "recent_actions": [
+    {
+      "date": "2026-09-24",
+      "label": "Emptied skimmer",
+      "amount": null,
+      "unit": "",
+      "note": "from the checklist"
+    }
+  ],
   "items": [
     {
       "id": "salt_up",
@@ -283,22 +291,8 @@ Address him as "you". Never use an exclamation mark.
       "superseded": false
     },
     {
-      "id": "emptied_skimmer",
-      "order": 4,
-      "title": "Empty the skimmer basket",
-      "kind": "task",
-      "priority": 2,
-      "because": "Never logged. The target cadence is every 3 days -- log it once and the clock starts.",
-      "dose": null,
-      "measured": null,
-      "target": null,
-      "wait_hours": null,
-      "after": null,
-      "superseded": false
-    },
-    {
       "id": "orp_blocked",
-      "order": 5,
+      "order": 4,
       "title": "Leave the cell alone for now",
       "kind": "watch",
       "priority": 2,
@@ -312,7 +306,7 @@ Address him as "you". Never use an exclamation mark.
     },
     {
       "id": "borate_test",
-      "order": 6,
+      "order": 5,
       "title": "Test borates",
       "kind": "test",
       "priority": 3,

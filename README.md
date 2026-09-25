@@ -146,6 +146,32 @@ switched on the "New reading" card says so.
 
 Rate limit is 30 requests/hour per user; a poll makes three, every three hours.
 
+## The cell, the pump, and a proxy that can't be trusted alone
+
+`equipment.cell_output_pct` and `equipment.pump_hours_per_day` are where the cell and timer are
+set right now. The engine reads them so it knows whether there is any headroom left to ask for —
+"turn the cell up one step" is not advice when the cell is already at 100%.
+
+Three rules come out of that:
+
+- **The cell is already flat out** — at 100% with the pump running long hours, a low ORP is not a
+  setting you can change. If pH, salt or CYA are out of band, that's the cause and it says so.
+- **The cell may be scaled or worn out** — same cell at 100%, but the inputs are all in band. The
+  inputs are right and it still isn't keeping up, so the cell itself is the suspect. Most last
+  three to seven years.
+- **Pump runtime** — on a saltwater pool the pump schedule *is* the chlorine schedule, because
+  the cell only makes chlorine while water moves through it. So while ORP is under the floor it
+  says explicitly to leave the schedule alone, and only once ORP is comfortably over with the
+  cell below full does it suggest trimming two hours and re-reading.
+
+There's also a gap this closed. `_shock_items` only fires on a **measured** free chlorine,
+deliberately — ORP moves with pH, salt and temperature, and "the proxy looks low so add chlorine"
+is the reflex that overshoots a pool. That reasoning holds at 580 mV. It stops holding at 400,
+where nobody actually knows whether the water is sanitised and silence is the worse error. So
+below `targets.orp_critical_mv` the engine asks for an FC strip test as a priority-zero item, and
+offers a **holding dose** — a bump of about 2 ppm, below what you would swim in, so it cannot
+over-chlorinate anything. It still refuses to compute a *shock* from ORP alone.
+
 ## Is anything worth buying?
 
 `engine/trends.py` fits a least-squares line through each measurement and measures how much acid
@@ -331,6 +357,9 @@ py engine/store.py opening physical_prep --on today
 - **The dose formulas are estimates for typical water.** They're the standard per-10,000-gallon
   constants, they're capped, and every dose is paired with "circulate, then retest". Trust the
   water over the app.
+- **The ICO reports UTC.** `pool.timezone` converts it; without that an evening reading is filed
+  under tomorrow's date and shows up as a reading from the future. `utc_offset_hours` is only a
+  fallback for machines with no IANA timezone database, and it doesn't follow daylight saving.
 - **Acid demand depends on TA**, which the ICO doesn't measure. With TA unknown the engine
   assumes a mid-band buffer and says so on the item. Test TA occasionally and the acid doses
   get sharper.

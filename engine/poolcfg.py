@@ -181,6 +181,43 @@ def safety_block():
         "%d. %s" % (i, s) for i, s in enumerate(lines, 1))
 
 
+def tzinfo():
+    """The pool's local timezone.
+
+    The ICO's API reports measurement times in UTC and GitHub Actions runs in
+    UTC, so without this an evening reading is stamped with tomorrow's date and
+    shows up in the app as a reading from the future. Falls back to a fixed
+    offset for machines with no IANA database, which is why `timezone` should
+    stay set -- a fixed offset does not follow daylight saving.
+    """
+    from datetime import timedelta, timezone as _tz
+    name = (CONFIG["pool"].get("timezone") or "").strip()
+    if name:
+        try:
+            from zoneinfo import ZoneInfo
+            return ZoneInfo(name)
+        except Exception:
+            print("! timezone %r unavailable -- using the fixed offset" % name)
+    try:
+        return _tz(timedelta(hours=float(CONFIG["pool"].get("utc_offset_hours") or 0)))
+    except (TypeError, ValueError):
+        return _tz(timedelta(0))
+
+
+def utc_to_local(iso):
+    """'2026-09-25 01:38:34' (UTC) -> '2026-09-24T21:38:34' (local)."""
+    from datetime import datetime, timezone as _tz
+    s = str(iso or "").strip().replace(" ", "T")[:19]
+    if not s:
+        return s
+    try:
+        dt = datetime.fromisoformat(s)
+    except ValueError:
+        return s
+    return dt.replace(tzinfo=_tz.utc).astimezone(tzinfo()).replace(tzinfo=None) \
+             .isoformat(timespec="seconds")
+
+
 def title():
     return (CONFIG["app"].get("title") or "Pool Pilot").strip() or "Pool Pilot"
 

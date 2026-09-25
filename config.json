@@ -10,8 +10,10 @@
     "gallons": 18000,
     "type": "inground_vinyl_liner",
     "sanitization": "saltwater",
-    "notes": "Gallons drives every dose on the checklist. If this number is wrong, every dose is wrong by the same ratio. surface_sqft is optional; with it, the spring brief can turn 'lowered 18 inches' into an actual dilution estimate.",
-    "surface_sqft": null
+    "notes": "Gallons drives every dose on the checklist. If this number is wrong, every dose is wrong by the same ratio. surface_sqft is optional; with it, the spring brief can turn 'lowered 18 inches' into an actual dilution estimate. timezone converts the ICO's UTC timestamps to local time -- without it an evening reading is filed under tomorrow. utc_offset_hours is only a fallback for machines with no IANA timezone database; it does not follow DST, so keep timezone set.",
+    "surface_sqft": null,
+    "timezone": "America/New_York",
+    "utc_offset_hours": -4
   },
   "equipment": {
     "salt_cell": "Jandy",
@@ -19,7 +21,9 @@
     "pump": "single + return waterfall, timer-scheduled",
     "skimmer": "Aqua Genie",
     "filter": "sand",
-    "notes": "salt_cell_increment_pct is how big one nudge of the cell output is -- the engine never suggests more than one nudge per checklist."
+    "notes": "salt_cell_increment_pct is how big one nudge of the cell output is -- the engine never suggests more than one nudge per checklist. cell_output_pct and pump_hours_per_day are where the cell and timer are set RIGHT NOW; the engine reads them to know whether there is any headroom left to ask for. Log a 'Changed cell output' action and the logged value takes over from here.",
+    "cell_output_pct": 100,
+    "pump_hours_per_day": 24
   },
   "targets": {
     "orp_mv": [
@@ -58,8 +62,10 @@
       "cya_ppm": "Left at 30-50 on purpose, even though saltwater pools are often run at 70-80. CYA binds chlorine, and an ORP probe only sees what is unbound -- high CYA would push ORP down and make the 600 mV floor unreachable no matter what the cell does. 30-50 is the band that keeps ORP-based control honest.",
       "salt_ppm": "2800-3200 centers on 3000, which is in-spec for essentially every Jandy cell. Check your cell's manual: if it asks for 3000-3500, move this band up to match it -- a cell run under its own band makes less chlorine and wears out faster.",
       "borates_ppm": "50 ppm is what makes the pH band above hold. Borates are a second buffer working where carbonate alkalinity is weakest, and they are most of the reason pH stops climbing every week.",
-      "fc_ppm": "At least 2 ppm. This is the one number where 'low' means the water genuinely is not protected, whatever ORP says -- so it outranks everything else on the list. The ICO does not measure it; a strip does."
-    }
+      "fc_ppm": "At least 2 ppm. This is the one number where 'low' means the water genuinely is not protected, whatever ORP says -- so it outranks everything else on the list. The ICO does not measure it; a strip does.",
+      "orp_critical_mv": "Below this, ORP is low enough that the water may genuinely not be sanitising, and the honest response stops being 'fix the inputs and wait'. The engine will not compute a shock dose from ORP -- that needs a measured free chlorine -- but it will stop being quiet about it and ask for an FC test today."
+    },
+    "orp_critical_mv": 550
   },
   "cadence_days": {
     "reading": 7,

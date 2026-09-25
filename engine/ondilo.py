@@ -326,7 +326,11 @@ def pull(token=None, pool_id=None, write=True):
         print("  ! the ICO returned nothing usable")
         return None
 
-    at = newest or datetime.now().isoformat(timespec="seconds")
+    # The API reports measurement times in UTC. Left alone, an evening reading
+    # is filed under tomorrow -- which is exactly what happened on the first
+    # live pull, and it showed up in the app as a reading from the future.
+    at = poolcfg.utc_to_local(newest) if newest \
+        else datetime.now().isoformat(timespec="seconds")
     # Keyed on the ICO's own measurement time, so polling repeatedly over one
     # measurement collapses onto a single record instead of piling up. The API
     # sends "2026-09-25 01:38:34" with a space; normalise it so the id matches

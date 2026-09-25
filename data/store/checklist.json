@@ -1,14 +1,14 @@
 {
   "date": "2026-09-24",
-  "generated_at": "2026-09-24T22:53:52",
+  "generated_at": "2026-09-24T23:20:17",
   "reading": {
-    "id": "ico:2026-09-25 01:38:34",
-    "at": "2026-09-25T01:38:34",
-    "date": "2026-09-25",
+    "id": "ico:2026-09-24T21:38:34",
+    "at": "2026-09-24T21:38:34",
+    "date": "2026-09-24",
     "source": "ondilo_api",
     "confirmed": true,
     "image": "",
-    "note": "",
+    "note": "(timestamp corrected from UTC)",
     "logged_at": "2026-09-25T02:30:15",
     "ph": 7.97,
     "orp_mv": 403.0,
@@ -126,6 +126,23 @@
   ],
   "items": [
     {
+      "id": "fc_test",
+      "key": "fc_test",
+      "title": "Test free chlorine today",
+      "kind": "test",
+      "priority": 0,
+      "because": "ORP is 403 mV, well under the 550 mV mark where the water may genuinely not be sanitising. Free chlorine isn't measured -- the ICO can't read it -- so nobody knows whether that is a real chlorine shortage or just the proxy sagging. pH and Salt are out of band, which depresses ORP on its own, so this may resolve once they are fixed. It is still worth a strip test today rather than assuming.",
+      "why": "ORP is 403 mV, well under the 550 mV mark where the water may genuinely not be sanitising. Free chlorine isn't measured -- the ICO can't read it -- so nobody knows whether that is a real chlorine shortage or just the proxy sagging. pH and Salt are out of band, which depresses ORP on its own, so this may resolve once they are fixed. It is still worth a strip test today rather than assuming.",
+      "how": "A free-chlorine strip takes ten seconds. Do it before you add anything.",
+      "dose": null,
+      "measured": "403 mV",
+      "target": "at least 2 ppm",
+      "wait_hours": null,
+      "after": null,
+      "superseded": false,
+      "order": 1
+    },
+    {
       "id": "salt_up",
       "key": "salt_up",
       "title": "Add salt",
@@ -154,7 +171,7 @@
       "wait_hours": null,
       "after": null,
       "superseded": false,
-      "order": 1
+      "order": 2
     },
     {
       "id": "ph_down",
@@ -187,7 +204,7 @@
       "wait_hours": null,
       "after": null,
       "superseded": false,
-      "order": 2
+      "order": 3
     },
     {
       "id": "backwashed_filter",
@@ -204,7 +221,37 @@
       "wait_hours": null,
       "after": null,
       "superseded": false,
-      "order": 3
+      "order": 4
+    },
+    {
+      "id": "fc_holding",
+      "key": "fc_holding",
+      "title": "If you can't test, add a holding dose",
+      "kind": "dose",
+      "priority": 0,
+      "because": "If you can't test today, 0.25 gal of 12.5% liquid chlorine raises free chlorine by about 1.5 ppm. That is a holding dose, not a shock: 2 ppm is below what you would swim in, so it cannot over-chlorinate the pool, and it buys a day without pretending to know what the level actually is. Test before adding any more than this. Acid is on today's list too: wait at least 4 hours after the acid before this goes in, and never put them in together.",
+      "why": "If you can't test today, 0.25 gal of 12.5% liquid chlorine raises free chlorine by about 1.5 ppm. That is a holding dose, not a shock: 2 ppm is below what you would swim in, so it cannot over-chlorinate the pool, and it buys a day without pretending to know what the level actually is. Test before adding any more than this. Acid is on today's list too: wait at least 4 hours after the acid before this goes in, and never put them in together.",
+      "how": "Wait at least 4 hours after the acid. Pump running. Pour it slowly around the deep end, never into the skimmer, and never into a bucket that has had acid in it. Then test tomorrow.",
+      "dose": {
+        "amount": 0.25,
+        "unit": "gal",
+        "chemical": "liquid chlorine",
+        "label": "0.25 gal of 12.5% liquid chlorine",
+        "detail": {
+          "gal": 0.25,
+          "want_gal": 0.34,
+          "capped": false,
+          "raises_ppm": 2.0,
+          "actual_ppm": 1.5,
+          "strength_pct": 12.5
+        }
+      },
+      "measured": "403 mV",
+      "target": "a holding 2 ppm",
+      "wait_hours": 4.0,
+      "after": "ph_down",
+      "superseded": false,
+      "order": 5
     },
     {
       "id": "emptied_skimmer",
@@ -221,7 +268,7 @@
       "wait_hours": null,
       "after": null,
       "superseded": false,
-      "order": 4
+      "order": 6
     },
     {
       "id": "orp_blocked",
@@ -238,7 +285,41 @@
       "wait_hours": null,
       "after": null,
       "superseded": false,
-      "order": 5
+      "order": 7
+    },
+    {
+      "id": "cell_maxed",
+      "key": "cell_maxed",
+      "title": "The cell is already flat out",
+      "kind": "watch",
+      "priority": 2,
+      "because": "The cell is at 100% (from config.json), running 24 hours a day, so there is no headroom left to ask for -- this is not a setting you can turn up. pH and Salt are out of band, and each of those starves the cell in its own way: low salt gives it less to work with, high pH wastes the chlorine it makes, low CYA lets the sun burn it off. Fix those and the same cell will produce more.",
+      "why": "The cell is at 100% (from config.json), running 24 hours a day, so there is no headroom left to ask for -- this is not a setting you can turn up. pH and Salt are out of band, and each of those starves the cell in its own way: low salt gives it less to work with, high pH wastes the chlorine it makes, low CYA lets the sun burn it off. Fix those and the same cell will produce more.",
+      "how": "",
+      "dose": null,
+      "measured": "100%",
+      "target": "headroom to turn up",
+      "wait_hours": null,
+      "after": null,
+      "superseded": false,
+      "order": 8
+    },
+    {
+      "id": "pump_hold",
+      "key": "pump_hold",
+      "title": "Leave the pump schedule alone for now",
+      "kind": "watch",
+      "priority": 3,
+      "because": "The pump is running 24 hours a day, which is a lot -- but on a saltwater pool the pump schedule is the chlorine schedule, because the cell only makes chlorine while water is going through it. With ORP at 403 mV, cutting hours would cut production exactly when you need it. Get ORP comfortably over 600 with the cell below full, and that is the moment to start trimming hours and watching what happens.",
+      "why": "The pump is running 24 hours a day, which is a lot -- but on a saltwater pool the pump schedule is the chlorine schedule, because the cell only makes chlorine while water is going through it. With ORP at 403 mV, cutting hours would cut production exactly when you need it. Get ORP comfortably over 600 with the cell below full, and that is the moment to start trimming hours and watching what happens.",
+      "how": "",
+      "dose": null,
+      "measured": "24 h/day",
+      "target": "trim once there's headroom",
+      "wait_hours": null,
+      "after": null,
+      "superseded": false,
+      "order": 9
     },
     {
       "id": "borate_test",
@@ -255,13 +336,13 @@
       "wait_hours": null,
       "after": null,
       "superseded": false,
-      "order": 6
+      "order": 10
     }
   ],
   "counts": {
-    "total": 6,
-    "todo": 5,
-    "doses": 2,
+    "total": 10,
+    "todo": 8,
+    "doses": 3,
     "out_of_band": 3
   },
   "safety_rules": [
@@ -287,21 +368,26 @@
   },
   "basis": {
     "date": "2026-09-24",
-    "reading_id": "ico:2026-09-25 01:38:34",
+    "reading_id": "ico:2026-09-24T21:38:34",
     "items": [
       "backwashed_filter",
       "borate_test",
+      "cell_maxed",
       "emptied_skimmer",
+      "fc_holding",
+      "fc_test",
       "orp_blocked",
       "ph_down",
+      "pump_hold",
       "salt_up"
     ],
     "doses": {
       "salt_up": 61.0,
-      "ph_down": 27
+      "ph_down": 27,
+      "fc_holding": 0.25
     }
   },
-  "headline": "Add salt.",
-  "summary": "5 thing(s) on the list today, 2 of them a dose. Reading is 0 day(s) old. Pump running before anything goes in.",
+  "headline": "Test free chlorine today.",
+  "summary": "8 thing(s) on the list today, 3 of them a dose. Reading is 0 day(s) old. Pump running before anything goes in.",
   "source": "fallback"
 }

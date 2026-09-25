@@ -132,8 +132,13 @@ def chlorine_gal(fc_delta_ppm, gallons, strength_pct=12.5):
     ppm_per_gal = FC_PPM_PER_GAL_12_5_PER_10K * (s / 12.5) / scale(gallons)
     gal = d / ppm_per_gal
     dose, capped = _capped(gal, MAX_CHLORINE_GAL_PER_10K, gallons)
-    return {"gal": _round_to(dose, 0.25, capped), "want_gal": round(gal, 2), "capped": capped,
-            "raises_ppm": round(d, 1), "strength_pct": s}
+    dose = _round_to(dose, 0.25, capped)
+    # What the ROUNDED dose actually delivers, which is not what was asked for.
+    # Quoting the request rather than the result is how an instruction ends up
+    # promising 2 ppm while handing over a jug that gives 1.5.
+    return {"gal": dose, "want_gal": round(gal, 2), "capped": capped,
+            "raises_ppm": round(d, 1),
+            "actual_ppm": round(dose * ppm_per_gal, 1), "strength_pct": s}
 
 
 # -------------------------------------------------------------------- loweres

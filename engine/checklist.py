@@ -279,6 +279,64 @@ def _ta_items(r, items_so_far):
     return []
 
 
+# A conservative, unmeasured bump. 2 ppm cannot over-chlorinate anything -- it
+# is below the level you would swim in -- so it is safe to suggest without a
+# free-chlorine reading. Anything bigger needs a measurement.
+HOLDING_FC_PPM = 2.0
+
+
+def _orp_critical_items(r, gallons, chems, out_of_band):
+    """ORP low enough that the water may genuinely not be sanitising.
+
+    The normal ORP rule is deliberately quiet: ORP is a proxy that moves with
+    pH, salt and temperature, and "the proxy looks low so add chlorine" is the
+    reflex that overshoots a pool. That reasoning holds at 580. It stops holding
+    at 400, where the honest reading is that nobody knows whether this water is
+    sanitised, and saying nothing is the worse error.
+
+    So this still refuses to compute a SHOCK dose from ORP -- that needs a
+    measured free chlorine -- but it asks for that measurement today, and offers
+    a holding dose small enough to be safe without one.
+    """
+    orp = r.get("orp_mv")
+    crit = poolcfg.CONFIG["targets"].get("orp_critical_mv")
+    if orp is None or crit is None or orp >= crit:
+        return []
+    if r.get("fc_ppm") is not None:
+        return []                    # FC is measured, so _shock_items owns this
+
+    d = chem.chlorine_gal(HOLDING_FC_PPM, gallons,
+                          chems["chlorine"].get("strength_pct", 12.5))
+    upstream = [MEASURE_LABELS[k][0] for k in ("ph", "salt_ppm", "cya_ppm") if k in out_of_band]
+    because = ("ORP is %s, well under the %g mV mark where the water may genuinely not be "
+               "sanitising. Free chlorine isn't measured -- the ICO can't read it -- so nobody "
+               "knows whether that is a real chlorine shortage or just the proxy sagging."
+               % (_fmt("orp_mv", orp), crit))
+    if upstream:
+        because += (" %s %s out of band, which depresses ORP on its own, so this may resolve "
+                    "once %s fixed. It is still worth a strip test today rather than assuming."
+                    % (" and ".join(upstream), "are" if len(upstream) > 1 else "is",
+                       "they are" if len(upstream) > 1 else "it is"))
+    item = _item("fc_test", "Test free chlorine today", "test", P_SAFETY, because,
+                 measured=_fmt("orp_mv", orp), target=_band_text("fc_ppm"))
+    out = [item]
+    if d:
+        out.append(_item(
+            "fc_holding", "If you can't test, add a holding dose", "dose", P_SAFETY,
+            "If you can't test today, %g gal of %g%% %s raises free chlorine by about %g ppm. "
+            "That is a holding dose, not a shock: %g ppm is below what you would swim in, so it "
+            "cannot over-chlorinate the pool, and it buys a day without pretending to know what "
+            "the level actually is. Test before adding any more than this."
+            % (d["gal"], d["strength_pct"], chems["chlorine"]["name"],
+               d.get("actual_ppm", d["raises_ppm"]), HOLDING_FC_PPM),
+            dose={"amount": d["gal"], "unit": "gal", "chemical": chems["chlorine"]["name"],
+                  "label": "%g gal of %g%% %s" % (d["gal"], d["strength_pct"],
+                                                  chems["chlorine"]["name"]),
+                  "detail": d},
+            measured=_fmt("orp_mv", orp), target="a holding %g ppm" % HOLDING_FC_PPM))
+    return out
+
+
 def _salt_items(r, gallons, chems):
     salt = r.get("salt_ppm")
     if salt is None:
@@ -368,6 +426,101 @@ def _borate_items(r, gallons, chems):
                   dose=dose, measured=_fmt("borates_ppm", cur), target="%g ppm" % tgt)]
 
 
+def _cell_now(acts):
+    """Where the cell is set, preferring a logged change over the configured value."""
+    last = store.last_action("cell_output", acts)
+    if last and last.get("amount") is not None:
+        return float(last["amount"]), "logged %s" % last.get("date")
+    cfg = poolcfg.CONFIG["equipment"].get("cell_output_pct")
+    try:
+        return float(cfg), "from config.json"
+    except (TypeError, ValueError):
+        return None, "unknown"
+
+
+def _pump_hours():
+    try:
+        return float(poolcfg.CONFIG["equipment"].get("pump_hours_per_day"))
+    except (TypeError, ValueError):
+        return None
+
+
+def _cell_capacity_items(r, out_of_band, acts):
+    """When the cell is already flat out, "turn it up" is not advice.
+
+    A cell at 100% with the pump running 24 hours has no headroom left, so a low
+    ORP is not a settings problem -- it is either an inputs problem (salt, pH,
+    CYA starving the cell) or the cell itself is scaled or worn out. Those are
+    very different jobs and it is worth being told which one you are looking at.
+    """
+    orp = r.get("orp_mv")
+    lo, _ = poolcfg.band("orp_mv")
+    pct, src = _cell_now(acts)
+    hrs = _pump_hours()
+    if orp is None or lo is None or orp >= lo or pct is None or pct < 95:
+        return []
+
+    maxed = "running %g hours a day" % hrs if hrs and hrs >= 20 else \
+            ("running %g hours a day" % hrs if hrs else "")
+    upstream = [MEASURE_LABELS[k][0] for k in ("ph", "salt_ppm", "cya_ppm") if k in out_of_band]
+    if upstream:
+        because = ("The cell is at %g%% (%s)%s, so there is no headroom left to ask for -- "
+                   "this is not a setting you can turn up. %s %s out of band, and each of "
+                   "those starves the cell in its own way: low salt gives it less to work "
+                   "with, high pH wastes the chlorine it makes, low CYA lets the sun burn it "
+                   "off. Fix those and the same cell will produce more."
+                   % (pct, src, (", " + maxed) if maxed else "",
+                      " and ".join(upstream), "are" if len(upstream) > 1 else "is"))
+        return [_item("cell_maxed", "The cell is already flat out", "watch", P_SOON, because,
+                      measured="%g%%" % pct, target="headroom to turn up")]
+    return [_item(
+        "cell_suspect", "The cell may be scaled or worn out", "task", P_TODAY,
+        "The cell is at %g%% (%s)%s and pH, salt and CYA are all in band -- so the inputs are "
+        "right and it still isn't keeping up. That usually means the cell itself: scale on the "
+        "plates, or simple old age. Most cells last three to seven years. Pull it and look at "
+        "the plates for white crust, and check the controller for a low-output or cell-life "
+        "warning."
+        % (pct, src, (", " + maxed) if maxed else ""),
+        measured="%g%%" % pct, target="headroom to turn up")]
+
+
+def _pump_items(r, acts):
+    """Runtime advice, and mostly advice NOT to touch it yet.
+
+    On a saltwater pool the pump schedule IS the chlorine schedule -- the cell
+    only makes chlorine while water is moving through it. So cutting hours to
+    save power is only safe once there is proven headroom, and the honest
+    version says so rather than offering a generic "8 to 12 hours is plenty".
+    """
+    hrs = _pump_hours()
+    orp = r.get("orp_mv")
+    lo, _ = poolcfg.band("orp_mv")
+    pct, src = _cell_now(acts)
+    if hrs is None or orp is None or lo is None:
+        return []
+
+    if orp < lo and hrs >= 20:
+        return [_item("pump_hold", "Leave the pump schedule alone for now", "watch", P_WATCH,
+                      "The pump is running %g hours a day, which is a lot -- but on a saltwater "
+                      "pool the pump schedule is the chlorine schedule, because the cell only "
+                      "makes chlorine while water is going through it. With ORP at %s, cutting "
+                      "hours would cut production exactly when you need it. Get ORP comfortably "
+                      "over %g with the cell below full, and that is the moment to start "
+                      "trimming hours and watching what happens."
+                      % (hrs, _fmt("orp_mv", orp), lo),
+                      measured="%g h/day" % hrs, target="trim once there's headroom")]
+
+    if orp >= lo + 75 and pct is not None and pct <= 70 and hrs >= 14:
+        return [_item("pump_trim", "You have room to shorten the pump day", "task", P_WATCH,
+                      "ORP is %s, comfortably over the %g floor, and the cell is only at %g%% "
+                      "(%s) -- that is real headroom. Try cutting the pump back by two hours "
+                      "and re-read in a couple of days. If ORP holds, cut two more. Salt cells "
+                      "and electricity both last longer for it."
+                      % (_fmt("orp_mv", orp), lo, pct, src),
+                      measured="%g h/day" % hrs, target="trim 2h and re-read")]
+    return []
+
+
 def _orp_items(r, out_of_band, acts, gallons):
     """ORP is downstream of everything else, so this rule reads the other rules first.
 
@@ -407,7 +560,9 @@ def _orp_items(r, out_of_band, acts, gallons):
                          "today" if last_age == 0 else "yesterday"),
                       measured=_fmt("orp_mv", orp), target=_band_text("orp_mv"))]
     step = poolcfg.CONFIG["equipment"].get("salt_cell_increment_pct", 10)
-    cur_pct = (last or {}).get("amount")
+    cur_pct, _src = _cell_now(acts)
+    if cur_pct is not None and cur_pct >= 95:
+        return []              # no headroom; _cell_capacity_items has this case
     nudge = chem.cell_nudge(cur_pct, "up", step)
     label = ("Turn the %s cell up from %g%% to %g%%" % (
         poolcfg.CONFIG["equipment"].get("salt_cell", "salt"), nudge["from_pct"], nudge["to_pct"])
@@ -503,13 +658,17 @@ def _apply_gap(items):
     """
     gap = poolcfg.min_gap_hours()
     acid = next((i for i in items if i["key"] == "ph_down" and i["dose"]), None)
-    shock = next((i for i in items if i["key"] == "shock" and i["dose"]), None)
-    if acid and shock:
-        shock["wait_hours"] = gap
-        shock["after"] = acid["id"]
-        shock["because"] += (" Acid is on today's list too: wait at least %g hours after the "
-                             "acid before this goes in, and never put them in together."
-                             % gap)
+    if not acid:
+        return items
+    # the holding dose is liquid chlorine too, so the same separation applies
+    for key in ("shock", "fc_holding"):
+        cl = next((i for i in items if i["key"] == key and i["dose"]), None)
+        if not cl:
+            continue
+        cl["wait_hours"] = gap
+        cl["after"] = acid["id"]
+        cl["because"] += (" Acid is on today's list too: wait at least %g hours after the acid "
+                          "before this goes in, and never put them in together." % gap)
     return items
 
 
@@ -600,11 +759,14 @@ def build(today=None, reading=None):
     if r:
         items += _ph_items(r, gallons, chems)
         items += _shock_items(r, gallons, chems)
+        items += _orp_critical_items(r, gallons, chems, out_of_band)
         items += _salt_items(r, gallons, chems)
         items += _cya_items(r, gallons, chems)
         items += _borate_items(r, gallons, chems)
         items += _ta_items(r, items)
         items += _orp_items(r, out_of_band, acts, gallons)
+        items += _cell_capacity_items(r, out_of_band, acts)
+        items += _pump_items(r, acts)
 
     items = _apply_supersedes(items, (r or {}).get("at"), acts)
     items = _apply_gap(items)
@@ -716,6 +878,12 @@ HOW = {
     "shock": "Pump running. Pour liquid chlorine slowly around the deep end, never into the "
              "skimmer, and never into a bucket that has had acid in it. Keep the pump running "
              "overnight.",
+    "fc_holding": "Pump running. Pour it slowly around the deep end, never into the skimmer, "
+                  "and never into a bucket that has had acid in it. Then test tomorrow.",
+    "fc_test": "A free-chlorine strip takes ten seconds. Do it before you add anything.",
+    "cell_suspect": "Pump off, close the valves, pull the cell and look at the plates. White "
+                    "crusty scale comes off with a 4:1 water-to-acid soak in a dedicated cell "
+                    "stand -- never in the pool, and never with the acid you pour in the water.",
     "orp_cell": "Change it on the cell controller only -- don't touch anything else the same "
                 "day, so tomorrow's reading tells you what this one change did.",
     "backwashed_filter": "Pump off, valve to backwash, pump on until the sight glass runs clear, "

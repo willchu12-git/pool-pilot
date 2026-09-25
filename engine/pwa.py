@@ -323,8 +323,8 @@ nav button.on{color:var(--aqua-soft)}
 
   <div class="card">
     <h2>New reading</h2>
-    <div class="sub">Upload the ICO screenshot and it gets read in the cloud, or type the numbers
-      in yourself.</div>
+    <div class="sub" id="readingLead">Upload the ICO screenshot and it gets read in the cloud,
+      or type the numbers in yourself.</div>
     <label for="shot">ICO screenshot</label>
     <input type="file" id="shot" accept="image/*" capture="environment">
     <button class="btn" id="shot_send" disabled>Upload screenshot</button>
@@ -818,7 +818,8 @@ function renderPanel(){
   }).join("");
   const r = LIVE.latest;
   $("panelAge").textContent = r
-    ? ("From the " + fmtDay(r.date) + " reading" + (r.source ? " (" + r.source + ")" : "") +
+    ? ("From the " + fmtDay(r.date) + " reading" +
+       (r.source ? " (" + sourceLabel(r.source) + ")" : "") +
        (LIVE.age ? ", " + LIVE.age + " day(s) ago." : ", today."))
     : "No confirmed reading yet — upload a screenshot or type one in below.";
 }
@@ -913,6 +914,11 @@ function renderConfirm(){
   $("confirmNote").textContent = row.note || "Nothing is dosed off this reading until you confirm it.";
 }
 
+/* how a reading got here, in words. "ondilo_api" is accurate and unreadable. */
+const SOURCE_LABEL = {ondilo_api:"from the ICO", ico:"read from a screenshot",
+                      ico_failed:"screenshot couldn't be read", manual:"typed in"};
+function sourceLabel(s){ return SOURCE_LABEL[s] || s || ""; }
+
 const MEASURES = [
   {key:"ph", label:"pH"}, {key:"orp_mv", label:"ORP mV"}, {key:"salt_ppm", label:"Salt ppm"},
   {key:"water_temp_f", label:"Temp °F"}, {key:"cya_ppm", label:"CYA ppm"},
@@ -944,6 +950,15 @@ async function confirmReading(){
 }
 
 function renderManual(){
+  /* When the ICO is pulling itself, uploading a screenshot of it is busywork --
+     but the manual form still matters, because the ICO does not measure CYA,
+     alkalinity, free chlorine or borates and those are what the checklist is
+     most often waiting on. */
+  const auto = !!(STATE.ondilo && STATE.ondilo.enabled);
+  $("readingLead").textContent = auto
+    ? "The ICO reports itself every few hours — nothing to upload. Use this for the " +
+      "strip tests it can't do: CYA, alkalinity, free chlorine, borates."
+    : "Upload the ICO screenshot and it gets read in the cloud, or type the numbers in yourself.";
   if($("manualFields").children.length) return;
   $("manualFields").innerHTML = MEASURES.map(function(m){
     return '<div class="field"><label for="mn_' + m.key + '">' + esc(m.label) + '</label>' +
@@ -1118,7 +1133,7 @@ function renderTimeline(){
     let body;
     if(r.type === "reading"){
       body = '<div class="what">' + (r.confirmed ? "Reading" : "Reading (unconfirmed)") +
-             (r.source && r.source !== "manual" ? " · " + esc(r.source) : "") + '</div>';
+             (r.source ? " · " + esc(sourceLabel(r.source)) : "") + '</div>';
       if(r.values && r.values.length)
         body += '<div class="vals">' + r.values.map(function(v){
           return '<span class="vpill ' + esc(v.status) + '">' + esc(v.label) + " " +

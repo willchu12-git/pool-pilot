@@ -66,7 +66,8 @@ MEASURE_LABELS = {
     "ph": ("pH", ""), "orp_mv": ("ORP", " mV"), "salt_ppm": ("Salt", " ppm"),
     "cya_ppm": ("CYA", " ppm"), "borates_ppm": ("Borates", " ppm"),
     "ta_ppm": ("TA", " ppm"), "ch_ppm": ("Calcium", " ppm"),
-    "fc_ppm": ("Free chlorine", " ppm"), "water_temp_f": ("Water temp", "°F"),
+    "fc_ppm": ("Free chlorine", " ppm"), "tds_ppm": ("TDS", " ppm"),
+    "water_temp_f": ("Water temp", "°F"),
 }
 
 

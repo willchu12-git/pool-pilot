@@ -138,6 +138,21 @@
     "vision_flags": "--allowedTools Read",
     "notes": "Leave claude_model empty to use your default Max-plan model. vision_flags is what lets `claude -p` actually open the screenshot file."
   },
+  "ondilo": {
+    "enabled": false,
+    "pool_id": "",
+    "client_id": "customer_api",
+    "client_secret": "",
+    "redirect_uri": "https://example.com/api",
+    "types": [
+      "temperature",
+      "ph",
+      "orp",
+      "salt",
+      "tds"
+    ],
+    "notes": "Pull readings straight off the ICO instead of screenshotting it. Run `py engine/ondilo.py login` once, put the refresh token in the ONDILO_REFRESH_TOKEN repository SECRET (never here -- this repo is public), then set enabled to true. The refresh token does not expire and is not rotated, so that is the only setup step. Leave pool_id blank to use the first pool on the account. The ICO does not measure CYA, TA, free chlorine or borates -- those stay manual."
+  },
   "push": {
     "enabled": false,
     "ntfy_server": "https://ntfy.sh",

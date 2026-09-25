@@ -1,8 +1,9 @@
 """
 run_cloud.py -- the orchestrator GitHub Actions runs (and I can run by hand).
 
-  python engine/run_cloud.py full          # daily: ingest, rebuild the checklist, build app, push
+  python engine/run_cloud.py full          # daily: pull, ingest, rebuild the checklist, push
   python engine/run_cloud.py interactive   # on a new drop: ingest, re-checklist if it moved
+  python engine/run_cloud.py poll          # every few hours: pull from the ICO, rebuild if new
   python engine/run_cloud.py build         # just rebuild state + app from what's on disk
 
 Claude runs through the CLI on my Max plan using the CLAUDE_CODE_OAUTH_TOKEN
@@ -27,6 +28,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import check_inbox    # noqa: E402
 import checklist      # noqa: E402
+import ondilo         # noqa: E402
 import poolcfg        # noqa: E402
 import pwa            # noqa: E402
 import push as pushmod  # noqa: E402
@@ -41,6 +43,19 @@ def step(label, fn, *a, **kw):
         print("  ! %s failed:" % label)
         traceback.print_exc(limit=3)
         return None
+
+
+def pull_ondilo():
+    """Ask the ICO for its latest numbers, if that's turned on.
+
+    Returns the reading id that landed, or None. Wrapped like every other step:
+    the ICO being unreachable is a reason to fall back to typing a reading in,
+    never a reason for the morning checklist not to exist.
+    """
+    if not (poolcfg.CONFIG.get("ondilo") or {}).get("enabled"):
+        return None
+    rec = ondilo.pull()
+    return (rec or {}).get("id")
 
 
 def stale_checklist():
@@ -74,18 +89,31 @@ def main():
     mode = sys.argv[1] if len(sys.argv) > 1 else "full"
     print("== pool pilot (%s) == config: %s" % (mode, poolcfg.CONFIG.get("_config_path")))
 
-    if mode in ("full", "interactive"):
+    if mode in ("full", "poll"):
+        step("pull from the ICO", pull_ondilo)
+
+    if mode in ("full", "interactive", "poll"):
         step("ingest phone drops", check_inbox.main)
 
     if mode == "full":
         step("daily checklist", checklist.main)
-    elif mode == "interactive":
+    elif mode in ("interactive", "poll"):
         stale, why = step("check the checklist", stale_checklist) or (True, "check failed")
         if stale:
             print("   the water picture moved: %s -- rewriting the checklist" % why)
-            step("rewrite checklist", checklist.main)
+            # poll.yml deliberately installs no Claude CLI: a poll only files
+            # numbers and recomputes doses, both deterministic. Asking for the AI
+            # wording here would just fail and fall back every three hours. The
+            # daily run rewrites the sentences.
+            step("rewrite checklist", checklist.main,
+                 ["--offline"] if mode == "poll" else [])
         else:
             print("   checklist still matches the data")
+            if mode == "poll":
+                # nothing moved, so there is nothing to rebuild or commit --
+                # a poll that finds no new measurement should cost nothing
+                print("== done (no change) ==")
+                return
 
     step("state", state_mod.main)
     step("build app", pwa.main)

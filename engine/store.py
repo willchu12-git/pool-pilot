@@ -37,7 +37,7 @@ OPENING = "opening_progress.json"
 # Every numeric a reading can carry. Anything not in here is dropped rather than
 # stored, so a hallucinated field from the vision pass can't reach the checklist.
 MEASURES = ("ph", "orp_mv", "salt_ppm", "water_temp_f", "cya_ppm", "borates_ppm",
-            "ta_ppm", "ch_ppm", "fc_ppm")
+            "ta_ppm", "ch_ppm", "fc_ppm", "tds_ppm")
 
 # Sanity bounds. A value outside these is not a reading, it's a misread -- it gets
 # dropped with a note rather than quietly dosed against.
@@ -45,6 +45,7 @@ SANE = {
     "ph": (5.0, 9.5), "orp_mv": (100, 1000), "salt_ppm": (0, 8000),
     "water_temp_f": (32, 110), "cya_ppm": (0, 200), "borates_ppm": (0, 150),
     "ta_ppm": (0, 400), "ch_ppm": (0, 1200), "fc_ppm": (0, 30),
+    "tds_ppm": (0, 12000),
 }
 
 # The quick chips on the Home tab, plus everything the cadence clock watches.

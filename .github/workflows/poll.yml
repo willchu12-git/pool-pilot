@@ -1,0 +1,43 @@
+name: Pool Pilot — poll the ICO
+
+# Asks the Ondilo API for the latest measurement and rebuilds only if it moved.
+# This is what replaces screenshotting the ICO app.
+#
+# The ICO measures roughly hourly; Ondilo's rate limit is 30 requests/hour per
+# user and this run makes three. Every 3 hours is plenty to keep the checklist
+# current without polling a pool that changes over days.
+
+on:
+  schedule:
+    - cron: "20 */3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: poolpilot               # shares the store with the other two workflows
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # commit_push.sh rebases onto origin/main when a concurrent run beats
+          # it to the push, and a shallow clone has no merge base to rebase onto.
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # No Claude CLI step: a poll only files numbers and recomputes doses, both
+      # of which are deterministic. The wording is rewritten by the daily run.
+      - name: Pull from the ICO and rebuild if it moved
+        env:
+          ONDILO_REFRESH_TOKEN: ${{ secrets.ONDILO_REFRESH_TOKEN }}
+        run: python engine/run_cloud.py poll
+
+      - name: Commit results
+        run: 'bash scripts/commit_push.sh "chore: ICO reading [skip ci]"'

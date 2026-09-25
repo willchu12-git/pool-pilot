@@ -43,6 +43,7 @@ pool-pilot/                 PUBLIC — Pages serves this whole repo
     poolcfg.py              loads config.json; renders safety_rules into every prompt
     chem.py                 pure dose arithmetic — the only place a number is produced
     store.py                append-only JSONL: readings, actions, opening progress
+    ondilo.py               pulls readings straight off the ICO over Ondilo's API
     vision.py               `claude -p --allowedTools Read` on a screenshot -> strict JSON
     vision_prompt.md
     checklist.py            the rules; builds the list, then asks Claude for the wording
@@ -82,6 +83,9 @@ that changes.
      result. This is what rides your Max plan instead of a pay-per-token API key.
      Without it everything still works except screenshot reading and the AI
      wording.
+   - `ONDILO_REFRESH_TOKEN` (optional, and the one worth having) — see
+     *Connecting the ICO directly* below. With it, readings arrive on their
+     own and there is nothing to screenshot.
    - `NTFY_TOPIC` (optional) — an unguessable topic for phone pushes.
 
 4. **Check `config.json`.** `pool.gallons` drives every dose; if it is wrong,
@@ -93,14 +97,59 @@ that changes.
    stored in that browser only and never leaves the phone except in requests to
    github.com.
 
+## Connecting the ICO directly (no screenshots)
+
+Ondilo publishes a [Customer API](https://interop.ondilo.com/docs/api/customer/v1). With it
+switched on, `.github/workflows/poll.yml` asks the ICO for its own numbers every three hours and
+files them — nothing to photograph.
+
+The reason this works unattended: **Ondilo refresh tokens are non-expiring and are not
+rotated.** Refreshing returns a new access token and no new refresh token, so you authorize once
+and the secret never needs touching again.
+
+```bash
+py engine/ondilo.py login
+```
+
+It prints a URL, you sign in, and you paste the redirected URL back (it won't load — the part
+that matters is the `?code=` in the address bar). Out comes a refresh token. Put it in the
+repository **secret** `ONDILO_REFRESH_TOKEN` — never in `config.json`, this repo is public —
+and set `ondilo.enabled` to `true`. If the account has more than one pool, `login` lists the ids
+for `ondilo.pool_id`.
+
+```bash
+py engine/ondilo.py pools          # what the account can see
+py engine/ondilo.py raw            # exactly what the API returns
+py engine/ondilo.py pull --dry-run # map it to a reading without writing
+```
+
+How a pulled reading differs from a screenshotted one:
+
+- **It is written confirmed.** The confirm card exists because OCR misreads decimal points; an
+  API integer has no such failure mode. The sanity bounds still apply, and a measure the ICO
+  itself flags `is_valid: false` is dropped with its `exclusion_reason` kept as a note.
+- **Its id is the ICO's own `value_time`**, not the time we fetched. Polling eight times a day
+  over one hourly measurement collapses onto a single record instead of piling up eight.
+- **Temperature comes back in the account's preferred unit**, so `/user/units` is consulted
+  rather than guessed at — 40 is a plausible pool in either scale.
+
+The ICO measures temperature, pH, ORP, salt and TDS. It does **not** measure CYA, total
+alkalinity, free chlorine or borates — those stay strip tests you type in, and with the pull
+switched on the "New reading" card says so.
+
+Rate limit is 30 requests/hour per user; a poll makes three, every three hours.
+
 ## Daily loop
 
-- Drop the ICO in, screenshot the app, hit **Upload screenshot**.
-- ~1 minute later the interactive workflow has read it and the app shows the confirm card.
-- Tap **Looks right** (or fix a number first). The checklist rebuilds with real doses.
-- Do the items. Tap **I did this** on each — that's what keeps the supersede rule honest.
+With the ICO connected there mostly isn't one — readings arrive on their own and the checklist
+is current when you look at it. What's left:
 
-Anything off-script goes through **Log something else** on the Today tab.
+- Do the items. Tap **I did this** on each — that's what keeps the supersede rule honest.
+- Type in a strip test when the checklist asks for CYA, alkalinity or borates.
+- Anything off-script goes through **Log something else** on the Today tab.
+
+Without the ICO connected: drop it in, screenshot the app, **Upload screenshot**, and about a
+minute later the confirm card appears. Tap **Looks right**, or fix a number first.
 
 ## Running it locally
 
@@ -109,6 +158,7 @@ py engine/serve.py          # http://127.0.0.1:8778, writes and rebuilds immedia
 py engine/checklist.py      # rebuild the checklist (add --offline to skip Claude)
 py engine/checklist.py --offline
 py engine/vision.py path/to/screenshot.jpg
+py engine/ondilo.py pull    # fetch from the ICO right now
 py engine/chem.py 18000     # what one unit of each chemical does to this pool
 py engine/store.py show
 ```
@@ -126,7 +176,10 @@ py engine/store.py opening physical_prep --on today
 - **No true push notifications.** ntfy.sh only, same as CycleSync. iOS Safari PWAs don't get
   real background push here.
 - **Photo capture is a file picker**, not a native camera integration — `<input type="file"
-  accept="image/*" capture="environment">`. Good enough for screenshotting another app.
+  accept="image/*" capture="environment">`. Mostly moot once the ICO pull is on.
+- **The ICO API can be flaky.** `/lastmeasures` has a history of returning nothing; when it
+  does, the poll logs it and leaves the previous reading alone rather than filing a blank
+  one. The screenshot path stays as a fallback.
 - **The dose formulas are estimates for typical water.** They're the standard per-10,000-gallon
   constants, they're capped, and every dose is paired with "circulate, then retest". Trust the
   water over the app.

@@ -173,6 +173,9 @@ def build(today=None, with_checklist=True):
         "trends": trends(readings, 90, today),
         "opening": store.opening_state(),
         "action_kinds": store.ACTION_KINDS,
+        # only whether it is switched on -- no token, no pool id, nothing that
+        # would be a leak in a public repo
+        "ondilo": {"enabled": bool((poolcfg.CONFIG.get("ondilo") or {}).get("enabled"))},
         "reference": chem.summary(
             poolcfg.gallons(),
             poolcfg.CONFIG["chemicals"]["borate"].get("boron_pct", 17.5)),

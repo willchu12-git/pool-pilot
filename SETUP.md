@@ -126,7 +126,17 @@ Claude Code:
 py engine/ondilo.py login
 ```
 
-It prints a web address. Open it, sign in with your normal Ondilo account, and approve.
+It prints a web address. Open it — you'll get an Ondilo sign-in box with **Your email
+address**, **Your password**, and an **Authorize** button.
+
+> ⚠️ **Sign in with the account your ICO phone app uses.** Lots of people have two Ondilo
+> accounts without realising: the **ondilo.com shop** account from buying the device, and the
+> **ICO mobile app** account the device is actually registered to. Only the second one works
+> here. If you're not sure which is which, open the ICO app on your phone and look at what email
+> it's signed in as.
+>
+> Using the shop account gets you `?error=access_denied` in the address bar instead of a code.
+> If that happens, paste the address in anyway — the tool will explain it.
 
 Your browser will then go to a page that **fails to load**. That is expected and fine. What
 matters is the address bar at the top — it now has a long URL with `?code=` in it. **Copy that

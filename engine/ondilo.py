@@ -117,12 +117,49 @@ def authorize_url(redirect_uri=None, state="poolpilot"):
         "scope": "api", "state": state})
 
 
+# What Ondilo sends back instead of a code, and what it actually means. The raw
+# OAuth error names are accurate and tell you nothing about what to do next.
+AUTH_ERRORS = {
+    "access_denied": (
+        "Ondilo refused the sign-in.\n\n"
+        "  Nearly always this is the WRONG ONDILO ACCOUNT. There are commonly two:\n"
+        "    - the ondilo.com SHOP account, from buying the device\n"
+        "    - the ICO MOBILE APP account, which the device is registered to\n"
+        "  Only the second one works here, and they are often different.\n\n"
+        "  Open the ICO app on your phone, check which email it is signed in as,\n"
+        "  and use exactly that. If you are unsure of the password, reset it from\n"
+        "  the ICO app and try again."),
+    "invalid_request":
+        "Ondilo rejected the request itself. Check that config.ondilo.redirect_uri "
+        "matches the redirect_uri in the authorize URL.",
+    "invalid_client":
+        "Ondilo did not recognise the client. Check config.ondilo.client_id "
+        "(it should be 'customer_api').",
+    "unsupported_response_type":
+        "Ondilo rejected the response type. That is a bug in ondilo.py, not "
+        "something you did.",
+}
+
+
 def _code_from(pasted):
-    """Accept either a bare code or the whole redirect URL pasted back."""
+    """Accept either a bare code or the whole redirect URL pasted back.
+
+    Raises with an explanation when what came back is an OAuth error rather than
+    a code -- ?error=access_denied is by far the most common thing to land here,
+    and "couldn't find a code" is a uselessly literal thing to say about it.
+    """
     pasted = (pasted or "").strip()
-    if "?" not in pasted and "code=" not in pasted:
+    if "?" not in pasted and "code=" not in pasted and "error=" not in pasted:
         return pasted
     q = urllib.parse.parse_qs(urllib.parse.urlparse(pasted).query)
+    err = (q.get("error") or [""])[0]
+    if err:
+        desc = (q.get("error_description") or [""])[0]
+        detail = ("\n\n  Ondilo also said: " + desc) if desc else ""
+        raise RuntimeError("%s\n\n%s%s" % (
+            err,
+            AUTH_ERRORS.get(err, "Ondilo returned this error and no advice for it."),
+            detail))
     return (q.get("code") or [""])[0]
 
 
@@ -289,14 +326,23 @@ def pull(token=None, pool_id=None, write=True):
 
 def _login():
     redirect = _cfg().get("redirect_uri") or DEFAULT_REDIRECT
-    print("\n1. Open this in a browser and sign in to Ondilo:\n")
+    print("\n1. Open this in a browser:\n")
     print("   " + authorize_url(redirect))
-    print("\n2. It will redirect to a page that probably won't load. That's fine --")
-    print("   the part that matters is in the address bar. Copy the WHOLE URL.\n")
+    print("\n   Sign in with the account your ICO MOBILE APP uses. That is often NOT")
+    print("   the same as the ondilo.com shop account you may have bought the device")
+    print("   with, and using the shop one is the usual cause of 'access denied'.")
+    print("\n2. It then redirects to a page that probably will not load. That is fine --")
+    print("   what matters is the address bar. Copy the WHOLE address.")
+    print("   (If it says ?error= rather than ?code=, paste it anyway and it will")
+    print("    be explained.)\n")
     pasted = input("3. Paste it here: ").strip()
-    code = _code_from(pasted)
+    try:
+        code = _code_from(pasted)
+    except RuntimeError as e:
+        print("\n! %s\n" % e)
+        return
     if not code:
-        print("! couldn't find a ?code= in that -- paste the full redirected URL")
+        print("! no ?code= in that -- paste the full redirected address")
         return
     tok = exchange_code(code, redirect)
     rt = tok.get("refresh_token")

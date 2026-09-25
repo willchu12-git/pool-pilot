@@ -1,0 +1,90 @@
+{
+  "paths": {
+    "store": "data/store",
+    "inbox": "inbox",
+    "out": "out",
+    "app": "app"
+  },
+  "pool": {
+    "gallons": 18000,
+    "type": "inground_vinyl_liner",
+    "sanitization": "saltwater",
+    "notes": "Gallons drives every dose on the checklist. If this number is wrong, every dose is wrong by the same ratio."
+  },
+  "equipment": {
+    "salt_cell": "Jandy",
+    "salt_cell_increment_pct": 10,
+    "pump": "single + return waterfall, timer-scheduled",
+    "skimmer": "Aqua Genie",
+    "filter": "sand",
+    "notes": "salt_cell_increment_pct is how big one nudge of the cell output is -- the engine never suggests more than one nudge per checklist."
+  },
+  "targets": {
+    "orp_mv": [600, null],
+    "ph": [7.8, 8.1],
+    "salt_ppm": [2800, 3200],
+    "cya_ppm": [30, 50],
+    "borates_ppm": 50,
+    "ta_ppm": [60, 100],
+    "water_temp_f": [null, null],
+    "notes": "[low, high]; null on either side means 'no ceiling/floor, don't nag about it'. borates_ppm is a single target, not a band."
+  },
+  "cadence_days": {
+    "reading": 7,
+    "backwash": 14,
+    "skimmer_basket": 3,
+    "salt_check": 30,
+    "cya_check": 30,
+    "notes": "Days before the app starts asking. These are reminders, not deadlines -- a stale one is a nudge, never an alarm."
+  },
+  "chemicals": {
+    "acid": {"name": "muriatic acid", "strength_pct": 31.45},
+    "chlorine": {"name": "liquid chlorine", "strength_pct": 12.5},
+    "salt": {"name": "pool salt", "bag_lb": 40},
+    "cya": {"name": "stabilizer (cyanuric acid)"},
+    "borate": {"name": "boric acid", "boron_pct": 17.5},
+    "notes": "Strengths matter: a dose computed for 31.45% acid is wrong for 14.5% acid. Change these if you buy something different."
+  },
+  "safety_rules": [
+    "never_pour_undiluted_acid_into_skimmer",
+    "never_shock_and_acid_same_session_min_gap_hours:4",
+    "always_predissolve_dry_chemicals_in_5gal_bucket",
+    "never_mix_chlorine_and_acid_in_the_same_bucket",
+    "always_add_acid_to_water_never_water_to_acid",
+    "pump_must_be_running_before_adding_anything"
+  ],
+  "opening": {
+    "steps": [
+      {"id": "physical_prep", "title": "Physical prep",
+       "detail": "Cover off, cleaned and stored. Skim the surface, brush the walls and floor, vacuum out the winter debris. Reinstall the ladder, rails and return fittings."},
+      {"id": "mechanical_start", "title": "Mechanical start",
+       "detail": "Reinstall drain plugs, prime the pump, open the valves, start the filter. Run it 24h continuously and watch for leaks and pressure. Do NOT run the salt cell yet."},
+      {"id": "base_sanitization", "title": "Base sanitization",
+       "detail": "Water is unstabilized and probably green-ish. Bring chlorine up with liquid chlorine while the pump runs, then keep filtering until the water clears."},
+      {"id": "cya_anchor", "title": "CYA anchor",
+       "detail": "Stabilizer goes in BEFORE the salt cell carries the load -- without CYA the sun burns off chlorine faster than the cell can make it. Sock it in the skimmer, never broadcast it on a vinyl liner."},
+      {"id": "salt_addition", "title": "Salt addition",
+       "detail": "Now bring salt into the cell's band. Broadcast into the deep end with the pump running, brush until dissolved, then wait a full circulation before you trust a salt reading."},
+      {"id": "borate_buffer", "title": "Borate buffer",
+       "detail": "Last, because it's the expensive one and it locks in a stable pH. Predissolve in a bucket in batches, and retest pH after it has circulated."}
+    ],
+    "notes": "Strictly sequential on purpose -- each step assumes the one before it is done. Adding salt before the water is clear just means you paid to salt a swamp."
+  },
+  "coach": {
+    "claude_model": "",
+    "timeout_sec": 300,
+    "vision_flags": "--allowedTools Read",
+    "notes": "Leave claude_model empty to use your default Max-plan model. vision_flags is what lets `claude -p` actually open the screenshot file."
+  },
+  "push": {
+    "enabled": false,
+    "ntfy_server": "https://ntfy.sh",
+    "ntfy_topic": "",
+    "notes": "Pick an unguessable topic -- anyone who knows it can read it. Install the free ntfy app and subscribe. Or set the NTFY_TOPIC secret instead."
+  },
+  "app": {
+    "data_repo": "willchu12-git/pool-pilot-data",
+    "title": "Pool Pilot",
+    "notes": "data_repo is the PRIVATE repo the PWA reads from and writes readings into, owner/name."
+  }
+}

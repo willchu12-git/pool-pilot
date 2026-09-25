@@ -1,0 +1,55 @@
+name: Pool Pilot — interactive
+
+# Fires within ~a minute of my phone dropping something into inbox/: an ICO
+# screenshot to read, a confirmation, a logged action, an opening step.
+# Reads the image, files the data, rewrites the checklist only if the water
+# picture actually moved. No push — so it stays fast and cheap.
+
+on:
+  push:
+    paths:
+      - "inbox/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: poolpilot
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    # ignore the bot's own commits
+    if: ${{ !contains(github.event.head_commit.message, '[skip ci]') }}
+    env:
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+      NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+      APP_REPO: ${{ vars.APP_REPO }}
+      APP_REPO_TOKEN: ${{ secrets.APP_REPO_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cache npm (so the CLI install skips the network on repeat runs)
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-claude-code-${{ runner.os }}
+          restore-keys: npm-claude-code-
+
+      - name: Install Claude Code CLI
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Read screenshots, ingest, rebuild
+        run: python engine/run_cloud.py interactive
+
+      - name: Commit results
+        run: 'bash scripts/commit_push.sh "chore: interactive update [skip ci]"'
+
+      - name: Publish app shell to the public Pages repo
+        if: env.APP_REPO != '' && env.APP_REPO_TOKEN != ''
+        run: bash scripts/publish_app.sh

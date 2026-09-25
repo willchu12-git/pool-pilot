@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+out/
+.DS_Store
+Thumbs.db
+# local-only secrets (never commit)
+.env
+*.token

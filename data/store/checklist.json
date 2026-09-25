@@ -1,0 +1,314 @@
+{
+  "date": "2026-09-24",
+  "generated_at": "2026-09-24T21:38:17",
+  "reading": {
+    "id": "2026-09-22T09:15:00",
+    "at": "2026-09-22T09:15:00",
+    "date": "2026-09-22",
+    "source": "ico",
+    "confirmed": true,
+    "image": "",
+    "note": "",
+    "logged_at": "2026-09-24T21:38:16",
+    "ph": 8.3,
+    "orp_mv": 558.0,
+    "salt_ppm": 2760.0,
+    "water_temp_f": 79.0,
+    "cya_ppm": 24.0,
+    "borates_ppm": null,
+    "ta_ppm": 95.0,
+    "ch_ppm": null,
+    "fc_ppm": null
+  },
+  "reading_age_days": 2,
+  "pending_confirmation": [],
+  "panel": [
+    {
+      "key": "ph",
+      "label": "pH",
+      "unit": "",
+      "value": 8.3,
+      "display": "8.3",
+      "target": "7.8-8.1",
+      "status": "high",
+      "low": 7.8,
+      "high": 8.1
+    },
+    {
+      "key": "orp_mv",
+      "label": "ORP",
+      "unit": "mV",
+      "value": 558.0,
+      "display": "558 mV",
+      "target": "at least 600 mV",
+      "status": "low",
+      "low": 600,
+      "high": null
+    },
+    {
+      "key": "salt_ppm",
+      "label": "Salt",
+      "unit": "ppm",
+      "value": 2760.0,
+      "display": "2,760 ppm",
+      "target": "2800-3200 ppm",
+      "status": "low",
+      "low": 2800,
+      "high": 3200
+    },
+    {
+      "key": "cya_ppm",
+      "label": "CYA",
+      "unit": "ppm",
+      "value": 24.0,
+      "display": "24 ppm",
+      "target": "30-50 ppm",
+      "status": "low",
+      "low": 30,
+      "high": 50
+    },
+    {
+      "key": "borates_ppm",
+      "label": "Borates",
+      "unit": "ppm",
+      "value": null,
+      "display": "not measured",
+      "target": "50 ppm",
+      "status": "unknown",
+      "low": 50,
+      "high": 50
+    },
+    {
+      "key": "ta_ppm",
+      "label": "TA",
+      "unit": "ppm",
+      "value": 95.0,
+      "display": "95 ppm",
+      "target": "60-100 ppm",
+      "status": "ok",
+      "low": 60,
+      "high": 100
+    },
+    {
+      "key": "water_temp_f",
+      "label": "Water temp",
+      "unit": "°F",
+      "value": 79.0,
+      "display": "79°F",
+      "target": "",
+      "status": "ok",
+      "low": null,
+      "high": null
+    }
+  ],
+  "items": [
+    {
+      "id": "salt_up",
+      "key": "salt_up",
+      "title": "Add salt",
+      "kind": "dose",
+      "priority": 1,
+      "because": "Salt is 2,760 ppm, below the 2800-3200 ppm the cell needs. A cell run under its salt band makes less chlorine and wears out faster.",
+      "why": "Salt is 2,760 ppm, below the 2800-3200 ppm the cell needs. A cell run under its salt band makes less chlorine and wears out faster.",
+      "how": "Pump running. Broadcast the salt across the deep end, then brush it off the floor until it dissolves so it isn't sitting on the liner. Give it a full circulation -- 24 hours -- before you trust a salt reading.",
+      "dose": {
+        "amount": 36.0,
+        "unit": "lb",
+        "chemical": "pool salt",
+        "label": "36 lb of salt (about 0.9 of a 40 lb bag)",
+        "detail": {
+          "lb": 36.0,
+          "want_lb": 36.0,
+          "capped": false,
+          "raises_ppm": 240.0,
+          "bags": 0.9,
+          "whole": 0,
+          "bag_lb": 40.0
+        }
+      },
+      "measured": "2,760 ppm",
+      "target": "2800-3200 ppm",
+      "wait_hours": null,
+      "after": null,
+      "superseded": false,
+      "order": 1
+    },
+    {
+      "id": "cya_up",
+      "key": "cya_up",
+      "title": "Add stabilizer",
+      "kind": "dose",
+      "priority": 1,
+      "because": "CYA is 24 ppm, under the 30-50 ppm target. Without stabilizer the sun strips chlorine faster than the cell can replace it, so the cell runs flat out and the ORP still sags.",
+      "why": "CYA is 24 ppm, under the 30-50 ppm target. Without stabilizer the sun strips chlorine faster than the cell can replace it, so the cell runs flat out and the ORP still sags.",
+      "how": "Predissolve it in a 5-gallon bucket of pool water, or hang it in a sock in front of a return. Never broadcast granules onto a vinyl liner. It reads slowly -- wait a week before retesting.",
+      "dose": {
+        "amount": 2.5,
+        "unit": "lb",
+        "chemical": "stabilizer (cyanuric acid)",
+        "label": "2.5 lb of stabilizer (cyanuric acid)",
+        "detail": {
+          "lb": 2.5,
+          "want_lb": 2.4,
+          "capped": false,
+          "raises_ppm": 16.0
+        }
+      },
+      "measured": "24 ppm",
+      "target": "30-50 ppm",
+      "wait_hours": null,
+      "after": null,
+      "superseded": false,
+      "order": 2
+    },
+    {
+      "id": "ph_down",
+      "key": "ph_down",
+      "title": "Bring pH down",
+      "kind": "dose",
+      "priority": 1,
+      "because": "pH is 8.3, above the 7.8-8.1 target. Computed against the measured TA of 95.",
+      "why": "pH is 8.3, above the 7.8-8.1 target. Computed against the measured TA of 95.",
+      "how": "Pump running. Measure the acid into a bucket of pool water first -- acid into water, never water into acid -- then walk it slowly around the deep end, away from the skimmer and the returns. Never down the skimmer. Retest tomorrow.",
+      "dose": {
+        "amount": 37,
+        "unit": "fl oz",
+        "chemical": "muriatic acid",
+        "label": "37 fl oz (4.6 cups) of muriatic acid",
+        "detail": {
+          "floz": 37,
+          "want_floz": 36.8,
+          "capped": false,
+          "cups": 4.6,
+          "quarts": 1.15,
+          "ta_used": 95.0,
+          "ta_assumed": false,
+          "drops_ph": 0.25,
+          "strength_pct": 31.45
+        }
+      },
+      "measured": "8.3",
+      "target": "7.8-8.1",
+      "wait_hours": null,
+      "after": null,
+      "superseded": false,
+      "order": 3
+    },
+    {
+      "id": "emptied_skimmer",
+      "key": "emptied_skimmer",
+      "title": "Empty the skimmer basket",
+      "kind": "task",
+      "priority": 1,
+      "because": "Last emptied 5 days ago; the cadence is every 3.",
+      "why": "Last emptied 5 days ago; the cadence is every 3.",
+      "how": "Pump off first. Lift the basket, empty it, check the weir flap still swings freely, drop it back in, pump on.",
+      "dose": null,
+      "measured": null,
+      "target": null,
+      "wait_hours": null,
+      "after": null,
+      "superseded": false,
+      "order": 4
+    },
+    {
+      "id": "backwashed_filter",
+      "key": "backwashed_filter",
+      "title": "Backwash the filter",
+      "kind": "task",
+      "priority": 2,
+      "because": "Last backwashed 20 days ago; the cadence is every 14.",
+      "why": "Last backwashed 20 days ago; the cadence is every 14.",
+      "how": "Pump off, valve to backwash, pump on until the sight glass runs clear, then rinse for 20 seconds before going back to filter. Top the water level back up afterwards.",
+      "dose": null,
+      "measured": null,
+      "target": null,
+      "wait_hours": null,
+      "after": null,
+      "superseded": false,
+      "order": 5
+    },
+    {
+      "id": "orp_blocked",
+      "key": "orp_blocked",
+      "title": "Leave the cell alone for now",
+      "kind": "watch",
+      "priority": 2,
+      "because": "ORP is 558 mV, under the at least 600 mV floor -- but pH, Salt and CYA are out of band too, and ORP sits downstream of all of it. Fix those first, give the water a full day to circulate, then re-read. Turning the cell up now just means running it harder against the same problem.",
+      "why": "ORP is 558 mV, under the at least 600 mV floor -- but pH, Salt and CYA are out of band too, and ORP sits downstream of all of it. Fix those first, give the water a full day to circulate, then re-read. Turning the cell up now just means running it harder against the same problem.",
+      "how": "",
+      "dose": null,
+      "measured": "558 mV",
+      "target": "at least 600 mV",
+      "wait_hours": null,
+      "after": null,
+      "superseded": false,
+      "order": 6
+    },
+    {
+      "id": "borate_test",
+      "key": "borate_test",
+      "title": "Test borates",
+      "kind": "test",
+      "priority": 3,
+      "because": "Borates aren't on the ICO panel and haven't been tested. The target is 50 ppm; a strip test once a season is enough to know where you are.",
+      "why": "Borates aren't on the ICO panel and haven't been tested. The target is 50 ppm; a strip test once a season is enough to know where you are.",
+      "how": "A borate test strip takes ten seconds. Once a season is plenty.",
+      "dose": null,
+      "measured": null,
+      "target": "50 ppm",
+      "wait_hours": null,
+      "after": null,
+      "superseded": false,
+      "order": 7
+    }
+  ],
+  "counts": {
+    "total": 7,
+    "todo": 6,
+    "doses": 3,
+    "out_of_band": 4
+  },
+  "safety_rules": [
+    "NEVER pour undiluted acid into the skimmer. Acid down the skimmer runs neat through the pump, heater and salt cell and eats them. Dilute it and pour it slowly around the deep end with the pump running.",
+    "NEVER put shock and acid in the same session without at least 4 hours between them, and say the gap out loud in the instructions. Both move pH hard in opposite directions, and back to back you cannot tell what the water actually did.",
+    "ALWAYS predissolve dry chemicals in a 5-gallon bucket of pool water before they go in. Undissolved granules sitting on a vinyl liner bleach and weaken it.",
+    "NEVER put chlorine and acid in the same bucket, in either order. That combination produces chlorine gas.",
+    "ALWAYS add acid to water, never water to acid -- pouring water into acid can boil and spit it back at you.",
+    "The pump must be RUNNING before anything goes in, and keep running afterwards, so a dose disperses instead of sitting in one corner."
+  ],
+  "pool": {
+    "gallons": 18000.0,
+    "type": "inground_vinyl_liner",
+    "sanitization": "saltwater"
+  },
+  "reference": {
+    "gallons": 18000.0,
+    "salt_lb_per_100ppm": 15.0,
+    "cya_lb_per_10ppm": 1.5,
+    "acid_floz_per_0_1ph_at_ta80": 12.4,
+    "chlorine_gal_per_1ppm": 0.17,
+    "boric_acid_lb_per_10ppm": 8.6
+  },
+  "basis": {
+    "date": "2026-09-24",
+    "reading_id": "2026-09-22T09:15:00",
+    "items": [
+      "backwashed_filter",
+      "borate_test",
+      "cya_up",
+      "emptied_skimmer",
+      "orp_blocked",
+      "ph_down",
+      "salt_up"
+    ],
+    "doses": {
+      "salt_up": 36.0,
+      "cya_up": 2.5,
+      "ph_down": 37
+    }
+  },
+  "headline": "Add salt.",
+  "summary": "6 thing(s) on the list today, 3 of them a dose. Reading is 2 day(s) old. Pump running before anything goes in.",
+  "source": "fallback"
+}

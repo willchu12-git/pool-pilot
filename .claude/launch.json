@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "poolpilot-preview",
+      "runtimeExecutable": "py",
+      "runtimeArgs": ["-3", "-m", "http.server", "8898", "--directory", "out"],
+      "port": 8898
+    }
+  ]
+}

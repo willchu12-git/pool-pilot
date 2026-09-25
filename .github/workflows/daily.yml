@@ -1,0 +1,54 @@
+name: Pool Pilot — daily
+
+# Rebuilds today's checklist, rebuilds the app, pushes to my phone if anything's due.
+# Runs whether or not my PC is on.
+
+on:
+  schedule:
+    - cron: "0 12 * * *"        # 12:00 UTC ≈ 8am ET / 7am CT. Shift for your timezone.
+  workflow_dispatch:             # "Run workflow" button in the Actions tab
+  push:
+    paths:
+      - "engine/**"              # rebuild when I change the engine or a prompt
+      - "config.json"            # ...or a target, a cadence, or a safety rule
+
+permissions:
+  contents: write
+
+concurrency:
+  group: poolpilot               # never let two runs write the store at once
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    env:
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+      NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+      APP_REPO: ${{ vars.APP_REPO }}
+      APP_REPO_TOKEN: ${{ secrets.APP_REPO_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cache npm (so the CLI install skips the network on repeat runs)
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-claude-code-${{ runner.os }}
+          restore-keys: npm-claude-code-
+
+      - name: Install Claude Code CLI
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Ingest, build the checklist, build the app, push
+        run: python engine/run_cloud.py full
+
+      - name: Commit results
+        run: 'bash scripts/commit_push.sh "chore: daily checklist [skip ci]"'
+
+      - name: Publish app shell to the public Pages repo
+        if: env.APP_REPO != '' && env.APP_REPO_TOKEN != ''
+        run: bash scripts/publish_app.sh

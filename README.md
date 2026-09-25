@@ -1,11 +1,11 @@
 # Pool Pilot
 
-A private pool-maintenance PWA for one pool and one person. Python engine, JSONL in a private
-git repo, a self-contained web app on the iPhone home screen, AI reasoning through the Claude
-CLI on a Max plan, and fully autonomous runs on GitHub Actions — so the PC can be off.
+A pool-maintenance PWA for one pool and one person. Python engine, JSONL in a git repo, a
+self-contained web app on the iPhone home screen, AI reasoning through the Claude CLI on a Max
+plan, and fully autonomous runs on GitHub Actions — so the PC can be off.
 
 Same architecture as CycleSync: git is the database, GitHub Actions is the server, and the
-phone is a static page that reads and writes one private repo over the GitHub API.
+phone is a static page that reads the repo over HTTPS and writes back through the GitHub API.
 
 ## The one thing to understand
 

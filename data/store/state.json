@@ -103,7 +103,7 @@
   ],
   "checklist": {
     "date": "2026-09-27",
-    "generated_at": "2026-09-27T16:58:51",
+    "generated_at": "2026-09-27T18:07:26",
     "reading": {
       "id": "ico:2026-09-27T12:40:33",
       "at": "2026-09-27T12:40:33",
@@ -226,21 +226,51 @@
     ],
     "items": [
       {
+        "id": "fc_holding",
+        "key": "fc_holding",
+        "title": "If you can't test, add a holding dose",
+        "kind": "dose",
+        "priority": 0,
+        "because": "If you can't test today, 0.25 gal of 12.5% liquid chlorine raises free chlorine by about 1.5 ppm. That is a holding dose, not a shock: 2 ppm is below what you would swim in, so it cannot over-chlorinate the pool, and it buys a day without pretending to know what the level actually is. Test before adding any more than this.",
+        "why": "ORP is 524 mV, under the 600 mV floor, and free chlorine hasn't been measured because the ICO can't read it. This dose is only for days you can't get a strip test in — 0.25 gal of 12.5% liquid chlorine lifts free chlorine by about 1.5 ppm, enough to hold the water over without pretending you know the real number, and it's too small a dose to over-chlorinate.",
+        "how": "You added acid earlier today, so hold off on this until at least 4 hours have passed since that dose — pouring chlorine in sooner makes it impossible to tell which chemical did what to the water. With the pump running, pour the liquid chlorine in slowly around the deep end, spread out rather than in one spot, and keep the pump running afterward so it disperses. Don't add this on top of a real test result — it's a stand-in for testing, not an addition to it.",
+        "dose": {
+          "amount": 0.25,
+          "unit": "gal",
+          "chemical": "liquid chlorine",
+          "label": "0.25 gal of 12.5% liquid chlorine",
+          "detail": {
+            "gal": 0.25,
+            "want_gal": 0.34,
+            "capped": false,
+            "raises_ppm": 2.0,
+            "actual_ppm": 1.5,
+            "strength_pct": 12.5
+          }
+        },
+        "measured": "524 mV",
+        "target": "a holding 2 ppm",
+        "wait_hours": null,
+        "after": null,
+        "superseded": false,
+        "order": 1
+      },
+      {
         "id": "fc_test",
         "key": "fc_test",
         "title": "Test free chlorine today",
         "kind": "test",
         "priority": 0,
         "because": "ORP is 524 mV, well under the 550 mV mark where the water may genuinely not be sanitising. Free chlorine isn't measured -- the ICO can't read it -- so nobody knows whether that is a real chlorine shortage or just the proxy sagging. pH and Salt are out of band, which depresses ORP on its own, so this may resolve once they are fixed. It is still worth a strip test today rather than assuming.",
-        "why": "ORP is 524 mV, well under the 550 mV mark where the water may genuinely not be sanitising. Free chlorine isn't measured -- the ICO can't read it -- so nobody knows whether that is a real chlorine shortage or just the proxy sagging. pH and Salt are out of band, which depresses ORP on its own, so this may resolve once they are fixed. It is still worth a strip test today rather than assuming.",
-        "how": "A free-chlorine strip takes ten seconds. Do it before you add anything.",
+        "why": "ORP of 524 mV is below the 550 mV mark where sanitizing can genuinely start to fail, but ORP is only a proxy — with pH and salt both out of band pulling it down on their own, a strip test is the only way to know if chlorine itself is actually short.",
+        "how": "Dip a chlorine test strip straight from the pool, away from the return jets, and read it against the bottle's color chart within the time it tells you. No dosing involved here — just get the number before you decide anything else about the cell or a chlorine addition.",
         "dose": null,
         "measured": "524 mV",
         "target": "at least 2 ppm",
         "wait_hours": null,
         "after": null,
         "superseded": false,
-        "order": 1
+        "order": 2
       },
       {
         "id": "salt_up",
@@ -249,8 +279,8 @@
         "kind": "dose",
         "priority": 1,
         "because": "Salt is 2,400 ppm, below the 2800-3200 ppm the cell needs. A cell run under its salt band makes less chlorine and wears out faster.",
-        "why": "Salt is 2,400 ppm, below the 2800-3200 ppm the cell needs. A cell run under its salt band makes less chlorine and wears out faster.",
-        "how": "Pump running. Broadcast the salt across the deep end, then brush it off the floor until it dissolves so it isn't sitting on the liner. Give it a full circulation -- 24 hours -- before you trust a salt reading.",
+        "why": "Salt is 2,400 ppm against the 2,800–3,200 ppm the cell needs, and a cell running below its band makes less chlorine while wearing out just as fast — that's part of why ORP is sagging too.",
+        "how": "With the pump running, pour the 90 lb of salt in slowly around the edges of the deep end, spreading it out rather than dumping it in one pile so it doesn't sit on the vinyl floor while it dissolves. Brush any pile that doesn't clear within a few minutes so grains aren't left resting on the liner, and leave the pump running so it circulates and finishes dissolving over the next day.",
         "dose": {
           "amount": 90.0,
           "unit": "lb",
@@ -271,39 +301,6 @@
         "wait_hours": null,
         "after": null,
         "superseded": false,
-        "order": 2
-      },
-      {
-        "id": "ph_down",
-        "key": "ph_down",
-        "title": "Bring pH down",
-        "kind": "dose",
-        "priority": 1,
-        "because": "pH is 7.95, above the 7.6-7.8 target. TA wasn't measured, so this dose assumes a mid-band buffer -- treat it as a starting point and retest.",
-        "why": "pH is 7.95, above the 7.6-7.8 target. TA wasn't measured, so this dose assumes a mid-band buffer -- treat it as a starting point and retest.",
-        "how": "Pump running. Measure the acid into a bucket of pool water first -- acid into water, never water into acid -- then walk it slowly around the deep end, away from the skimmer and the returns. Never down the skimmer. Retest tomorrow.",
-        "dose": {
-          "amount": 25,
-          "unit": "fl oz",
-          "chemical": "muriatic acid",
-          "label": "25 fl oz (3.12 cups) of muriatic acid",
-          "detail": {
-            "floz": 25,
-            "want_floz": 24.8,
-            "capped": false,
-            "cups": 3.12,
-            "quarts": 0.78,
-            "ta_used": 80,
-            "ta_assumed": true,
-            "drops_ph": 0.2,
-            "strength_pct": 31.45
-          }
-        },
-        "measured": "7.95",
-        "target": "7.6-7.8",
-        "wait_hours": null,
-        "after": null,
-        "superseded": false,
         "order": 3
       },
       {
@@ -313,8 +310,8 @@
         "kind": "task",
         "priority": 2,
         "because": "Never logged. The target cadence is every 14 days -- log it once and the clock starts.",
-        "why": "Never logged. The target cadence is every 14 days -- log it once and the clock starts.",
-        "how": "Pump off, valve to backwash, pump on until the sight glass runs clear, then rinse for 20 seconds before going back to filter. Top the water level back up afterwards.",
+        "why": "There's no record of this ever happening, so the 14-day cadence has nothing to measure against — running it once today gives you a real starting point instead of guessing how long the sand's been going without a rinse.",
+        "how": "Shut the pump off first, turn the multiport valve to backwash, then restart the pump and run it until the water in the sight glass runs clear, usually a couple of minutes. Switch the valve back to filter before you walk away, and log the date so the 14-day clock actually means something next time.",
         "dose": null,
         "measured": null,
         "target": null,
@@ -324,51 +321,21 @@
         "order": 4
       },
       {
-        "id": "fc_holding",
-        "key": "fc_holding",
-        "title": "If you can't test, add a holding dose",
-        "kind": "dose",
-        "priority": 0,
-        "because": "If you can't test today, 0.25 gal of 12.5% liquid chlorine raises free chlorine by about 1.5 ppm. That is a holding dose, not a shock: 2 ppm is below what you would swim in, so it cannot over-chlorinate the pool, and it buys a day without pretending to know what the level actually is. Test before adding any more than this. Acid is on today's list too: wait at least 4 hours after the acid before this goes in, and never put them in together.",
-        "why": "If you can't test today, 0.25 gal of 12.5% liquid chlorine raises free chlorine by about 1.5 ppm. That is a holding dose, not a shock: 2 ppm is below what you would swim in, so it cannot over-chlorinate the pool, and it buys a day without pretending to know what the level actually is. Test before adding any more than this. Acid is on today's list too: wait at least 4 hours after the acid before this goes in, and never put them in together.",
-        "how": "Wait at least 4 hours after the acid. Pump running. Pour it slowly around the deep end, never into the skimmer, and never into a bucket that has had acid in it. Then test tomorrow.",
-        "dose": {
-          "amount": 0.25,
-          "unit": "gal",
-          "chemical": "liquid chlorine",
-          "label": "0.25 gal of 12.5% liquid chlorine",
-          "detail": {
-            "gal": 0.25,
-            "want_gal": 0.34,
-            "capped": false,
-            "raises_ppm": 2.0,
-            "actual_ppm": 1.5,
-            "strength_pct": 12.5
-          }
-        },
-        "measured": "524 mV",
-        "target": "a holding 2 ppm",
-        "wait_hours": 4.0,
-        "after": "ph_down",
-        "superseded": false,
-        "order": 5
-      },
-      {
         "id": "emptied_skimmer",
         "key": "emptied_skimmer",
         "title": "Empty the skimmer basket",
         "kind": "task",
         "priority": 2,
         "because": "Last emptied 3 days ago; the cadence is every 3.",
-        "why": "Last emptied 3 days ago; the cadence is every 3.",
-        "how": "Pump off first. Lift the basket, empty it, check the weir flap still swings freely, drop it back in, pump on.",
+        "why": "You last emptied it 3 days ago and the cadence here is every 3, so today's the day it's due again — a full basket just means less water gets pulled through toward the cell.",
+        "how": "The pump can stay running for this one. Lift the basket straight out, dump the leaves and debris, rinse it if it's slimy, and drop it back in seated the way it came out.",
         "dose": null,
         "measured": null,
         "target": null,
         "wait_hours": null,
         "after": null,
         "superseded": false,
-        "order": 6
+        "order": 5
       },
       {
         "id": "orp_blocked",
@@ -377,14 +344,31 @@
         "kind": "watch",
         "priority": 2,
         "because": "ORP is 524 mV, under the at least 600 mV floor -- but pH and Salt are out of band too, and ORP sits downstream of all of it. Fix those first, give the water a full day to circulate, then re-read. Turning the cell up now just means running it harder against the same problem.",
-        "why": "ORP is 524 mV, under the at least 600 mV floor -- but pH and Salt are out of band too, and ORP sits downstream of all of it. Fix those first, give the water a full day to circulate, then re-read. Turning the cell up now just means running it harder against the same problem.",
-        "how": "",
+        "why": "ORP at 524 mV is under the 600 mV floor, but it's a downstream number — it reads low when pH and salt are off even if the cell itself is fine, so turning the cell up now would just mean running it harder against water that isn't ready for it yet.",
+        "how": "Leave the cell's output setting where it is for today. Once salt is in and pH has settled, give the water a full day of circulation at the current setting, then take a fresh reading before deciding whether the cell needs a nudge.",
         "dose": null,
         "measured": "524 mV",
         "target": "at least 600 mV",
         "wait_hours": null,
         "after": null,
         "superseded": false,
+        "order": 6
+      },
+      {
+        "id": "ph_down",
+        "key": "ph_down",
+        "title": "Retest before touching pH again",
+        "kind": "test",
+        "priority": 2,
+        "because": "You logged \"Added acid\" 25 fl oz on 2026-09-27, which is AFTER the reading this dose was computed from. The water has already moved -- take a fresh reading instead of dosing the same measurement twice.",
+        "why": "The 7.95 pH reading this dose was calculated from is now stale — you added 25 fl oz of acid after that reading was taken on 2026-09-27, so the water has already moved and this number no longer describes what's in the pool. Dosing off it again would mean guessing on top of a guess.",
+        "how": "Don't add any more acid today. Wait until at least 4 hours have passed since that last acid dose so it's fully circulated, then pull a fresh pH reading before deciding whether anything more is needed.",
+        "dose": null,
+        "measured": "7.95",
+        "target": "7.6-7.8",
+        "wait_hours": null,
+        "after": null,
+        "superseded": true,
         "order": 7
       },
       {
@@ -394,8 +378,8 @@
         "kind": "watch",
         "priority": 2,
         "because": "The cell is at 100% (from config.json), running 24 hours a day, so there is no headroom left to ask for -- this is not a setting you can turn up. pH and Salt are out of band, and each of those starves the cell in its own way: low salt gives it less to work with, high pH wastes the chlorine it makes, low CYA lets the sun burn it off. Fix those and the same cell will produce more.",
-        "why": "The cell is at 100% (from config.json), running 24 hours a day, so there is no headroom left to ask for -- this is not a setting you can turn up. pH and Salt are out of band, and each of those starves the cell in its own way: low salt gives it less to work with, high pH wastes the chlorine it makes, low CYA lets the sun burn it off. Fix those and the same cell will produce more.",
-        "how": "",
+        "why": "The cell is already at 100% output on a 24-hour schedule, so there's no dial left to turn — the only way to get more chlorine out of it is to fix what's holding it back: low salt gives it less to work with, and high pH wastes the chlorine it does make.",
+        "how": "Nothing to do here today except leave the setting alone. Once salt and pH are both back in band and a fresh reading shows ORP climbing, that's the point where nudging the cell down slightly becomes an option, not before.",
         "dose": null,
         "measured": "100%",
         "target": "headroom to turn up",
@@ -411,8 +395,8 @@
         "kind": "watch",
         "priority": 3,
         "because": "The pump is running 24 hours a day, which is a lot -- but on a saltwater pool the pump schedule is the chlorine schedule, because the cell only makes chlorine while water is going through it. With ORP at 524 mV, cutting hours would cut production exactly when you need it. Get ORP comfortably over 600 with the cell below full, and that is the moment to start trimming hours and watching what happens.",
-        "why": "The pump is running 24 hours a day, which is a lot -- but on a saltwater pool the pump schedule is the chlorine schedule, because the cell only makes chlorine while water is going through it. With ORP at 524 mV, cutting hours would cut production exactly when you need it. Get ORP comfortably over 600 with the cell below full, and that is the moment to start trimming hours and watching what happens.",
-        "how": "",
+        "why": "The pump running 24 hours a day is what's keeping any chlorine production going at all, since the cell only makes chlorine while water is passing through it — cutting hours now would cut production exactly while ORP is sitting at 524 mV, under the 600 mV floor.",
+        "how": "Leave the timer as it is for now. Once ORP is comfortably over 600 mV with the cell running below 100%, that's the point to start trimming an hour at a time and watching what a fresh reading does the next day.",
         "dose": null,
         "measured": "24 h/day",
         "target": "trim once there's headroom",
@@ -428,8 +412,8 @@
         "kind": "test",
         "priority": 3,
         "because": "Borates aren't on the ICO panel and haven't been tested. The target is 50 ppm; a strip test once a season is enough to know where you are.",
-        "why": "Borates aren't on the ICO panel and haven't been tested. The target is 50 ppm; a strip test once a season is enough to know where you are.",
-        "how": "A borate test strip takes ten seconds. Once a season is plenty.",
+        "why": "Borates aren't on the ICO panel, so the only way to know where you stand against the 50 ppm target is a manual test — once a season is enough to catch it drifting.",
+        "how": "Dip a borate test strip straight from the pool and read it against the bottle's chart. No dosing today either way — this is just to get a number on record.",
         "dose": null,
         "measured": null,
         "target": "50 ppm",
@@ -441,8 +425,8 @@
     ],
     "counts": {
       "total": 10,
-      "todo": 8,
-      "doses": 3,
+      "todo": 7,
+      "doses": 2,
       "out_of_band": 3
     },
     "safety_rules": [
@@ -482,14 +466,13 @@
         "salt_up"
       ],
       "doses": {
-        "salt_up": 90.0,
-        "ph_down": 25,
-        "fc_holding": 0.25
+        "fc_holding": 0.25,
+        "salt_up": 90.0
       }
     },
-    "headline": "Test free chlorine today.",
-    "summary": "8 thing(s) on the list today, 3 of them a dose. Reading is 0 day(s) old. Pump running before anything goes in.",
-    "source": "fallback"
+    "headline": "Salt's low, pH's high, ORP is sagging from both — fix the water, not the cell",
+    "summary": "Salt is 2,400 ppm against a 2,800–3,200 ppm band, and pH is 7.95 against a 7.6–7.8 target — both of those are likely why ORP is sitting at 524 mV, under the 600 mV floor, even though this reading is from today. You already added acid after this reading was taken, so treat that pH number as stale and retest before touching it again. Get the salt in, test free chlorine and borates since neither is on the ICO panel, and leave the cell and pump schedule alone until the water catches up.",
+    "source": "claude"
   },
   "panel": [
     {
@@ -637,13 +620,13 @@
     {
       "key": "added_acid",
       "label": "Acid",
-      "days": null,
-      "date": null,
-      "amount": null,
-      "unit": null,
+      "days": 0,
+      "date": "2026-09-27",
+      "amount": 25.0,
+      "unit": "fl oz",
       "every": null,
       "due": false,
-      "never": true
+      "never": false
     },
     {
       "key": "backwashed_filter",
@@ -669,6 +652,17 @@
     }
   ],
   "timeline": [
+    {
+      "type": "action",
+      "at": "2026-09-27T14:07:10",
+      "date": "2026-09-27",
+      "id": "2026-09-27T14:07:10-9gqp0",
+      "action": "added_acid",
+      "label": "Added acid",
+      "amount": 25.0,
+      "unit": "fl oz",
+      "note": "from the checklist"
+    },
     {
       "type": "reading",
       "at": "2026-09-27T12:40:33",
@@ -1796,11 +1790,11 @@
     },
     "acid_demand": {
       "days": 30,
-      "occasions": 0,
-      "floz": 0.0,
-      "floz_per_month": 0.0,
-      "per_month_occasions": 0.0,
-      "logged_amounts": 0
+      "occasions": 1,
+      "floz": 25.0,
+      "floz_per_month": 25.0,
+      "per_month_occasions": 1.0,
+      "logged_amounts": 1
     },
     "recommendations": [
       {
@@ -2058,7 +2052,7 @@
   "counts": {
     "readings": 16,
     "confirmed": 16,
-    "actions": 2,
+    "actions": 3,
     "pending": 0
   },
   "raw": {
@@ -2412,6 +2406,17 @@
         "unit": "",
         "note": "",
         "logged_at": "2026-09-25T03:08:21"
+      },
+      {
+        "id": "2026-09-27T14:07:10-9gqp0",
+        "at": "2026-09-27T14:07:10",
+        "date": "2026-09-27",
+        "action": "added_acid",
+        "label": "Added acid",
+        "amount": 25.0,
+        "unit": "fl oz",
+        "note": "from the checklist",
+        "logged_at": "2026-09-27T18:07:26"
       }
     ]
   },
@@ -2432,9 +2437,8 @@
       "salt_up"
     ],
     "doses": {
-      "salt_up": 90.0,
-      "ph_down": 25,
-      "fc_holding": 0.25
+      "fc_holding": 0.25,
+      "salt_up": 90.0
     }
   }
 }

@@ -1,19 +1,19 @@
 {
   "date": "2026-09-29",
-  "generated_at": "2026-09-29T01:00:23",
+  "generated_at": "2026-09-29T09:51:25",
   "reading": {
-    "id": "ico:2026-09-28T20:42:16",
-    "at": "2026-09-28T20:42:16",
-    "date": "2026-09-28",
+    "id": "ico:2026-09-29T05:42:46",
+    "at": "2026-09-29T05:42:46",
+    "date": "2026-09-29",
     "source": "ondilo_api",
     "confirmed": true,
     "image": "",
-    "note": "temperature read as C (18.2) -- the account says F, but that value can't be",
-    "logged_at": "2026-09-29T01:00:23",
+    "note": "temperature read as C (18) -- the account says F, but that value can't be",
+    "logged_at": "2026-09-29T09:51:25",
     "ph": 7.78,
-    "orp_mv": 666.0,
-    "salt_ppm": 2358.0,
-    "water_temp_f": 64.76,
+    "orp_mv": 686.0,
+    "salt_ppm": 2359.0,
+    "water_temp_f": 64.4,
     "cya_ppm": null,
     "borates_ppm": null,
     "ta_ppm": null,
@@ -21,7 +21,7 @@
     "fc_ppm": null,
     "tds_ppm": null
   },
-  "reading_age_days": 1,
+  "reading_age_days": 0,
   "pending_confirmation": [],
   "panel": [
     {
@@ -41,8 +41,8 @@
       "label": "ORP",
       "unit": "mV",
       "fmt_unit": " mV",
-      "value": 666.0,
-      "display": "666 mV",
+      "value": 686.0,
+      "display": "686 mV",
       "target": "at least 600 mV",
       "status": "ok",
       "low": 600,
@@ -65,8 +65,8 @@
       "label": "Salt",
       "unit": "ppm",
       "fmt_unit": " ppm",
-      "value": 2358.0,
-      "display": "2,358 ppm",
+      "value": 2359.0,
+      "display": "2,359 ppm",
       "target": "2800-3200 ppm",
       "status": "low",
       "low": 2800,
@@ -113,8 +113,8 @@
       "label": "Water temp",
       "unit": "°F",
       "fmt_unit": "°F",
-      "value": 64.76,
-      "display": "64.76°F",
+      "value": 64.4,
+      "display": "64.4°F",
       "target": "",
       "status": "ok",
       "low": null,
@@ -128,8 +128,8 @@
       "title": "Add salt",
       "kind": "dose",
       "priority": 1,
-      "because": "Salt is 2,358 ppm, below the 2800-3200 ppm the cell needs. A cell run under its salt band makes less chlorine and wears out faster.",
-      "why": "Salt is 2,358 ppm, below the 2800-3200 ppm the cell needs. A cell run under its salt band makes less chlorine and wears out faster.",
+      "because": "Salt is 2,359 ppm, below the 2800-3200 ppm the cell needs. A cell run under its salt band makes less chlorine and wears out faster.",
+      "why": "Salt is 2,359 ppm, below the 2800-3200 ppm the cell needs. A cell run under its salt band makes less chlorine and wears out faster.",
       "how": "Pump running. Broadcast the salt across the deep end, then brush it off the floor until it dissolves so it isn't sitting on the liner. Give it a full circulation -- 24 hours -- before you trust a salt reading.",
       "dose": {
         "amount": 90.0,
@@ -138,15 +138,15 @@
         "label": "90 lb of salt (about 2.25 of a 40 lb bag)",
         "detail": {
           "lb": 90.0,
-          "want_lb": 96.3,
+          "want_lb": 96.1,
           "capped": true,
-          "raises_ppm": 642.0,
+          "raises_ppm": 641.0,
           "bags": 2.25,
           "whole": 2,
           "bag_lb": 40.0
         }
       },
-      "measured": "2,358 ppm",
+      "measured": "2,359 ppm",
       "target": "2800-3200 ppm",
       "wait_hours": null,
       "after": null,
@@ -200,7 +200,7 @@
   },
   "basis": {
     "date": "2026-09-29",
-    "reading_id": "ico:2026-09-28T20:42:16",
+    "reading_id": "ico:2026-09-29T05:42:46",
     "items": [
       "borate_test",
       "salt_up"
@@ -210,6 +210,6 @@
     }
   },
   "headline": "Add salt.",
-  "summary": "1 thing(s) on the list today, 1 of them a dose. Reading is 1 day(s) old. Pump running before anything goes in.",
+  "summary": "1 thing(s) on the list today, 1 of them a dose. Reading is 0 day(s) old. Pump running before anything goes in.",
   "source": "fallback"
 }

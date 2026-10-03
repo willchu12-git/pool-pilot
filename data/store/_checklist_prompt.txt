@@ -81,7 +81,7 @@ Address him as "you". Never use an exclamation mark.
 
 ```json
 {
-  "date": "2026-10-02",
+  "date": "2026-10-03",
   "pool": {
     "gallons": 18000.0,
     "type": "inground_vinyl_liner",
@@ -111,7 +111,7 @@ Address him as "you". Never use an exclamation mark.
     "fc_ppm": null,
     "tds_ppm": null
   },
-  "reading_age_days": 0,
+  "reading_age_days": 1,
   "panel": [
     {
       "key": "ph",
@@ -309,7 +309,7 @@ Address him as "you". Never use an exclamation mark.
       "title": "Empty the skimmer basket",
       "kind": "task",
       "priority": 1,
-      "because": "Last emptied 5 days ago; the cadence is every 3.",
+      "because": "Last emptied 6 days ago; the cadence is every 3.",
       "dose": null,
       "measured": null,
       "target": null,

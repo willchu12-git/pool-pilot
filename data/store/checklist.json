@@ -1,6 +1,6 @@
 {
-  "date": "2026-10-02",
-  "generated_at": "2026-10-02T17:31:37",
+  "date": "2026-10-03",
+  "generated_at": "2026-10-03T00:57:39",
   "reading": {
     "id": "ico:2026-10-02T04:51:08",
     "at": "2026-10-02T04:51:08",
@@ -21,7 +21,7 @@
     "fc_ppm": null,
     "tds_ppm": null
   },
-  "reading_age_days": 0,
+  "reading_age_days": 1,
   "pending_confirmation": [],
   "panel": [
     {
@@ -129,8 +129,8 @@
       "kind": "dose",
       "priority": 0,
       "because": "If you can't test today, 0.25 gal of 12.5% liquid chlorine raises free chlorine by about 1.5 ppm. That is a holding dose, not a shock: 2 ppm is below what you would swim in, so it cannot over-chlorinate the pool, and it buys a day without pretending to know what the level actually is. Test before adding any more than this.",
-      "why": "ORP is 378 mV and free chlorine wasn't measured, so you don't know what's in the water. This is only for the case where you can't test today. 0.25 gal of 12.5% liquid chlorine is a holding dose, not a shock, and test before adding any more.",
-      "how": "Start the pump and leave it running, then pour the 0.25 gal of 12.5% liquid chlorine slowly around the deep end, well away from the skimmer. Keep it out of any bucket that has ever held acid. Leave the pump running afterwards so it disperses instead of sitting in one spot.",
+      "why": "ORP is 378 mV and free chlorine was not measured, so you don't know whether the pool is sanitising. This is a holding dose for use only if you can't test today. It raises free chlorine about 1.5 ppm, which is below swimming level, so it can't over-chlorinate the pool.",
+      "how": "Skip this if you test and the strip shows 2 ppm or more. If you do use it, start with the pump running and keep it running afterward. Pour the 0.25 gal of liquid chlorine slowly around the deep end, standing back so it doesn't splash, and don't put it in a bucket with anything else, especially acid.",
       "dose": {
         "amount": 0.25,
         "unit": "gal",
@@ -159,8 +159,8 @@
       "kind": "test",
       "priority": 0,
       "because": "ORP is 378 mV, well under the 550 mV mark where the water may genuinely not be sanitising. Free chlorine isn't measured -- the ICO can't read it -- so nobody knows whether that is a real chlorine shortage or just the proxy sagging. Salt is out of band, which depresses ORP on its own, so this may resolve once it is fixed. It is still worth a strip test today rather than assuming.",
-      "why": "ORP is 378 mV, well under the 600 mV target, but the ICO can't read free chlorine, so free chlorine is not measured. It could be a real chlorine shortage or just ORP sagging because salt is 987 ppm against a 2,800–3,200 band. A strip test today tells you which.",
-      "how": "Take the sample from elbow depth, away from the return jets, and read the strip right away. Write the number down so tomorrow's checklist can use it.",
+      "why": "ORP is 378 mV, well under the 550 mV mark where sanitising can fail. The ICO can't read free chlorine, so you can't tell a real shortage from low salt dragging ORP down. A strip test settles it, and it tells you whether any chlorine is needed today.",
+      "how": "Take the sample from elbow depth, away from the returns, with the pump running. Dip the strip, read it right away and compare to the 2 ppm minimum. Write the number down so the next checklist uses a measured value.",
       "dose": null,
       "measured": "378 mV",
       "target": "at least 2 ppm",
@@ -176,8 +176,8 @@
       "kind": "dose",
       "priority": 1,
       "because": "Salt is 987 ppm, below the 2800-3200 ppm the cell needs. A cell run under its salt band makes less chlorine and wears out faster.",
-      "why": "Salt is 987 ppm against a 2,800–3,200 band. The cell makes less chlorine below its band and wears out faster, which is likely why ORP is sitting at 378 mV. This is the fix the other items depend on.",
-      "how": "Run the pump and predissolve the 90 lb of salt in a 5-gallon bucket of pool water, a bucket-sized batch at a time. Pour each batch slowly around the deep end. Never dump dry salt on the liner, because undissolved granules bleach and weaken vinyl. Keep the pump running afterwards so it mixes.",
+      "why": "Salt is 987 ppm against a 2800-3200 band. The cell makes less chlorine below its band and wears out faster, which is why ORP sits at 378 mV. This is the root problem, and chlorine and ORP won't recover until salt does.",
+      "how": "Keep the pump running the whole time. Don't dump the 90 lb in one spot. Predissolve salt in a 5-gallon bucket of pool water in batches and pour each around the deep end, or broadcast it over the deep end and brush it until it's gone, so no granules sit on the vinyl floor. Keep the pump running afterward so it mixes.",
       "dose": {
         "amount": 90.0,
         "unit": "lb",
@@ -206,9 +206,9 @@
       "title": "Empty the skimmer basket",
       "kind": "task",
       "priority": 1,
-      "because": "Last emptied 5 days ago; the cadence is every 3.",
-      "why": "You last emptied the basket 5 days ago and the cadence is every 3. A full basket restricts flow, and the cell only makes chlorine on water that moves through it.",
-      "how": "Turn the pump off before you pull the basket so you don't get a surge of debris. Dump it, rinse it, and seat it back properly. Then switch the pump back on and confirm it's running.",
+      "because": "Last emptied 6 days ago; the cadence is every 3.",
+      "why": "The skimmer basket was last emptied 6 days ago and the cadence is every 3. A full basket restricts flow to the pump and the cell. Flow matters most now, while the cell is working this hard.",
+      "how": "Turn the pump off at the timer first, then lift the basket out. Dump it away from the pool, rinse it and set it back. Turn the pump back on and check that water is moving through the skimmer.",
       "dose": null,
       "measured": null,
       "target": null,
@@ -224,8 +224,8 @@
       "kind": "watch",
       "priority": 2,
       "because": "ORP is 378 mV, under the at least 600 mV floor -- but Salt is out of band too, and ORP sits downstream of all of it. Fix that first, give the water a full day to circulate, then re-read. Turning the cell up now just means running it harder against the same problem.",
-      "why": "ORP is 378 mV against a 600 mV floor, but salt is also out of band, and ORP depends on all of it. Turning the cell up now only runs it harder against the same problem.",
-      "how": "Do nothing to the cell today. Get the salt in, let the pump circulate for a full day, then read ORP again.",
+      "why": "ORP is 378 mV against the 600 mV floor, but salt is out of band too, and ORP depends on it. Salt is the thing to fix first. Turning the cell up now would only run it harder against low salt.",
+      "how": "There is nothing to do today except leave the cell setting where it is. Let the salt circulate for a full day, then take a fresh reading before you change anything.",
       "dose": null,
       "measured": "378 mV",
       "target": "at least 600 mV",
@@ -241,8 +241,8 @@
       "kind": "watch",
       "priority": 2,
       "because": "The cell is at 100% (from config.json), running 24 hours a day, so there is no headroom left to ask for -- this is not a setting you can turn up. Salt is out of band, and each of those starves the cell in its own way: low salt gives it less to work with, high pH wastes the chlorine it makes, low CYA lets the sun burn it off. Fix those and the same cell will produce more.",
-      "why": "The cell is already at 100% and running 24 hours a day, so there's no setting left to turn up. Low salt, at 987 ppm, gives it too little to work with. Once salt is in band, the same cell will make more chlorine.",
-      "how": "Leave the cell at 100%. Fix the salt first and see what the cell does with the same settings.",
+      "why": "The cell is already at 100% and running 24 hours a day, so you can't turn it up. At 987 ppm of salt, it has little to work with. Fix the salt and the same cell will make more chlorine.",
+      "how": "Leave the cell at 100% and don't touch the output. Once the salt is mixed in, the cell has what it needs. The fresh test after that will show whether it is keeping up.",
       "dose": null,
       "measured": "100%",
       "target": "headroom to turn up",
@@ -258,8 +258,8 @@
       "kind": "watch",
       "priority": 3,
       "because": "The pump is running 24 hours a day, which is a lot -- but on a saltwater pool the pump schedule is the chlorine schedule, because the cell only makes chlorine while water is going through it. With ORP at 378 mV, cutting hours would cut production exactly when you need it. Get ORP comfortably over 600 with the cell below full, and that is the moment to start trimming hours and watching what happens.",
-      "why": "The pump runs 24 hours a day, but on a saltwater pool that schedule is the chlorine schedule, because the cell only makes chlorine while water flows through it. With ORP at 378 mV, cutting hours would cut chlorine production when you need it most.",
-      "how": "Leave the timer exactly as it is. Once ORP is comfortably over 600 and the cell is below full, that's the time to trim hours.",
+      "why": "The pump runs 24 hours a day, but on a saltwater pool the pump schedule is the chlorine schedule. The cell only makes chlorine while water flows through it. With ORP at 378 mV, cutting hours would cut chlorine exactly when you need it.",
+      "how": "Leave the timer alone. Once ORP is comfortably over 600 and the cell is below full output, you can start trimming hours. Until then, nothing changes here.",
       "dose": null,
       "measured": "24 h/day",
       "target": "trim once there's headroom",
@@ -275,8 +275,8 @@
       "kind": "test",
       "priority": 3,
       "because": "Borates aren't on the ICO panel and haven't been tested. The target is 50 ppm; a strip test once a season is enough to know where you are.",
-      "why": "Borates aren't on the ICO panel and haven't been tested, so their level is not measured. The target is 50 ppm. A strip test once a season is enough to know where you stand.",
-      "how": "Use a borate strip or test kit on a sample taken from elbow depth. Write the number down. Don't add anything based on this test today.",
+      "why": "Borates aren't on the ICO panel and haven't been tested. The target is 50 ppm, so today's value is not measured. A strip test once a season is enough to know where you stand.",
+      "how": "Do this when you have the strips out for the chlorine test. Take the sample from elbow depth with the pump running. Dip the strip, read it and write the number down.",
       "dose": null,
       "measured": null,
       "target": "50 ppm",
@@ -314,7 +314,7 @@
     "boric_acid_lb_per_10ppm": 8.6
   },
   "basis": {
-    "date": "2026-10-02",
+    "date": "2026-10-03",
     "reading_id": "ico:2026-10-02T04:51:08",
     "items": [
       "borate_test",
@@ -331,7 +331,7 @@
       "salt_up": 90.0
     }
   },
-  "headline": "Salt is the problem today: 987 ppm against a 2,800–3,200 band",
-  "summary": "The reading is from this morning. Salt is 987 ppm, far under its band, and ORP is 378 mV against a 600 mV floor. Free chlorine, CYA, TA and borates weren't measured. Start by testing free chlorine and getting salt in, since the cell can't do its job without it.",
+  "headline": "Salt is far too low and chlorine is unmeasured: test, then add salt",
+  "summary": "The reading is one day old. Salt is 987 ppm against a 2800-3200 band, so the cell is starved and ORP is sagging at 378 mV. pH is 7.78, inside its 7.6-7.8 band. Free chlorine, CYA, TA and borates were not measured, so start with a strip test and fix the salt.",
   "source": "claude"
 }

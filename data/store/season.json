@@ -2,7 +2,13 @@
   "state": "open",
   "closed_at": null,
   "opened_at": null,
-  "closing": {},
+  "closing": {
+    "final_reading": {
+      "reading_id": "ico:2026-10-02T04:51:08",
+      "note": "reading of 2026-10-02",
+      "recorded_at": "2026-10-03T00:57:39"
+    }
+  },
   "history": [],
-  "updated_at": null
+  "updated_at": "2026-10-03T00:57:39"
 }

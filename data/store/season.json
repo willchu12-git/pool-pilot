@@ -1,14 +1,28 @@
 {
-  "state": "open",
-  "closed_at": null,
+  "state": "closed",
+  "closed_at": "2026-10-02",
   "opened_at": null,
   "closing": {
     "final_reading": {
       "reading_id": "ico:2026-10-02T04:51:08",
       "note": "reading of 2026-10-02",
       "recorded_at": "2026-10-03T00:57:39"
+    },
+    "pro_visit": {
+      "cover": "mesh",
+      "lines_blown": true,
+      "recorded_at": "2026-10-03T05:20:19"
     }
   },
   "history": [],
-  "updated_at": "2026-10-03T00:57:39"
+  "updated_at": "2026-10-03T05:20:19",
+  "close_note": "",
+  "closing_water": {
+    "ph": 7.78,
+    "orp_mv": 378.0,
+    "salt_ppm": 987.0,
+    "water_temp_f": 67.28,
+    "date": "2026-10-02",
+    "id": "ico:2026-10-02T04:51:08"
+  }
 }

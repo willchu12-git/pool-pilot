@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-10-07",
-  "today": "2026-10-07",
+  "generated_at": "2026-10-08",
+  "today": "2026-10-08",
   "title": "Pool Pilot",
   "pool": {
     "gallons": 18000,
@@ -102,8 +102,8 @@
     "The pump must be RUNNING before anything goes in, and keep running afterwards, so a dose disperses instead of sitting in one corner."
   ],
   "checklist": {
-    "date": "2026-10-07",
-    "generated_at": "2026-10-07T18:28:50",
+    "date": "2026-10-08",
+    "generated_at": "2026-10-08T01:01:15",
     "closed": true,
     "reading": null,
     "reading_age_days": null,
@@ -138,10 +138,10 @@
       "boric_acid_lb_per_10ppm": 8.6
     },
     "headline": "Closed for the season.",
-    "summary": "Closed 2026-10-02, 5 days ago. Nothing to dose and nothing to test — the ICO is out of the water, so there are no readings to be had. Everything from closing is on the Season tab, and it will be waiting when you open.",
+    "summary": "Closed 2026-10-02, 6 days ago. Nothing to dose and nothing to test — the ICO is out of the water, so there are no readings to be had. Everything from closing is on the Season tab, and it will be waiting when you open.",
     "source": "closed",
     "basis": {
-      "date": "2026-10-07",
+      "date": "2026-10-08",
       "closed": true,
       "closed_at": "2026-10-02",
       "reading_id": null,
@@ -295,7 +295,7 @@
     {
       "key": "added_acid",
       "label": "Acid",
-      "days": 10,
+      "days": 11,
       "date": "2026-09-27",
       "amount": 25.0,
       "unit": "fl oz",
@@ -306,7 +306,7 @@
     {
       "key": "backwashed_filter",
       "label": "Backwash",
-      "days": 10,
+      "days": 11,
       "date": "2026-09-27",
       "amount": null,
       "unit": "",
@@ -317,7 +317,7 @@
     {
       "key": "emptied_skimmer",
       "label": "Skimmer",
-      "days": 10,
+      "days": 11,
       "date": "2026-09-27",
       "amount": null,
       "unit": "",
@@ -1524,8 +1524,8 @@
     }
   ],
   "trends": {
-    "from": "2026-07-09",
-    "to": "2026-10-07",
+    "from": "2026-07-10",
+    "to": "2026-10-08",
     "days": 90,
     "series": [
       {
@@ -2281,7 +2281,7 @@
   },
   "opening_brief": {
     "closed_at": "2026-10-02",
-    "days_closed": 5,
+    "days_closed": 6,
     "cover": "mesh safety cover",
     "dilution_risk": "high",
     "expect": [
@@ -2293,10 +2293,10 @@
     "notes": [
       "Lines were blown and plugged, so the plugs have to come out before the pump is primed."
     ],
-    "headline": "Closed 2026-10-02, 5 days ago."
+    "headline": "Closed 2026-10-02, 6 days ago."
   },
   "analysis": {
-    "today": "2026-10-07",
+    "today": "2026-10-08",
     "window_days": 90,
     "drift": {
       "ph": {
@@ -2448,7 +2448,7 @@
     "closed": true,
     "closed_at": "2026-10-02",
     "opened_at": null,
-    "days_closed": 5,
+    "days_closed": 6,
     "closing_water": {
       "ph": 7.78,
       "orp_mv": 378.0,
@@ -3388,7 +3388,7 @@
   },
   "disclaimer": "Every dose here is an estimate from your pool's volume and one measurement. Add, circulate, retest -- never dose twice against the same reading. Chemicals are handled at your own risk; when a number looks wrong, trust the water and retest before you trust this app.",
   "basis": {
-    "date": "2026-10-07",
+    "date": "2026-10-08",
     "closed": true,
     "closed_at": "2026-10-02",
     "reading_id": null,

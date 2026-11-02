@@ -1,6 +1,6 @@
 {
-  "date": "2026-11-01",
-  "generated_at": "2026-11-01T17:40:20",
+  "date": "2026-11-02",
+  "generated_at": "2026-11-02T00:45:42",
   "closed": true,
   "reading": null,
   "reading_age_days": null,
@@ -35,10 +35,10 @@
     "boric_acid_lb_per_10ppm": 8.6
   },
   "headline": "Closed for the season.",
-  "summary": "Closed 2026-10-02, 30 days ago. Nothing to dose and nothing to test — the ICO is out of the water, so there are no readings to be had. Everything from closing is on the Season tab, and it will be waiting when you open.",
+  "summary": "Closed 2026-10-02, 31 days ago. Nothing to dose and nothing to test — the ICO is out of the water, so there are no readings to be had. Everything from closing is on the Season tab, and it will be waiting when you open.",
   "source": "closed",
   "basis": {
-    "date": "2026-11-01",
+    "date": "2026-11-02",
     "closed": true,
     "closed_at": "2026-10-02",
     "reading_id": null,

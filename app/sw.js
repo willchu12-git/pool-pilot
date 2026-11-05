@@ -1,7 +1,7 @@
 /* Pool Pilot service worker: cache the shell, never cache the pool data.
    Readings are fetched live from the private repo (or served from localStorage
    when offline), so they never land in the HTTP cache. */
-const SHELL = "poolpilot-shell-2026-11-04-1924";
+const SHELL = "poolpilot-shell-2026-11-05-0648";
 const FILES = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", function(e){
